@@ -1,4 +1,4 @@
-package backend.academy.scrapper.model
+package backend.academy.model
 
 data class ApiErrorResponse (
     val description: String,
@@ -7,7 +7,6 @@ data class ApiErrorResponse (
     val exceptionMessage: String,
     val stacktrace: List<String>
 )
-
 data class LinkResponse (
     val id: Long,
     val url: String,

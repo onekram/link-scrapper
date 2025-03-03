@@ -1,7 +1,7 @@
 package backend.academy.scrapper.controller;
 
 import backend.academy.scrapper.exception.BadRequestException;
-import backend.academy.scrapper.model.ApiErrorResponse;
+import backend.academy.model.ApiErrorResponse;
 import java.util.stream.Stream;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

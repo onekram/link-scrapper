@@ -1,7 +1,7 @@
 package backend.academy.scrapper.repository;
 
 import backend.academy.scrapper.exception.BadRequestException;
-import backend.academy.scrapper.model.AddLinkRequest;
+import backend.academy.model.AddLinkRequest;
 import org.springframework.stereotype.Repository;
 import java.net.MalformedURLException;
 import java.net.URI;

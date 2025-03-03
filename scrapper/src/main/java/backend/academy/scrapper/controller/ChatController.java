@@ -2,7 +2,7 @@ package backend.academy.scrapper.controller;
 
 import backend.academy.scrapper.exception.BadRequestException;
 import backend.academy.scrapper.exception.NotFoundException;
-import backend.academy.scrapper.model.ApiErrorResponse;
+import backend.academy.model.ApiErrorResponse;
 import backend.academy.scrapper.service.ChatService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;

@@ -1,10 +1,10 @@
 package backend.academy.scrapper.service;
 
 import backend.academy.scrapper.exception.NotFoundException;
-import backend.academy.scrapper.model.AddLinkRequest;
-import backend.academy.scrapper.model.LinkResponse;
-import backend.academy.scrapper.model.ListLinksResponse;
-import backend.academy.scrapper.model.RemoveLinkRequest;
+import backend.academy.model.LinkResponse;
+import backend.academy.model.ListLinksResponse;
+import backend.academy.model.RemoveLinkRequest;
+import backend.academy.model.AddLinkRequest;
 import backend.academy.scrapper.repository.LinkRecord;
 import backend.academy.scrapper.repository.LinksRepository;
 import backend.academy.scrapper.repository.ChatRepository;

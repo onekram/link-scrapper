@@ -3,11 +3,11 @@ package backend.academy.scrapper.controller;
 
 import backend.academy.scrapper.exception.BadRequestException;
 import backend.academy.scrapper.exception.NotFoundException;
-import backend.academy.scrapper.model.AddLinkRequest;
-import backend.academy.scrapper.model.ApiErrorResponse;
-import backend.academy.scrapper.model.LinkResponse;
-import backend.academy.scrapper.model.ListLinksResponse;
-import backend.academy.scrapper.model.RemoveLinkRequest;
+import backend.academy.model.AddLinkRequest;
+import backend.academy.model.ApiErrorResponse;
+import backend.academy.model.LinkResponse;
+import backend.academy.model.ListLinksResponse;
+import backend.academy.model.RemoveLinkRequest;
 import backend.academy.scrapper.service.LinksService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
