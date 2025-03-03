@@ -21,9 +21,9 @@ public class StateRepository {
 
     public State getPreviousState(Long id) {
         return getStateRecord(id).getPrevious();
-    }
+    } // TODO Add back button logic
 
     private StateRecord getStateRecord(Long id) {
-        return db.computeIfAbsent(id, key -> new StateRecord(State.START, State.MENU));
+        return db.computeIfAbsent(id, _ -> new StateRecord(State.START, State.MENU));
     }
 }
