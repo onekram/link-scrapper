@@ -136,7 +136,7 @@ public class HandlerConfiguration {
     //TODO FilterHandler
 
     @Bean
-    Handler unTrack(LinksService linksService) {
+    public Handler unTrack(LinksService linksService) {
         return MessageHandler.builder()
             .withFilter(new StateFilter(State.MENU))
             .withFilter(new MessageTextFilter("/untrack"))
@@ -155,7 +155,7 @@ public class HandlerConfiguration {
     }
 
     @Bean
-    Handler inputLinkToUnTrack(LinksService linksService) {
+    public Handler inputLinkToUnTrack(LinksService linksService) {
         return MessageHandler.builder()
             .withFilter(new StateFilter(State.UNTRACK_LINK))
             .nextState(State.MENU)
@@ -173,7 +173,7 @@ public class HandlerConfiguration {
     }
 
     @Bean
-    Handler unrecognizedAnswerHandler() {
+    public Handler unrecognizedAnswerHandler() {
         return MessageHandler.builder()
             .message("\uD83E\uDD37 I don't no such command, try \uD83D\uDD0D /help to find necessary one...")
             .build();
