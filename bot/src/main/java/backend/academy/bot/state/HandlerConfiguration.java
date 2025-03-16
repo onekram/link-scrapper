@@ -6,6 +6,7 @@ import backend.academy.bot.state.filter.MessageTextFilter;
 import backend.academy.bot.state.filter.StateFilter;
 import backend.academy.bot.state.handler.Handler;
 import backend.academy.bot.state.handler.MessageHandler;
+import backend.academy.bot.util.MessageUtil;
 import backend.academy.model.AddLinkRequest;
 import backend.academy.model.LinkResponse;
 import backend.academy.model.ListLinksResponse;
@@ -14,13 +15,20 @@ import com.pengrad.telegrambot.model.Message;
 import com.pengrad.telegrambot.model.request.ReplyKeyboardMarkup;
 import com.pengrad.telegrambot.model.request.ReplyKeyboardRemove;
 import com.pengrad.telegrambot.request.SendMessage;
-import java.util.Collections;
+import java.util.List;
 import java.util.stream.Collectors;
+import lombok.RequiredArgsConstructor;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
+@RequiredArgsConstructor
 public class HandlerConfiguration {
+    public static final @NotNull String ADD_LINK_BUILDER = "addLinkBuilder";
+
+    private final HandlerContextParameters handlerContextParameters;
+
     @Bean
     public Handler startHandler(ChatService chatService) {
         return MessageHandler.builder()
@@ -74,8 +82,9 @@ public class HandlerConfiguration {
             .method(handlerContext -> {
                 Long id = handlerContext.message().chat().id();
                 ListLinksResponse response = linksService.getTrackedLinks(id);
-                String links = response.getLinks().stream() // TODO Create message util class or smth
-                    .map(LinkResponse::getUrl).collect(Collectors.joining("\n"));
+                String links = response.getLinks().stream()
+                    .map(MessageUtil::linkMessage)
+                    .collect(Collectors.joining("\n"));
                 return new SendMessage(
                     id,
                     links.isEmpty()
@@ -99,17 +108,15 @@ public class HandlerConfiguration {
     }
 
     @Bean
-    public Handler linkHandler(LinksService linksService) {
+    public Handler linkHandler() {
         return MessageHandler.builder()
             .withFilter(new StateFilter(State.TRACK_LINK))
             .nextState(State.TRACK_TAGS)
             .method((handlerContext -> {
                 Long id = handlerContext.message().chat().id();
-                linksService.trackLink(
-                    id,
-                    new AddLinkRequest(handlerContext.message().text(), Collections.emptyList(), Collections.emptyList())
-                    //TODO Create builder for AddLinkRequest and put in in handlerContext
-                );
+                String textLink = handlerContext.message().text().strip();
+                AddLinkRequest.Builder builder = new AddLinkRequest.Builder().link(textLink);
+                handlerContextParameters.setParameter(ADD_LINK_BUILDER, builder);
                 return new SendMessage(
                     id,
                     "\uD83C\uDFF7 Input tags..."
@@ -126,14 +133,43 @@ public class HandlerConfiguration {
     public Handler tagsHandler() {
         return MessageHandler.builder()
             .withFilter(new StateFilter(State.TRACK_TAGS))
-            .nextState(State.MENU)
-            .message("✅ Saved your choice")
+            .nextState(State.TRACK_FILTERS)
+            .method(handlerContext -> {
+                Long id = handlerContext.message().chat().id();
+                String text = handlerContext.message().text().strip();
+                AddLinkRequest.Builder builder = handlerContextParameters
+                    .getParameter(ADD_LINK_BUILDER, AddLinkRequest.Builder.class);
+                builder.tags(List.of(text.split("\\s+")));
+                return new SendMessage(
+                    id,
+                    "\uD83D\uDD0D Input filters..."
+                );
+            })
             .keyboard(new ReplyKeyboardRemove())
             .build();
-        //TODO Build AddLinkRequest with tags
     }
 
-    //TODO FilterHandler
+    @Bean
+    public Handler filterHandler(LinksService linksService) {
+        return MessageHandler.builder()
+            .withFilter(new StateFilter(State.TRACK_FILTERS))
+            .nextState(State.MENU)
+            .method(handlerContext -> {
+                Long id = handlerContext.message().chat().id();
+                String text = handlerContext.message().text().strip();
+                AddLinkRequest.Builder builder = handlerContextParameters
+                    .getParameter(ADD_LINK_BUILDER, AddLinkRequest.Builder.class);
+                builder.filters(List.of(text.split("\\s+")));
+                handlerContextParameters.clearParameter(ADD_LINK_BUILDER);
+                linksService.trackLink(id, builder.build());
+                return new SendMessage(
+                    id,
+                    "✅ Saved your choice"
+                );
+            })
+            .keyboard(new ReplyKeyboardRemove())
+            .build();
+    }
 
     @Bean
     public Handler unTrack(LinksService linksService) {
