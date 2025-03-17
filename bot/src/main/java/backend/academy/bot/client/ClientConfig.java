@@ -1,5 +1,6 @@
 package backend.academy.bot.client;
 
+import backend.academy.bot.BotConfig;
 import backend.academy.model.ApiErrorResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
@@ -17,9 +18,9 @@ import reactor.core.publisher.Mono;
 public class ClientConfig {
 
     @Bean
-    public WebClient webClient() {
+    public WebClient webClient(BotConfig botConfig) {
         return WebClient.builder()
-            .baseUrl("http://localhost:8081") // TODO Set independent url
+            .baseUrl(botConfig.scrapperUrl())
             .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
             .defaultHeader(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE)
             .filter(logRequest())
