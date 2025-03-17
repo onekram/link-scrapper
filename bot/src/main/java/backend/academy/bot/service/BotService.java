@@ -1,21 +1,19 @@
 package backend.academy.bot.service;
 
-import backend.academy.bot.repository.state.StateRepository;
-import backend.academy.bot.state.HandlerContext;
-import backend.academy.bot.state.Router;
-import backend.academy.bot.state.State;
+import backend.academy.bot.util.LocalTunnelUtil;
 import com.pengrad.telegrambot.ExceptionHandler;
 import com.pengrad.telegrambot.TelegramBot;
 import com.pengrad.telegrambot.UpdatesListener;
-import com.pengrad.telegrambot.model.Message;
-import com.pengrad.telegrambot.model.Update;
+import com.pengrad.telegrambot.request.DeleteWebhook;
 import com.pengrad.telegrambot.request.GetUpdates;
-import com.pengrad.telegrambot.request.SendMessage;
+import com.pengrad.telegrambot.request.SetWebhook;
+import com.pengrad.telegrambot.response.BaseResponse;
 import jakarta.annotation.PostConstruct;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -23,12 +21,45 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class BotService {
     private final TelegramBot telegramBot;
-    private final Router router;
-    private final StateRepository stateRepository;
+    private final UpdateService updateService;
+
+    @Value("${server.port}")
+    private Integer port;
+
+    @Value("${features.webhook.enabled}")
+    private boolean webhookEnabled;
 
     @PostConstruct
     public void initBot() {
-        telegramBot.setUpdatesListener(updatesListener(), exceptionHandler()); // TODO Use webHook instead
+        if (webhookEnabled) {
+            try {
+                useWebhook();
+            } catch (WebhookException e) {
+                useUpdateListener();
+            }
+        } else {
+            useUpdateListener();
+        }
+    }
+
+    private void useWebhook() throws WebhookException {
+        BaseResponse response;
+        try {
+            String url = LocalTunnelUtil.startLocalTunnel(port);
+            response = telegramBot.execute(new SetWebhook().url(url));
+            log.info("Set webhook response: {}", response);
+        } catch (Exception e) {
+            throw new WebhookException("Error while setting webhook");
+        }
+        if (!response.isOk()) {
+            throw new WebhookException("Webhook is not set");
+        }
+    }
+
+    private void useUpdateListener() {
+        BaseResponse response = telegramBot.execute(new DeleteWebhook());
+        log.info("Delete webhook response: {}", response);
+        telegramBot.setUpdatesListener(updatesListener(), exceptionHandler(), getUpdates());
     }
 
     private GetUpdates getUpdates() {
@@ -37,29 +68,7 @@ public class BotService {
 
     private UpdatesListener updatesListener() {
         return updates -> {
-            for (Update update : updates) {
-                if (update.message() != null) {
-                    Message message = update.message();
-                    long chatId = message.chat().id();
-
-                    try {
-                        State currentState = stateRepository.getCurrentState(chatId);
-                        log.info("Message chatId: {}, current state: {}, text: {}", chatId, currentState, message.text());
-
-                        State nextState = router.process(new HandlerContext(
-                            message,
-                            telegramBot,
-                            currentState
-                        ));
-                        log.info("Move to state: {}", nextState);
-                        stateRepository.saveState(chatId, nextState);
-                    } catch (Exception e) {
-                        log.error("Exception while routing occurred", e);
-                        telegramBot.execute(new SendMessage(chatId, "\uD83D\uDEA8 Error occurs... Try later \uD83D\uDD27"));
-                        stateRepository.saveState(chatId, State.MENU);
-                    }
-                }
-            }
+            updates.forEach(updateService::updateProcess);
             return UpdatesListener.CONFIRMED_UPDATES_ALL;
         };
     }

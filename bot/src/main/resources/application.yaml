@@ -2,6 +2,10 @@ app:
   telegram-token: ${TELEGRAM_TOKEN} # env variable
   scrapper-url: "https://localhost:8081"
 
+features:
+  webhook:
+    enabled: false
+
 spring:
   application:
     name: Bot
