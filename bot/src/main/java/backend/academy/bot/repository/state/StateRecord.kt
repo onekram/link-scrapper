@@ -4,5 +4,4 @@ import backend.academy.bot.state.State
 
 data class StateRecord(
     val current: State,
-    val previous: State
 )

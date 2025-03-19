@@ -10,20 +10,14 @@ public class StateRepository {
     private final Map<Long, StateRecord> db = new ConcurrentHashMap<>();
 
     public void saveState(Long id, State state) {
-        db.merge(id,
-            new StateRecord(state, State.MENU),
-            (oldValue, newValue) -> new StateRecord(newValue.getCurrent(), oldValue.getCurrent()));
+        db.put(id, new StateRecord(state));
     }
 
     public State getCurrentState(Long id) {
         return getStateRecord(id).getCurrent();
     }
 
-    public State getPreviousState(Long id) {
-        return getStateRecord(id).getPrevious();
-    } // TODO Add back button logic
-
     private StateRecord getStateRecord(Long id) {
-        return db.computeIfAbsent(id, _ -> new StateRecord(State.START, State.MENU));
+        return db.computeIfAbsent(id, _ -> new StateRecord(State.START));
     }
 }
