@@ -1,6 +1,6 @@
 app:
   telegram-token: ${TELEGRAM_TOKEN} # env variable
-  scrapper-url: "https://localhost:8081"
+  scrapper-url: "http://localhost:8081"
 
 features:
   webhook:

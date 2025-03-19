@@ -5,6 +5,7 @@ import com.pengrad.telegrambot.TelegramBot;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import java.util.ResourceBundle;
 
 @Configuration
 @RequiredArgsConstructor
@@ -14,5 +15,10 @@ public class BeanConfiguration {
     @Bean
     public TelegramBot telegramBot() {
         return new TelegramBot(botConfig.telegramToken());
+    }
+
+    @Bean
+    public ResourceBundle resourceBundle() {
+        return ResourceBundle.getBundle("message_en");
     }
 }

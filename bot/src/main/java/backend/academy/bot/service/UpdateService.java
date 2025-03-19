@@ -11,6 +11,7 @@ import com.pengrad.telegrambot.request.SendMessage;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import java.util.ResourceBundle;
 
 @Slf4j
 @Service
@@ -19,6 +20,7 @@ public class UpdateService {
     private final TelegramBot telegramBot;
     private final Router router;
     private final StateRepository stateRepository;
+    private final ResourceBundle resourceBundle;
 
     public void updateProcess(Update update) {
         Message message = update.message();
@@ -39,7 +41,7 @@ public class UpdateService {
             stateRepository.saveState(chatId, nextState);
         } catch (Exception e) {
             log.error("Exception while routing occurred", e);
-            telegramBot.execute(new SendMessage(chatId, "\uD83D\uDEA8 Error occurs... Try later \uD83D\uDD27"));
+            telegramBot.execute(new SendMessage(chatId, resourceBundle.getString("error.message")));
             stateRepository.saveState(chatId, State.MENU);
         }
     }

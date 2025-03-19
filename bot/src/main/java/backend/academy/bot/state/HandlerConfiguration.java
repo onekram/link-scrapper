@@ -16,6 +16,7 @@ import com.pengrad.telegrambot.model.request.ReplyKeyboardMarkup;
 import com.pengrad.telegrambot.model.request.ReplyKeyboardRemove;
 import com.pengrad.telegrambot.request.SendMessage;
 import java.util.List;
+import java.util.ResourceBundle;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
@@ -28,6 +29,17 @@ public class HandlerConfiguration {
     public static final @NotNull String ADD_LINK_BUILDER = "addLinkBuilder";
 
     private final HandlerContextParameters handlerContextParameters;
+    private final ResourceBundle resourceBundle;
+
+    @Bean
+    public Handler menuHandler() {
+        return MessageHandler.builder()
+            .withFilter(new MessageTextFilter(resourceBundle.getString("menu.message")))
+            .nextState(State.MENU)
+            .message(resourceBundle.getString("available.list.of.commands.message"))
+            .keyboard(new ReplyKeyboardRemove())
+            .build();
+    }
 
     @Bean
     public Handler startHandler(ChatService chatService) {
@@ -40,7 +52,7 @@ public class HandlerConfiguration {
                 chatService.registerChat(id);
                 return new SendMessage(
                     id,
-                    "Hello! Send \uD83D\uDDE3 /help to see list of command!" // TODO Create message_ru.properties
+                    resourceBundle.getString("welcome.message")
                 );
             })
             .keyboard(new ReplyKeyboardRemove())
@@ -57,7 +69,7 @@ public class HandlerConfiguration {
                 chatService.registerChat(id);
                 return new SendMessage(
                     id,
-                    "You jump to start! Send \uD83D\uDDE3 /help to see list of command!"
+                    resourceBundle.getString("start.message")
                 );
             })
             .keyboard(new ReplyKeyboardRemove())
@@ -68,7 +80,7 @@ public class HandlerConfiguration {
     public Handler helpHandler() {
         return MessageHandler.builder()
             .withFilter(new MessageTextFilter("/help"))
-            .message("Available list of commands:\n▶️ /start\n\uD83D\uDDE3 /help\n\uD83D\uDD0D /track\n\uD83D\uDEAB /untrack\n\uD83D\uDCC3 /list")
+            .message(resourceBundle.getString("available.list.of.commands.message"))
             .keyboard(new ReplyKeyboardRemove())
             .build();
     }
@@ -88,7 +100,7 @@ public class HandlerConfiguration {
                 return new SendMessage(
                     id,
                     links.isEmpty()
-                        ? "\uD83E\uDD14 It seems like you don't track any links\nUse \uD83D\uDD0D /track command"
+                        ? resourceBundle.getString("no.links.message")
                         : links
                 );
             })
@@ -102,8 +114,9 @@ public class HandlerConfiguration {
             .withFilter(new StateFilter(State.MENU))
             .withFilter(new MessageTextFilter("/track"))
             .nextState(State.TRACK_LINK)
-            .message("\uD83D\uDCDD Input link to resource...")
+            .message(resourceBundle.getString("input.resource.link.message"))
             .keyboard(new ReplyKeyboardRemove())
+            .menuButton(true)
             .build();
     }
 
@@ -119,13 +132,14 @@ public class HandlerConfiguration {
                 handlerContextParameters.setParameter(ADD_LINK_BUILDER, builder);
                 return new SendMessage(
                     id,
-                    "\uD83C\uDFF7 Input tags..."
+                    resourceBundle.getString("input.tags.message")
                 );
             }))
             .keyboard(
                 new ReplyKeyboardMarkup("Work", "Study")
                     .oneTimeKeyboard(true)
                     .resizeKeyboard(true))
+            .menuButton(true)
             .build();
     }
 
@@ -142,7 +156,7 @@ public class HandlerConfiguration {
                 builder.tags(List.of(text.split("\\s+")));
                 return new SendMessage(
                     id,
-                    "\uD83D\uDD0D Input filters..."
+                    resourceBundle.getString("input.filters.message")
                 );
             })
             .keyboard(new ReplyKeyboardRemove())
@@ -164,7 +178,7 @@ public class HandlerConfiguration {
                 linksService.trackLink(id, builder.build());
                 return new SendMessage(
                     id,
-                    "✅ Saved your choice"
+                    resourceBundle.getString("saved.message")
                 );
             })
             .keyboard(new ReplyKeyboardRemove())
@@ -184,8 +198,8 @@ public class HandlerConfiguration {
                     .toArray(String[]::new);
                 return new SendMessage(
                     id,
-                    "✅ Choose links to untrack \uD83D\uDC47"
-                ).replyMarkup(new ReplyKeyboardMarkup(links));
+                    resourceBundle.getString("untrack.links.message")
+                ).replyMarkup(new ReplyKeyboardMarkup(links).addRow(resourceBundle.getString("menu.message")));
             })
             .build();
     }
@@ -201,7 +215,7 @@ public class HandlerConfiguration {
                 LinkResponse linkResponse = linksService.untrackLink(chatId, new RemoveLinkRequest(message.text()));
                 return new SendMessage(
                     chatId,
-                    "\uD83D\uDEAB Unsubscribed from " + linkResponse.getUrl()
+                    resourceBundle.getString("unsubscribed.message") + " " + linkResponse.getUrl()
                 );
             })
             .keyboard(new ReplyKeyboardRemove())
@@ -211,7 +225,8 @@ public class HandlerConfiguration {
     @Bean
     public Handler unrecognizedAnswerHandler() {
         return MessageHandler.builder()
-            .message("\uD83E\uDD37 I don't no such command, try \uD83D\uDD0D /help to find necessary one...")
+            .message(resourceBundle.getString("unsupported.command.message"))
+            .menuButton(true)
             .build();
     }
 }
