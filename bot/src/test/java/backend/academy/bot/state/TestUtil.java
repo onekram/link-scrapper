@@ -21,4 +21,8 @@ public class TestUtil {
 
         return new HandlerContext(message, new TelegramBot("123"), State.START);
     }
+
+    public static HandlerContext generateHandlerContext(State state) {
+        return new HandlerContext(new Message(), new TelegramBot("123"), state);
+    }
 }
