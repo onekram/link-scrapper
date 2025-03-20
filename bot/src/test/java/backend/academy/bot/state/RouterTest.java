@@ -1,8 +1,6 @@
 package backend.academy.bot.state;
 
 import backend.academy.bot.state.handler.Handler;
-import com.pengrad.telegrambot.TelegramBot;
-import com.pengrad.telegrambot.model.Message;
 import java.util.ArrayList;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -12,6 +10,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
+import static backend.academy.bot.state.TestUtil.generateHandlerContext;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.never;
@@ -74,9 +73,5 @@ class RouterTest {
 
 
         assertEquals(State.MENU, router.process(generateHandlerContext()));
-    }
-
-    private static HandlerContext generateHandlerContext() {
-        return new HandlerContext(new Message(), new TelegramBot("123"), State.START);
     }
 }
