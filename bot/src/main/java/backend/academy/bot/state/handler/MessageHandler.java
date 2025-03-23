@@ -10,25 +10,42 @@ import java.util.List;
 import java.util.ResourceBundle;
 import java.util.function.Function;
 import java.util.function.Predicate;
+import jakarta.annotation.PostConstruct;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Singular;
 import org.springframework.beans.factory.annotation.Autowired;
 
-@Builder
 public class MessageHandler implements Handler {
-    @Singular("withFilter")
     private final List<Predicate<HandlerContext>> filters;
     @Getter
-    @Builder.Default
     private State nextState = State.MENU;
     private final String message;
     private final Function<HandlerContext, SendMessage> method;
     private Keyboard keyboard;
-    private boolean menuButton;
+    private final boolean menuButton;
 
     @Autowired
     private ResourceBundle resourceBundle;
+
+    @Builder
+    private MessageHandler(@Singular("withFilter") List<Predicate<HandlerContext>> filters,
+                           State nextState, String message,
+                           Function<HandlerContext, SendMessage> method,
+                           Keyboard keyboard,
+                           boolean menuButton) {
+        this.filters = filters;
+        this.nextState = nextState == null ? this.nextState : nextState;
+        this.message = message;
+        this.method = method;
+        this.keyboard = keyboard;
+        this.menuButton = menuButton;
+    }
+
+    @PostConstruct
+    private void postConstruct() {
+        updateKeyboard();
+    }
 
     @Override
     public boolean handle(HandlerContext context) {
@@ -43,30 +60,24 @@ public class MessageHandler implements Handler {
         SendMessage response = method == null
             ? new SendMessage(context.message().chat().id(), message)
             : method.apply(context);
-        response = addKeyboard(response);
+        if (keyboard != null) {
+            response.replyMarkup(keyboard);
+        }
         context.bot().execute(response);
     }
 
-    private SendMessage addKeyboard(SendMessage response) {
+    private void updateKeyboard() {
         switch (keyboard) {
             case null -> {
                 if (menuButton) {
-                    return response.replyMarkup(new ReplyKeyboardMarkup(resourceBundle.getString("menu.message")));
+                    keyboard = new ReplyKeyboardMarkup(resourceBundle.getString("menu.message"));
                 }
-                return response;
             }
-            case ReplyKeyboardRemove ignored -> {
-                if (menuButton) {
-                    return response.replyMarkup(new ReplyKeyboardMarkup(resourceBundle.getString("menu.message")));
-                }
-                return response.replyMarkup(keyboard);
-            }
-            case ReplyKeyboardMarkup replyKeyboardMarkup when menuButton -> {
-                return response.replyMarkup(replyKeyboardMarkup.addRow(resourceBundle.getString("menu.message")));
-            }
-            default -> {
-                return response.replyMarkup(keyboard);
-            }
+            case ReplyKeyboardRemove ignored when menuButton ->
+                keyboard = new ReplyKeyboardMarkup(resourceBundle.getString("menu.message"));
+            case ReplyKeyboardMarkup replyKeyboardMarkup when menuButton ->
+                replyKeyboardMarkup.addRow(resourceBundle.getString("menu.message"));
+            default -> {}
         }
     }
 }

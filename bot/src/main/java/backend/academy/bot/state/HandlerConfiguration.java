@@ -159,6 +159,7 @@ public class HandlerConfiguration {
                     resourceBundle.getString("input.filters.message")
                 );
             })
+            .menuButton(true)
             .keyboard(new ReplyKeyboardRemove())
             .build();
     }
