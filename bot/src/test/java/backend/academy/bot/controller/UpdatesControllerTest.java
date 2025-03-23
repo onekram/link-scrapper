@@ -11,7 +11,6 @@ import org.mockito.ArgumentCaptor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.context.annotation.Description;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
@@ -56,8 +55,8 @@ class UpdatesControllerTest {
         assertThat(sentMessages.getFirst()).extracting(TestUtil::getId).isEqualTo(123L);
         assertThat(sentMessages.getLast()).extracting(TestUtil::getId).isEqualTo(456L);
 
-        assertThat(sentMessages.getFirst()).extracting(TestUtil::getText).isEqualTo("Updates detected");
-        assertThat(sentMessages.getLast()).extracting(TestUtil::getText).isEqualTo("Updates detected");
+        assertThat(sentMessages.getFirst()).extracting(TestUtil::getText).isEqualTo("\uD83C\uDD95 description for url url");
+        assertThat(sentMessages.getLast()).extracting(TestUtil::getText).isEqualTo("\uD83C\uDD95 description for url url");
     }
 
     @Test
