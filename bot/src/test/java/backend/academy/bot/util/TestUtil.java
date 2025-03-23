@@ -2,15 +2,19 @@ package backend.academy.bot.util;
 
 import backend.academy.bot.state.HandlerContext;
 import backend.academy.bot.state.State;
+import backend.academy.model.LinkUpdate;
 import com.pengrad.telegrambot.TelegramBot;
 import com.pengrad.telegrambot.model.Chat;
 import com.pengrad.telegrambot.model.Message;
 import com.pengrad.telegrambot.model.Update;
 import com.pengrad.telegrambot.model.message.MaybeInaccessibleMessage;
+import com.pengrad.telegrambot.request.BaseRequest;
+import com.pengrad.telegrambot.request.SendMessage;
 import lombok.SneakyThrows;
 import lombok.experimental.UtilityClass;
 import java.lang.reflect.Field;
-import static java.awt.SystemColor.text;
+import java.util.List;
+import java.util.Map;
 
 @UtilityClass
 public class TestUtil {
@@ -58,5 +62,24 @@ public class TestUtil {
         field.set(update, message);
 
         return update;
+    }
+
+    public LinkUpdate generateLinkUpdate(Long... ids) {
+        return new LinkUpdate(42L, "url", "description", List.of(ids));
+    }
+
+    public Long getId(SendMessage sendMessage) {
+        return (Long) getParameters(sendMessage).get("chat_id");
+    }
+
+    public String getText(SendMessage sendMessage) {
+        return (String) getParameters(sendMessage).get("text");
+    }
+
+    @SneakyThrows
+    private Map<String, Object> getParameters(SendMessage sendMessage) {
+        Field field = BaseRequest.class.getDeclaredField("parameters");
+        field.setAccessible(true);
+        return (Map<String, Object>) field.get(sendMessage);
     }
 }
