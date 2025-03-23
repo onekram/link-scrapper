@@ -42,3 +42,10 @@ data class AddLinkRequest (
 data class RemoveLinkRequest (
     val link: String
 )
+
+data class LinkUpdate (
+    val id: Long,
+    val url: String,
+    val description: String,
+    val tgChatIds: List<Long>
+)
