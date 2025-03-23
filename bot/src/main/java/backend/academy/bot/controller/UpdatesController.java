@@ -12,12 +12,17 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import java.io.IOException;
+import java.util.stream.Stream;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
 @RestController
 @Slf4j
@@ -53,5 +58,19 @@ public class UpdatesController {
                 }
             }));
         return ResponseEntity.ok().build();
+    }
+
+    @ExceptionHandler({MethodArgumentTypeMismatchException.class, HttpMessageNotReadableException.class})
+    public ResponseEntity<ApiErrorResponse> invalidParameters(Exception ex) {
+        HttpStatus status = HttpStatus.BAD_REQUEST;
+        return ResponseEntity.status(status).body(
+            new ApiErrorResponse(
+                "Некорректные параметры запроса",
+                String.valueOf(status.value()),
+                ex.getClass().getSimpleName(),
+                ex.getMessage(),
+                Stream.of(ex.getStackTrace()).map(StackTraceElement::toString).toList()
+            )
+        );
     }
 }
