@@ -21,8 +21,12 @@ public abstract class AbstractUpdateService implements UpdateService {
             .filter(entry -> isUpdated(entry.getValue(), from))
             .collect(Collectors.groupingBy(entry -> entry.getValue().getUrl().toString(),
                 Collectors.mapping(Map.Entry::getKey, Collectors.toList()))).entrySet().stream()
-            .map(entry -> new LinkUpdate(System.currentTimeMillis(), entry.getKey(), getMessage(), entry.getValue()))
+            .map(this::buildLinkUpdate)
             .toList();
+    }
+
+    private LinkUpdate buildLinkUpdate(Map.Entry<String, List<Long>> entry) {
+        return new LinkUpdate(System.currentTimeMillis(), entry.getKey(), getMessage(), entry.getValue());
     }
 
     protected abstract boolean isUpdated(LinkRecord linkRecord, Instant from);

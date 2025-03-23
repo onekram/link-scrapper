@@ -9,7 +9,12 @@ public enum LinkType {
     GITHUB("^(?:https?://)?"
         + "github\\.com/"
         + "([^/]+)/"
-        + "([^/]+)$");
+        + "([^/]+)$"),
+
+   STACK_OVERFLOW("^(?:https?://)?"
+        + "stackoverflow\\.com/questions/"
+        + "(\\d+)"
+        + "(?:/[^/]+)?$");
 
     private final Pattern pattern;
 

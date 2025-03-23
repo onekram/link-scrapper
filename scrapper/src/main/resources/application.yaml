@@ -6,6 +6,7 @@ app:
   github-api-url: "https://api.github.com"
   bot-url: "http://localhost:8080"
   fixed-rate-scheduling: 4000
+  stack-overflow-api-url: "https://api.stackexchange.com/2.3"
 
 spring:
   application:
