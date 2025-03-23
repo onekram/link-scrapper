@@ -46,7 +46,7 @@ public class UpdatesController {
         produces = { "application/json" })
     public ResponseEntity<Void> sendUpdates(@RequestBody LinkUpdate linkUpdate) {
         linkUpdate.getTgChatIds().forEach(
-            chatId -> telegramBot.execute(new SendMessage(chatId, "Updates detected"), new Callback<SendMessage, SendResponse>() {
+            chatId -> telegramBot.execute(new SendMessage(chatId, "\uD83C\uDD95 " + linkUpdate.getDescription() + " for url " + linkUpdate.getUrl()), new Callback<SendMessage, SendResponse>() {
                 @Override
                 public void onResponse(SendMessage request, SendResponse response) {
                     log.info("Message sent: {} with response: {}", request, response);
