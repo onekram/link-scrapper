@@ -1,6 +1,6 @@
 package backend.academy.scrapper.client.github;
 
-import backend.academy.scrapper.client.model.RepositoryResponse;
+import backend.academy.scrapper.client.model.GithubRepositoryResponse;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.service.annotation.GetExchange;
 import org.springframework.web.service.annotation.HttpExchange;
@@ -9,5 +9,5 @@ import org.springframework.web.service.annotation.HttpExchange;
 public interface GithubReposClient {
 
     @GetExchange("/{owner}/{repo}")
-    RepositoryResponse checkForUpdates(@PathVariable String owner, @PathVariable String repo);
+    GithubRepositoryResponse checkForUpdates(@PathVariable String owner, @PathVariable String repo);
 }

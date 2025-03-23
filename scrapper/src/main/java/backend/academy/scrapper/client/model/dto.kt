@@ -3,7 +3,7 @@ package backend.academy.scrapper.client.model
 import com.fasterxml.jackson.annotation.JsonProperty
 import java.time.Instant
 
-data class RepositoryResponse(
+data class GithubRepositoryResponse(
     @JsonProperty("updated_at")
     val lastUpdate: Instant
 )

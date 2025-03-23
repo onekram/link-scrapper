@@ -2,7 +2,7 @@ package backend.academy.scrapper.update;
 
 import backend.academy.model.LinkUpdate;
 import backend.academy.scrapper.client.github.GithubReposClient;
-import backend.academy.scrapper.client.model.RepositoryResponse;
+import backend.academy.scrapper.client.model.GithubRepositoryResponse;
 import backend.academy.scrapper.parser.LinkType;
 import backend.academy.scrapper.repository.LinkRecord;
 import backend.academy.scrapper.service.LinksService;
@@ -44,7 +44,7 @@ class GithubUpdateServiceTest {
             )
         );
         Instant now = Instant.now();
-        when(githubReposClient.checkForUpdates(any(), any())).thenReturn(new RepositoryResponse(now));
+        when(githubReposClient.checkForUpdates(any(), any())).thenReturn(new GithubRepositoryResponse(now));
 
         var actualUpdates = githubUpdateService.getUpdates(now.minusMillis(1000));
 
