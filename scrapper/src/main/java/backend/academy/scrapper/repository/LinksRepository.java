@@ -2,6 +2,7 @@ package backend.academy.scrapper.repository;
 
 import backend.academy.scrapper.exception.BadRequestException;
 import backend.academy.model.AddLinkRequest;
+import backend.academy.scrapper.parser.LinkType;
 import org.springframework.stereotype.Repository;
 import java.net.MalformedURLException;
 import java.net.URI;
@@ -15,7 +16,8 @@ public class LinksRepository {
 
     public LinkRecord addLink(Long id, AddLinkRequest request) {
         try {
-            LinkRecord linkRecord = new LinkRecord(id, new URI(request.getLink()).toURL(),  request.getTags(), request.getFilters());
+            LinkType linkType = LinkType.getType(request.getLink()).orElse(null);
+            LinkRecord linkRecord = new LinkRecord(id, new URI(request.getLink()).toURL(), request.getTags(), request.getFilters(), linkType);
             db.put(id, linkRecord);
             return linkRecord;
         } catch (URISyntaxException | MalformedURLException | IllegalArgumentException ex) {

@@ -30,4 +30,8 @@ public class ChatRepository {
     public void addLink(Long id, Long linkId) {
         db.computeIfAbsent(id, key -> new ChatRecord(id, new ArrayList<>())).getLinks().add(linkId);
     }
+
+    public List<Long> fetchAll() {
+        return db.keySet().stream().toList();
+    }
 }

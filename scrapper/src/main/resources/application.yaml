@@ -3,6 +3,9 @@ app:
   stackoverflow:
     key: ${SO_TOKEN_KEY}
     access-token: ${SO_ACCESS_TOKEN}
+  github-api-url: "https://api.github.com"
+  bot-url: "http://localhost:8080"
+  fixed-rate-scheduling: 4000
 
 spring:
   application:

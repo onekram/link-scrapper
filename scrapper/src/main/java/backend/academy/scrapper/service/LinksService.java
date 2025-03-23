@@ -1,17 +1,21 @@
 package backend.academy.scrapper.service;
 
-import backend.academy.scrapper.exception.NotFoundException;
+import backend.academy.model.AddLinkRequest;
 import backend.academy.model.LinkResponse;
 import backend.academy.model.ListLinksResponse;
 import backend.academy.model.RemoveLinkRequest;
-import backend.academy.model.AddLinkRequest;
+import backend.academy.scrapper.exception.NotFoundException;
+import backend.academy.scrapper.parser.LinkType;
+import backend.academy.scrapper.repository.ChatRepository;
 import backend.academy.scrapper.repository.LinkRecord;
 import backend.academy.scrapper.repository.LinksRepository;
-import backend.academy.scrapper.repository.ChatRepository;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import java.util.List;
-import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor
@@ -54,6 +58,19 @@ public class LinksService {
             .orElseThrow(() -> new NotFoundException(String.format("Не существует ссылки: %s", request.getLink())));
         linksRepository.removeLink(record.getId());
         return recordToResponse(record);
+    }
+
+    public Map<Long, List<LinkRecord>> fetchIdAndLinksByType(LinkType linkType) {
+        return chatRepository.fetchAll().stream()
+            .collect(
+                Collectors.toMap(
+                    Function.identity(),
+                    id -> chatRepository.getLinks(id).stream()
+                        .map(linksRepository::getLink)
+                        .filter(Objects::nonNull)
+                        .filter(link -> Objects.equals(link.getType(), linkType))
+                        .toList()
+                ));
     }
 
     private LinkResponse recordToResponse(LinkRecord record) {
