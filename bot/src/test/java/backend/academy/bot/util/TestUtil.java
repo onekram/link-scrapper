@@ -2,19 +2,24 @@ package backend.academy.bot.util;
 
 import backend.academy.bot.state.HandlerContext;
 import backend.academy.bot.state.State;
+import backend.academy.bot.state.handler.MessageHandler;
 import backend.academy.model.LinkUpdate;
 import com.pengrad.telegrambot.TelegramBot;
 import com.pengrad.telegrambot.model.Chat;
 import com.pengrad.telegrambot.model.Message;
 import com.pengrad.telegrambot.model.Update;
-import com.pengrad.telegrambot.model.message.MaybeInaccessibleMessage;
+import com.pengrad.telegrambot.model.request.Keyboard;
+import com.pengrad.telegrambot.model.request.KeyboardButton;
 import com.pengrad.telegrambot.request.BaseRequest;
-import java.lang.reflect.Field;
-import java.sql.Ref;
 import java.util.List;
+import java.util.function.Function;
+import java.util.function.Predicate;
+import java.util.stream.Stream;
 import lombok.SneakyThrows;
 import lombok.experimental.UtilityClass;
 import org.springframework.test.util.ReflectionTestUtils;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @UtilityClass
 public class TestUtil {
@@ -59,5 +64,39 @@ public class TestUtil {
 
     public static String getText(BaseRequest<?, ?> sendMessage) {
         return (String) sendMessage.getParameters().get("text");
+    }
+
+    public static Keyboard getKeyboardFromHandler(MessageHandler messageHandler) {
+        return (Keyboard) ReflectionTestUtils.getField(messageHandler, "keyboard");
+    }
+
+    public static void assertContainsButton(MessageHandler messageHandler, String... texts) {
+        Keyboard keyboard = getKeyboardFromHandler(messageHandler);
+        assertNotNull(keyboard);
+        assertContainsButton(keyboard, texts);
+    }
+
+    public static void assertContainsButton(Keyboard keyboard, String... texts) {
+        assertContainOrNot(keyboard, stream -> stream::anyMatch, texts);
+    }
+
+    public static void assertDoesntContainButton(Keyboard keyboard, String... texts) {
+        assertContainOrNot(keyboard, stream -> stream::noneMatch, texts);
+    }
+
+    @SuppressWarnings("unchecked")
+    private static void assertContainOrNot(Keyboard keyboard, Function<Stream<KeyboardButton>, Predicate<Predicate<KeyboardButton>>> matchFunction, String... texts) {
+        List<List<KeyboardButton>> buttonsRows = (List<List<KeyboardButton>>) ReflectionTestUtils.getField(keyboard, "keyboard");
+        assertNotNull(buttonsRows);
+
+        for (String text : texts) {
+            assertTrue(matchFunction.apply(buttonsRows.stream().flatMap(List::stream)).test(
+                keyboardButton -> {
+                    String buttonText = (String) ReflectionTestUtils.getField(keyboardButton, "text");
+                    assertNotNull(buttonText);
+                    return buttonText.contains(text);
+                }
+            ));
+        }
     }
 }
