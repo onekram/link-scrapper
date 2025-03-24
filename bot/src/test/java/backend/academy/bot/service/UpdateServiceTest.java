@@ -1,22 +1,10 @@
 package backend.academy.bot.service;
 
-import static backend.academy.bot.util.LoggerTestUtil.appenderContainsLog;
-import static backend.academy.bot.util.LoggerTestUtil.getListAppender;
-import static backend.academy.bot.util.TestUtil.generateMessage;
-import static backend.academy.bot.util.TestUtil.generateUpdate;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-
 import backend.academy.bot.repository.state.StateRepository;
 import backend.academy.bot.state.HandlerContext;
 import backend.academy.bot.state.Router;
 import backend.academy.bot.state.State;
+import backend.academy.bot.util.TestUtil;
 import ch.qos.logback.classic.Level;
 import com.pengrad.telegrambot.TelegramBot;
 import com.pengrad.telegrambot.model.Message;
@@ -30,6 +18,18 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import static backend.academy.bot.util.LoggerTestUtil.appenderContainsLog;
+import static backend.academy.bot.util.LoggerTestUtil.getListAppender;
+import static backend.academy.bot.util.TestUtil.generateMessage;
+import static backend.academy.bot.util.TestUtil.generateUpdate;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class UpdateServiceTest {
@@ -88,7 +88,7 @@ class UpdateServiceTest {
     }
 
     @Test
-    @DisplayName("Happy path")
+    @DisplayName("Router throw Exception")
     void exception() {
         var appender = getListAppender(UpdateService.class);
 
@@ -106,7 +106,7 @@ class UpdateServiceTest {
         verify(stateRepository, times(1)).saveState(123L, State.MENU);
         verify(telegramBot, times(1)).execute(argumentCaptor.capture());
         SendMessage sendMessage = argumentCaptor.getValue();
-        assertEquals("Error", sendMessage.getParameters().get("text"));
+        assertEquals("Error", TestUtil.getText(sendMessage));
 
         assertTrue(appenderContainsLog(appender, Level.ERROR, "Exception while routing occurred"));
     }
