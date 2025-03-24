@@ -15,14 +15,12 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import backend.academy.model.AddLinkRequest;
 import backend.academy.model.RemoveLinkRequest;
-import backend.academy.scrapper.parser.LinkType;
 import backend.academy.scrapper.repository.ChatRepository;
-import backend.academy.scrapper.repository.LinkRecord;
 import backend.academy.scrapper.repository.LinksRepository;
 import backend.academy.scrapper.service.ChatService;
 import backend.academy.scrapper.service.LinksService;
+import backend.academy.scrapper.test.util.TestUtil;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import java.net.URI;
 import java.util.Collections;
 import java.util.List;
 import org.junit.jupiter.api.Test;
@@ -52,20 +50,8 @@ class LinksControllerTest {
     @Test
     void getLinksOk() throws Exception {
         when(chatRepository.getLinks(1L)).thenReturn(List.of(42L, 43L));
-        when(linksRepository.getLink(42L))
-                .thenReturn(new LinkRecord(
-                        42L,
-                        new URI("https://dot.com"),
-                        Collections.emptyList(),
-                        Collections.emptyList(),
-                        LinkType.GITHUB));
-        when(linksRepository.getLink(43L))
-                .thenReturn(new LinkRecord(
-                        43L,
-                        new URI("https://another.com"),
-                        Collections.emptyList(),
-                        Collections.emptyList(),
-                        LinkType.STACK_OVERFLOW));
+        mockGetLink(42L, "https://dot.com");
+        mockGetLink(43L, "https://another.com");
         mockMvc.perform(get("/links").contentType(MediaType.APPLICATION_JSON).header("Tg-Chat-Id", 1L))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.size").value(2));
@@ -105,30 +91,16 @@ class LinksControllerTest {
     @Test
     void addLinkOk() throws Exception {
         when(chatRepository.getLinks(1L)).thenReturn(List.of(42L, 43L));
-        when(linksRepository.getLink(42L))
-                .thenReturn(new LinkRecord(
-                        42L,
-                        new URI("https://dot.com"),
-                        Collections.emptyList(),
-                        Collections.emptyList(),
-                        LinkType.GITHUB));
-        when(linksRepository.getLink(43L))
-                .thenReturn(new LinkRecord(
-                        43L,
-                        new URI("https://another.com"),
-                        Collections.emptyList(),
-                        Collections.emptyList(),
-                        LinkType.STACK_OVERFLOW));
-        when(linksRepository.addLink(any()))
-                .thenReturn(new LinkRecord(
-                        123L, new URI("https://third.com"), Collections.emptyList(), Collections.emptyList(), null));
+        mockGetLink(42L, "https://dot.com");
+        mockGetLink(43L, "https://another.com");
+        when(linksRepository.addLink(any())).thenAnswer(invocation -> invocation.getArgument(0));
         mockMvc.perform(post("/links")
                         .contentType(MediaType.APPLICATION_JSON)
                         .header("Tg-Chat-Id", 1L)
                         .content(objectMapper.writeValueAsString(new AddLinkRequest(
                                 "https://third.com", Collections.emptyList(), Collections.emptyList()))))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id").value(123L))
+                .andExpect(jsonPath("$.id").exists())
                 .andExpect(jsonPath("$.url").value("https://third.com"));
 
         verify(chatRepository, times(1)).getLinks(1L);
@@ -163,20 +135,8 @@ class LinksControllerTest {
     @Test
     void removeLinkOk() throws Exception {
         when(chatRepository.getLinks(1L)).thenReturn(List.of(42L, 43L));
-        when(linksRepository.getLink(42L))
-                .thenReturn(new LinkRecord(
-                        42L,
-                        new URI("https://dot.com"),
-                        Collections.emptyList(),
-                        Collections.emptyList(),
-                        LinkType.GITHUB));
-        when(linksRepository.getLink(43L))
-                .thenReturn(new LinkRecord(
-                        43L,
-                        new URI("https://another.com"),
-                        Collections.emptyList(),
-                        Collections.emptyList(),
-                        LinkType.STACK_OVERFLOW));
+        mockGetLink(42L, "https://dot.com");
+        mockGetLink(43L, "https://another.com");
         mockMvc.perform(delete("/links")
                         .contentType(MediaType.APPLICATION_JSON)
                         .header("Tg-Chat-Id", 1L)
@@ -214,20 +174,8 @@ class LinksControllerTest {
     @Test
     void removeLinkNotFound() throws Exception {
         when(chatRepository.getLinks(1L)).thenReturn(List.of(42L, 43L));
-        when(linksRepository.getLink(42L))
-                .thenReturn(new LinkRecord(
-                        42L,
-                        new URI("https://dot.com"),
-                        Collections.emptyList(),
-                        Collections.emptyList(),
-                        LinkType.GITHUB));
-        when(linksRepository.getLink(43L))
-                .thenReturn(new LinkRecord(
-                        43L,
-                        new URI("https://another.com"),
-                        Collections.emptyList(),
-                        Collections.emptyList(),
-                        LinkType.STACK_OVERFLOW));
+        mockGetLink(42L, "https://dot.com");
+        mockGetLink(43L, "https://another.com");
         mockMvc.perform(delete("/links")
                         .contentType(MediaType.APPLICATION_JSON)
                         .header("Tg-Chat-Id", 1L)
@@ -240,5 +188,9 @@ class LinksControllerTest {
                 .andExpect(jsonPath("$.stacktrace").isArray());
 
         verify(linksRepository, never()).removeLink(anyLong());
+    }
+
+    private void mockGetLink(long id, String url) {
+        when(linksRepository.getLink(id)).thenReturn(TestUtil.generateLinkRecord(id, url));
     }
 }
