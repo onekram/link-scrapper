@@ -1,4 +1,4 @@
-package backend.academy.bot.util;
+package backend.academy.bot.test.utils;
 
 import static org.slf4j.LoggerFactory.getLogger;
 

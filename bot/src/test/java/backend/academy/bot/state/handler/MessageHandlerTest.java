@@ -15,7 +15,7 @@ import static org.mockito.Mockito.when;
 
 import backend.academy.bot.state.HandlerContext;
 import backend.academy.bot.state.State;
-import backend.academy.bot.util.TestUtil;
+import backend.academy.bot.test.utils.TestUtil;
 import com.pengrad.telegrambot.TelegramBot;
 import com.pengrad.telegrambot.model.request.Keyboard;
 import com.pengrad.telegrambot.model.request.ReplyKeyboardMarkup;

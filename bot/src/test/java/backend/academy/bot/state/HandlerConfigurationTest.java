@@ -12,7 +12,7 @@ import static org.mockito.Mockito.when;
 
 import backend.academy.bot.service.ChatService;
 import backend.academy.bot.service.LinksService;
-import backend.academy.bot.util.TestUtil;
+import backend.academy.bot.test.utils.TestUtil;
 import backend.academy.model.AddLinkRequest;
 import backend.academy.model.ListLinksResponse;
 import backend.academy.model.RemoveLinkRequest;

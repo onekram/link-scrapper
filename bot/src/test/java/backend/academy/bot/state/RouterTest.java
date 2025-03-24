@@ -1,6 +1,6 @@
 package backend.academy.bot.state;
 
-import static backend.academy.bot.util.TestUtil.generateHandlerContext;
+import static backend.academy.bot.test.utils.TestUtil.generateHandlerContext;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.never;

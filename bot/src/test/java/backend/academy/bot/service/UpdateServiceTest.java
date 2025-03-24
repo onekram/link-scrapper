@@ -1,9 +1,9 @@
 package backend.academy.bot.service;
 
-import static backend.academy.bot.util.LoggerTestUtil.appenderContainsLog;
-import static backend.academy.bot.util.LoggerTestUtil.getListAppender;
-import static backend.academy.bot.util.TestUtil.generateMessage;
-import static backend.academy.bot.util.TestUtil.generateUpdate;
+import static backend.academy.bot.test.utils.LoggerTestUtil.appenderContainsLog;
+import static backend.academy.bot.test.utils.LoggerTestUtil.getListAppender;
+import static backend.academy.bot.test.utils.TestUtil.generateMessage;
+import static backend.academy.bot.test.utils.TestUtil.generateUpdate;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
@@ -17,7 +17,7 @@ import backend.academy.bot.repository.state.StateRepository;
 import backend.academy.bot.state.HandlerContext;
 import backend.academy.bot.state.Router;
 import backend.academy.bot.state.State;
-import backend.academy.bot.util.TestUtil;
+import backend.academy.bot.test.utils.TestUtil;
 import ch.qos.logback.classic.Level;
 import com.pengrad.telegrambot.TelegramBot;
 import com.pengrad.telegrambot.model.Message;

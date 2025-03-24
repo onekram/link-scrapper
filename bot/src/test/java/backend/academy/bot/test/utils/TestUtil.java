@@ -1,4 +1,4 @@
-package backend.academy.bot.util;
+package backend.academy.bot.test.utils;
 
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertNotNull;

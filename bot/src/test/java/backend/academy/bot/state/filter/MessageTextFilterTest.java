@@ -1,6 +1,6 @@
 package backend.academy.bot.state.filter;
 
-import static backend.academy.bot.util.TestUtil.generateHandlerContext;
+import static backend.academy.bot.test.utils.TestUtil.generateHandlerContext;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.util.stream.Stream;
