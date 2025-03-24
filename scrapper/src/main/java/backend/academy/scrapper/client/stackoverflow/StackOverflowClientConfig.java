@@ -2,15 +2,18 @@ package backend.academy.scrapper.client.stackoverflow;
 
 import backend.academy.scrapper.ScrapperConfig;
 import backend.academy.scrapper.client.model.StackOverflowApiErrorResponse;
+import java.net.URI;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
+import org.springframework.web.reactive.function.client.ClientRequest;
 import org.springframework.web.reactive.function.client.ExchangeFilterFunction;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.support.WebClientAdapter;
 import org.springframework.web.service.invoker.HttpServiceProxyFactory;
+import org.springframework.web.util.UriComponentsBuilder;
 import reactor.core.publisher.Mono;
 
 @Configuration
@@ -23,10 +26,30 @@ public class StackOverflowClientConfig {
             .baseUrl(scrapperConfig.stackOverflowApiUrl())
             .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
             .defaultHeader(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE)
+            .filter(addQueryParams(
+                scrapperConfig.stackOverflow().accessToken(),
+                scrapperConfig.stackOverflow().key()
+            ))
             .filter(logRequest())
             .filter(logResponse())
             .filter(errorHandler())
             .build();
+    }
+
+    private ExchangeFilterFunction addQueryParams(String accessToken, String key) {
+        return (clientRequest, next) -> {
+            URI modifiedUri = UriComponentsBuilder.fromUri(clientRequest.url())
+                .queryParam("key", key)
+                .queryParam("access_token", accessToken)
+                .build()
+                .toUri();
+
+            ClientRequest filteredRequest = ClientRequest.from(clientRequest)
+                .url(modifiedUri)
+                .build();
+
+            return next.exchange(filteredRequest);
+        };
     }
 
     private ExchangeFilterFunction logRequest() {
