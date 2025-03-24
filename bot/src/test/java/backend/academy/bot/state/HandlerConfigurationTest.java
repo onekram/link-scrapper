@@ -114,6 +114,7 @@ class HandlerConfigurationTest {
         State nextState = router.process(handlerContext);
 
         assertEquals(State.MENU, nextState);
+        verify(chatService, times(1)).registerChat(123L);
         updateCaptor();
         checkSentMessageResourceBundle("start.message");
         checkSentMessageChatId(123L);
@@ -134,6 +135,7 @@ class HandlerConfigurationTest {
         State nextState = router.process(handlerContext);
 
         assertEquals(State.MENU, nextState);
+        verify(chatService, times(1)).registerChat(123L);
         updateCaptor();
         checkSentMessageResourceBundle("welcome.message");
         checkSentMessageChatId(123L);
