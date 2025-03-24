@@ -1,11 +1,13 @@
 package backend.academy.bot.util;
 
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import backend.academy.bot.state.HandlerContext;
 import backend.academy.bot.state.State;
 import backend.academy.bot.state.handler.MessageHandler;
+import backend.academy.model.LinkResponse;
 import backend.academy.model.LinkUpdate;
 import com.pengrad.telegrambot.TelegramBot;
 import com.pengrad.telegrambot.model.Chat;
@@ -13,8 +15,12 @@ import com.pengrad.telegrambot.model.Message;
 import com.pengrad.telegrambot.model.Update;
 import com.pengrad.telegrambot.model.request.Keyboard;
 import com.pengrad.telegrambot.model.request.KeyboardButton;
+import com.pengrad.telegrambot.model.request.ReplyKeyboardMarkup;
+import com.pengrad.telegrambot.model.request.ReplyKeyboardRemove;
 import com.pengrad.telegrambot.request.BaseRequest;
+import java.util.Collections;
 import java.util.List;
+import java.util.Random;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
@@ -67,6 +73,18 @@ public class TestUtil {
         return (String) sendMessage.getParameters().get("text");
     }
 
+    public static Keyboard getKeyboard(BaseRequest<?, ?> sendMessage) {
+        return (Keyboard) sendMessage.getParameters().get("reply_markup");
+    }
+
+    public static void assertKeyboardIsRemoved(BaseRequest<?, ?> sendMessage) {
+        assertInstanceOf(ReplyKeyboardRemove.class, getKeyboard(sendMessage));
+    }
+
+    public static void assertKeyboardIsReplyMarkup(BaseRequest<?, ?> sendMessage) {
+        assertInstanceOf(ReplyKeyboardMarkup.class, getKeyboard(sendMessage));
+    }
+
     public static Keyboard getKeyboardFromHandler(MessageHandler messageHandler) {
         return (Keyboard) ReflectionTestUtils.getField(messageHandler, "keyboard");
     }
@@ -83,6 +101,14 @@ public class TestUtil {
 
     public static void assertDoesntContainButton(Keyboard keyboard, String... texts) {
         assertContainOrNot(keyboard, stream -> stream::noneMatch, texts);
+    }
+
+    public static LinkResponse generateLinkResponse(String url) {
+        return new LinkResponse(generateLong(), url, Collections.emptyList(), Collections.emptyList());
+    }
+
+    public static long generateLong() {
+       return new Random().nextLong(1L, 10000L);
     }
 
     @SuppressWarnings("unchecked")
