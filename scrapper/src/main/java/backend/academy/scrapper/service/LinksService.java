@@ -15,6 +15,7 @@ import java.net.URISyntaxException;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
@@ -36,19 +37,20 @@ public class LinksService {
     }
 
     public LinkResponse addLink(Long tgChatId, AddLinkRequest request) {
-        LinkRecord linkRecord = chatRepository.getLinks(tgChatId).stream()
+        Optional<LinkRecord> linkRecord = chatRepository.getLinks(tgChatId).stream()
                 .map(linksRepository::getLink)
                 .filter(Objects::nonNull)
                 .filter(link -> request.getLink().equals(link.getUrl().toString()))
-                .findAny()
-                .orElseGet(() -> {
-                    long id = System.currentTimeMillis();
-                    LinkRecord record = linksRepository.addLink(requestToRecord(id, request));
-                    chatRepository.addLink(tgChatId, record.getId());
-                    return record;
-                });
-        linksRepository.addLink(requestToRecord(linkRecord.getId(), request));
-        return recordToResponse(linkRecord);
+                .findAny();
+        if (linkRecord.isPresent()) {
+            LinkRecord record = linksRepository.addLink(
+                    requestToRecord(linkRecord.map(LinkRecord::getId).get(), request));
+            return recordToResponse(record);
+        }
+        long id = System.currentTimeMillis();
+        LinkRecord record = linksRepository.addLink(requestToRecord(id, request));
+        chatRepository.addLink(tgChatId, record.getId());
+        return recordToResponse(record);
     }
 
     public LinkResponse removeLink(Long tgChatId, RemoveLinkRequest request) {
