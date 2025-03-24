@@ -3,9 +3,9 @@ package backend.academy.bot.util;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+import backend.academy.bot.test.utils.TestUtil;
 import java.util.Collections;
 import java.util.List;
-import backend.academy.bot.test.utils.TestUtil;
 import org.junit.jupiter.api.Test;
 
 class MessageUtilTest {

@@ -2,19 +2,19 @@ package backend.academy.scrapper.test.util;
 
 import backend.academy.scrapper.parser.LinkType;
 import backend.academy.scrapper.repository.LinkRecord;
-import io.micrometer.tracing.Link;
-import lombok.SneakyThrows;
-import lombok.experimental.UtilityClass;
 import java.net.URI;
 import java.util.Collections;
 import java.util.List;
 import java.util.Random;
+import lombok.SneakyThrows;
+import lombok.experimental.UtilityClass;
 
 @UtilityClass
 public class TestUtil {
 
     @SneakyThrows
-    public static LinkRecord generateLinkRecord(long id, String url, List<String> tags, List<String> filters, LinkType linkType) {
+    public static LinkRecord generateLinkRecord(
+            long id, String url, List<String> tags, List<String> filters, LinkType linkType) {
         return new LinkRecord(id, new URI(url), tags, filters, linkType);
     }
 
