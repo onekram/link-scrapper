@@ -4,11 +4,14 @@ import backend.academy.model.AddLinkRequest;
 import backend.academy.model.LinkResponse;
 import backend.academy.model.ListLinksResponse;
 import backend.academy.model.RemoveLinkRequest;
+import backend.academy.scrapper.exception.BadRequestException;
 import backend.academy.scrapper.exception.NotFoundException;
 import backend.academy.scrapper.parser.LinkType;
 import backend.academy.scrapper.repository.ChatRepository;
 import backend.academy.scrapper.repository.LinkRecord;
 import backend.academy.scrapper.repository.LinksRepository;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -24,8 +27,7 @@ public class LinksService {
     private final LinksRepository linksRepository;
 
     public ListLinksResponse listAll(Long tgChatId) {
-        List<Long> linkIds = chatRepository.getLinks(tgChatId);
-        List<LinkResponse> linkResponses = linkIds.stream()
+        List<LinkResponse> linkResponses = chatRepository.getLinks(tgChatId).stream()
                 .map(linksRepository::getLink)
                 .filter(Objects::nonNull)
                 .map(this::recordToResponse)
@@ -41,11 +43,11 @@ public class LinksService {
                 .findAny()
                 .orElseGet(() -> {
                     long id = System.currentTimeMillis();
-                    LinkRecord record = linksRepository.addLink(id, request);
+                    LinkRecord record = linksRepository.addLink(requestToRecord(id, request));
                     chatRepository.addLink(tgChatId, record.getId());
                     return record;
                 });
-        linksRepository.addLink(linkRecord.getId(), request);
+        linksRepository.addLink(requestToRecord(linkRecord.getId(), request));
         return recordToResponse(linkRecord);
     }
 
@@ -71,5 +73,14 @@ public class LinksService {
 
     private LinkResponse recordToResponse(LinkRecord record) {
         return new LinkResponse(record.getId(), record.getUrl().toString(), record.getTags(), record.getFilters());
+    }
+
+    private LinkRecord requestToRecord(Long id, AddLinkRequest request) {
+        try {
+            LinkType linkType = LinkType.getType(request.getLink()).orElse(null);
+            return new LinkRecord(id, new URI(request.getLink()), request.getTags(), request.getFilters(), linkType);
+        } catch (URISyntaxException | IllegalArgumentException ex) {
+            throw new BadRequestException(String.format("Невалидная ссылка: %s", request.getLink()));
+        }
     }
 }
