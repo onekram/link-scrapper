@@ -104,7 +104,11 @@ public class TestUtil {
     }
 
     public static LinkResponse generateLinkResponse(String url) {
-        return new LinkResponse(generateLong(), url, Collections.emptyList(), Collections.emptyList());
+        return generateLinkResponse(url, Collections.emptyList(), Collections.emptyList());
+    }
+
+    public static LinkResponse generateLinkResponse(String url, List<String> tags, List<String> filters) {
+        return new LinkResponse(generateLong(), url, tags, filters);
     }
 
     public static long generateLong() {
