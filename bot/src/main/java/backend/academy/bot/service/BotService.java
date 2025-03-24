@@ -4,8 +4,10 @@ import backend.academy.bot.util.LocalTunnelUtil;
 import com.pengrad.telegrambot.ExceptionHandler;
 import com.pengrad.telegrambot.TelegramBot;
 import com.pengrad.telegrambot.UpdatesListener;
+import com.pengrad.telegrambot.model.BotCommand;
 import com.pengrad.telegrambot.request.DeleteWebhook;
 import com.pengrad.telegrambot.request.GetUpdates;
+import com.pengrad.telegrambot.request.SetMyCommands;
 import com.pengrad.telegrambot.request.SetWebhook;
 import com.pengrad.telegrambot.response.BaseResponse;
 import jakarta.annotation.PostConstruct;
@@ -31,6 +33,7 @@ public class BotService {
 
     @PostConstruct
     public void initBot() {
+        setCommands();
         if (webhookEnabled) {
             try {
                 useWebhook();
@@ -87,5 +90,15 @@ public class BotService {
                 log.error(message);
             }
         };
+    }
+
+    private void setCommands() {
+        telegramBot.execute(new SetMyCommands(
+                new BotCommand("start", "Start dialog"),
+                new BotCommand("help", "See available commands"),
+                new BotCommand("track", "Start tracking link"),
+                new BotCommand("untrack", "Stop tracking link"),
+                new BotCommand("list", "See tracking links"),
+                new BotCommand("list", "See tracking links")));
     }
 }
