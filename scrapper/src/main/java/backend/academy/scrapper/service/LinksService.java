@@ -15,7 +15,6 @@ import java.net.URISyntaxException;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
@@ -37,19 +36,14 @@ public class LinksService {
     }
 
     public LinkResponse addLink(Long tgChatId, AddLinkRequest request) {
-        Optional<LinkRecord> linkRecord = chatRepository.getLinks(tgChatId).stream()
+        Long linkRecordId = chatRepository.getLinks(tgChatId).stream()
                 .map(linksRepository::getLink)
                 .filter(Objects::nonNull)
                 .filter(link -> request.getLink().equals(link.getUrl().toString()))
-                .findAny();
-        if (linkRecord.isPresent()) {
-            LinkRecord record = linksRepository.addLink(
-                    requestToRecord(linkRecord.map(LinkRecord::getId).get(), request));
-            return recordToResponse(record);
-        }
-        long id = System.currentTimeMillis();
-        LinkRecord record = linksRepository.addLink(requestToRecord(id, request));
-        chatRepository.addLink(tgChatId, record.getId());
+                .findAny()
+                .map(LinkRecord::getId)
+                .orElseGet(System::currentTimeMillis);
+        LinkRecord record = linksRepository.addLink(requestToRecord(linkRecordId, request));
         return recordToResponse(record);
     }
 
