@@ -150,13 +150,16 @@
                 <groupId>org.jetbrains.kotlin</groupId>
                 <artifactId>kotlin-maven-plugin</artifactId>
                 <version>${kotlin.version}</version>
+                <configuration>
+                    <jvmTarget>1.8</jvmTarget>
+                </configuration>
                 <executions>
                     <execution>
                         <id>compile</id>
-                        <phase>compile</phase>
                         <goals>
                             <goal>compile</goal>
                         </goals>
+                        <phase>compile</phase>
                         <configuration>
                             <sourceDirs>
                                 <source>src/main/java</source>
@@ -166,15 +169,12 @@
                     </execution>
                     <execution>
                         <id>test-compile</id>
-                        <phase>test-compile</phase>
                         <goals>
                             <goal>test-compile</goal>
                         </goals>
+                        <phase>test-compile</phase>
                     </execution>
                 </executions>
-                <configuration>
-                    <jvmTarget>1.8</jvmTarget>
-                </configuration>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -190,17 +190,17 @@
                     </execution>
                     <execution>
                         <id>compile</id>
-                        <phase>compile</phase>
                         <goals>
                             <goal>compile</goal>
                         </goals>
+                        <phase>compile</phase>
                     </execution>
                     <execution>
                         <id>testCompile</id>
-                        <phase>test-compile</phase>
                         <goals>
                             <goal>testCompile</goal>
                         </goals>
+                        <phase>test-compile</phase>
                     </execution>
                 </executions>
             </plugin>

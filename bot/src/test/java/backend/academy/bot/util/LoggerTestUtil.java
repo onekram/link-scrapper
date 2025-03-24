@@ -1,11 +1,12 @@
 package backend.academy.bot.util;
 
+import static org.slf4j.LoggerFactory.getLogger;
+
 import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.Logger;
 import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.read.ListAppender;
 import lombok.experimental.UtilityClass;
-import static org.slf4j.LoggerFactory.getLogger;
 
 @UtilityClass
 public class LoggerTestUtil {
@@ -19,6 +20,7 @@ public class LoggerTestUtil {
 
     public static boolean appenderContainsLog(ListAppender<ILoggingEvent> appender, Level level, String message) {
         return appender.list.stream()
-            .anyMatch(event -> event.getLevel().equals(level) && event.getFormattedMessage().equals(message));
+                .anyMatch(event -> event.getLevel().equals(level)
+                        && event.getFormattedMessage().equals(message));
     }
 }

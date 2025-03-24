@@ -18,48 +18,29 @@ import reactor.core.publisher.Mono;
 public class GithubClientConfig {
 
     @Bean
-    public WebClient githubWebClient(ScrapperConfig scrapperConfig) {
+    public WebClient githubWebClient(
+            ScrapperConfig scrapperConfig, ExchangeFilterFunction logRequest, ExchangeFilterFunction logResponse) {
         return WebClient.builder()
-            .baseUrl(scrapperConfig.githubApiUrl())
-            .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
-            .defaultHeader(HttpHeaders.ACCEPT, "application/vnd.github+json")
-            .defaultHeader("X-GitHub-Api-Version", "2022-11-28")
-            .defaultHeader(HttpHeaders.AUTHORIZATION, "Bearer " + scrapperConfig.githubToken())
-            .filter(logRequest())
-            .filter(logResponse())
-            .filter(errorHandler())
-            .build();
-    }
-
-    private ExchangeFilterFunction logRequest() {
-        return ExchangeFilterFunction.ofRequestProcessor(request -> {
-            log.info("Request: {} {}", request.method(), request.url());
-            request.headers().forEach((name, values) ->
-                values.forEach(value -> log.debug("Request header: {}={}", name, value)));
-            return Mono.just(request);
-        });
-    }
-
-    private ExchangeFilterFunction logResponse() {
-        return ExchangeFilterFunction.ofResponseProcessor(response -> {
-            log.info("Response status: {}", response.statusCode());
-            response.headers().asHttpHeaders().forEach((name, values) ->
-                values.forEach(value -> log.debug("Response header: {}={}", name, value)));
-            return Mono.just(response);
-        });
+                .baseUrl(scrapperConfig.githubApiUrl())
+                .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
+                .defaultHeader(HttpHeaders.ACCEPT, "application/vnd.github+json")
+                .defaultHeader("X-GitHub-Api-Version", "2022-11-28")
+                .defaultHeader(HttpHeaders.AUTHORIZATION, "Bearer " + scrapperConfig.githubToken())
+                .filter(logRequest)
+                .filter(logResponse)
+                .filter(errorHandler())
+                .build();
     }
 
     private ExchangeFilterFunction errorHandler() {
         return ExchangeFilterFunction.ofResponseProcessor(response -> {
             if (response.statusCode().isError()) {
                 return response.bodyToMono(GithubApiError.class)
-                    .flatMap(errorBody -> {
-                        log.error("API Error: {} | Message: {}",
-                            errorBody.getStatus(),
-                            errorBody.getMessage());
-                        return Mono.error(new RuntimeException());
-                    })
-                    .thenReturn(response);
+                        .flatMap(errorBody -> {
+                            log.error("API Error: {} | Message: {}", errorBody.getStatus(), errorBody.getMessage());
+                            return Mono.error(new RuntimeException());
+                        })
+                        .thenReturn(response);
             }
             return Mono.just(response);
         });
@@ -67,9 +48,8 @@ public class GithubClientConfig {
 
     @Bean
     public GithubReposClient githubClient(WebClient githubWebClient) {
-        HttpServiceProxyFactory factory = HttpServiceProxyFactory
-            .builderFor(WebClientAdapter.create(githubWebClient))
-            .build();
+        HttpServiceProxyFactory factory = HttpServiceProxyFactory.builderFor(WebClientAdapter.create(githubWebClient))
+                .build();
         return factory.createClient(GithubReposClient.class);
     }
 }

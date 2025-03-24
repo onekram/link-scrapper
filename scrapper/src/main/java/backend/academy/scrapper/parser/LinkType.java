@@ -6,15 +6,9 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public enum LinkType {
-    GITHUB("^(?:https?://)?"
-        + "github\\.com/"
-        + "([^/]+)/"
-        + "([^/]+)$"),
+    GITHUB("^(?:https?://)?github\\.com/([^/]+)/([^/]+)$"),
 
-   STACK_OVERFLOW("^(?:https?://)?"
-        + "stackoverflow\\.com/questions/"
-        + "(\\d+)"
-        + "(?:/[^/]+)?$");
+    STACK_OVERFLOW("^(?:https?://)?stackoverflow\\.com/questions/(\\d+)(?:/[^/]+)?$");
 
     private final Pattern pattern;
 
@@ -23,9 +17,9 @@ public enum LinkType {
     }
 
     public static Optional<LinkType> getType(String url) {
-        return Arrays.stream(LinkType.values())
-            .filter(linkType -> linkType.pattern.matcher(url).matches())
-            .findFirst();
+        return Arrays.stream(values())
+                .filter(linkType -> linkType.pattern.matcher(url).matches())
+                .findFirst();
     }
 
     public Matcher parseUrl(String url) {

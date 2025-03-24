@@ -5,7 +5,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.scheduling.annotation.EnableScheduling;
 
-@SpringBootApplication
+@SpringBootApplication(scanBasePackages = "backend.academy")
 @EnableConfigurationProperties({ScrapperConfig.class})
 @EnableScheduling
 public class ScrapperApplication {

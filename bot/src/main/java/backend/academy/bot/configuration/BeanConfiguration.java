@@ -2,10 +2,10 @@ package backend.academy.bot.configuration;
 
 import backend.academy.bot.BotConfig;
 import com.pengrad.telegrambot.TelegramBot;
+import java.util.ResourceBundle;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import java.util.ResourceBundle;
 
 @Configuration
 @RequiredArgsConstructor

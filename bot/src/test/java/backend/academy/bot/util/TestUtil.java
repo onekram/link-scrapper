@@ -1,5 +1,8 @@
 package backend.academy.bot.util;
 
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 import backend.academy.bot.state.HandlerContext;
 import backend.academy.bot.state.State;
 import backend.academy.bot.state.handler.MessageHandler;
@@ -18,8 +21,6 @@ import java.util.stream.Stream;
 import lombok.SneakyThrows;
 import lombok.experimental.UtilityClass;
 import org.springframework.test.util.ReflectionTestUtils;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @UtilityClass
 public class TestUtil {
@@ -85,18 +86,22 @@ public class TestUtil {
     }
 
     @SuppressWarnings("unchecked")
-    private static void assertContainOrNot(Keyboard keyboard, Function<Stream<KeyboardButton>, Predicate<Predicate<KeyboardButton>>> matchFunction, String... texts) {
-        List<List<KeyboardButton>> buttonsRows = (List<List<KeyboardButton>>) ReflectionTestUtils.getField(keyboard, "keyboard");
+    private static void assertContainOrNot(
+            Keyboard keyboard,
+            Function<Stream<KeyboardButton>, Predicate<Predicate<KeyboardButton>>> matchFunction,
+            String... texts) {
+        List<List<KeyboardButton>> buttonsRows =
+                (List<List<KeyboardButton>>) ReflectionTestUtils.getField(keyboard, "keyboard");
         assertNotNull(buttonsRows);
 
         for (String text : texts) {
-            assertTrue(matchFunction.apply(buttonsRows.stream().flatMap(List::stream)).test(
-                keyboardButton -> {
-                    String buttonText = (String) ReflectionTestUtils.getField(keyboardButton, "text");
-                    assertNotNull(buttonText);
-                    return buttonText.contains(text);
-                }
-            ));
+            assertTrue(matchFunction
+                    .apply(buttonsRows.stream().flatMap(List::stream))
+                    .test(keyboardButton -> {
+                        String buttonText = (String) ReflectionTestUtils.getField(keyboardButton, "text");
+                        assertNotNull(buttonText);
+                        return buttonText.contains(text);
+                    }));
         }
     }
 }

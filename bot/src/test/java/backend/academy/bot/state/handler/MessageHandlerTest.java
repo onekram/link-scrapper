@@ -1,5 +1,18 @@
 package backend.academy.bot.state.handler;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.argThat;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
+import static org.mockito.Mockito.when;
+
 import backend.academy.bot.state.HandlerContext;
 import backend.academy.bot.state.State;
 import backend.academy.bot.util.TestUtil;
@@ -17,18 +30,6 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.util.ReflectionTestUtils;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.argThat;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.spy;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoInteractions;
-import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class MessageHandlerTest {
@@ -50,10 +51,10 @@ class MessageHandlerTest {
         when(context.bot()).thenReturn(bot);
 
         MessageHandler handler = MessageHandler.builder()
-            .withFilter(_ -> true)
-            .message("Test message")
-            .menuButton(true)
-            .build();
+                .withFilter(ignore -> true)
+                .message("Test message")
+                .menuButton(true)
+                .build();
         setResourceBundle(handler, resourceBundle);
         invokePostConstruct(handler);
 
@@ -73,10 +74,10 @@ class MessageHandlerTest {
         when(resourceBundle.getString("menu.message")).thenReturn("Menu");
 
         MessageHandler handler = MessageHandler.builder()
-            .withFilter(_ -> false)
-            .message("Test message")
-            .menuButton(true)
-            .build();
+                .withFilter(ignore -> false)
+                .message("Test message")
+                .menuButton(true)
+                .build();
         setResourceBundle(handler, resourceBundle);
         invokePostConstruct(handler);
 
@@ -91,13 +92,13 @@ class MessageHandlerTest {
     @DisplayName("Custom method")
     void customMethod() {
         SendMessage sendMessage = spy(new SendMessage(123L, "Custom"));
-        Function<HandlerContext, SendMessage> customMethod = _ -> sendMessage;
+        Function<HandlerContext, SendMessage> customMethod = ignore -> sendMessage;
         when(context.bot()).thenReturn(bot);
 
         MessageHandler handler = MessageHandler.builder()
-            .withFilter(_ -> true)
-            .method(customMethod)
-            .build();
+                .withFilter(ignore -> true)
+                .method(customMethod)
+                .build();
 
         boolean result = handler.handle(context);
 
@@ -109,15 +110,16 @@ class MessageHandlerTest {
     @Test
     @DisplayName("Keyboard field overrides method keyboard")
     void customMethodKeyboardOverrides() {
-        SendMessage sendMessage = spy(new SendMessage(123L, "Custom").replyMarkup(new ReplyKeyboardMarkup("ButtonMethod")));
-        Function<HandlerContext, SendMessage> customMethod = _ -> sendMessage;
+        SendMessage sendMessage =
+                spy(new SendMessage(123L, "Custom").replyMarkup(new ReplyKeyboardMarkup("ButtonMethod")));
+        Function<HandlerContext, SendMessage> customMethod = ignore -> sendMessage;
         when(context.bot()).thenReturn(bot);
 
         MessageHandler handler = MessageHandler.builder()
-            .withFilter(_ -> true)
-            .method(customMethod)
-            .keyboard(new ReplyKeyboardMarkup("ButtonField"))
-            .build();
+                .withFilter(ignore -> true)
+                .method(customMethod)
+                .keyboard(new ReplyKeyboardMarkup("ButtonField"))
+                .build();
 
         boolean result = handler.handle(context);
 
@@ -133,15 +135,16 @@ class MessageHandlerTest {
     @Test
     @DisplayName("Custom method overrides message")
     void customMethodOverrides() {
-        SendMessage sendMessage = spy(new SendMessage(123L, "Custom").replyMarkup(new ReplyKeyboardMarkup("ButtonMethod")));
-        Function<HandlerContext, SendMessage> customMethod = _ -> sendMessage;
+        SendMessage sendMessage =
+                spy(new SendMessage(123L, "Custom").replyMarkup(new ReplyKeyboardMarkup("ButtonMethod")));
+        Function<HandlerContext, SendMessage> customMethod = ignore -> sendMessage;
         when(context.bot()).thenReturn(bot);
 
         MessageHandler handler = MessageHandler.builder()
-            .withFilter(_ -> true)
-            .method(customMethod)
-            .message("Not custom")
-            .build();
+                .withFilter(ignore -> true)
+                .method(customMethod)
+                .message("Not custom")
+                .build();
 
         boolean result = handler.handle(context);
 
@@ -154,9 +157,7 @@ class MessageHandlerTest {
     void setMenuIfKeyboardIsNull() {
         when(resourceBundle.getString("menu.message")).thenReturn("Menu");
 
-        MessageHandler handler = MessageHandler.builder()
-            .menuButton(true)
-            .build();
+        MessageHandler handler = MessageHandler.builder().menuButton(true).build();
         setResourceBundle(handler, resourceBundle);
         invokePostConstruct(handler);
 
@@ -169,9 +170,9 @@ class MessageHandlerTest {
         when(resourceBundle.getString("menu.message")).thenReturn("Menu");
 
         MessageHandler handler = MessageHandler.builder()
-            .keyboard(new ReplyKeyboardRemove())
-            .menuButton(true)
-            .build();
+                .keyboard(new ReplyKeyboardRemove())
+                .menuButton(true)
+                .build();
         setResourceBundle(handler, resourceBundle);
         invokePostConstruct(handler);
 
@@ -184,10 +185,8 @@ class MessageHandlerTest {
         when(resourceBundle.getString("menu.message")).thenReturn("Menu");
 
         ReplyKeyboardMarkup existing = new ReplyKeyboardMarkup("Button1");
-        MessageHandler handler = MessageHandler.builder()
-            .keyboard(existing)
-            .menuButton(true)
-            .build();
+        MessageHandler handler =
+                MessageHandler.builder().keyboard(existing).menuButton(true).build();
         setResourceBundle(handler, resourceBundle);
         invokePostConstruct(handler);
 
@@ -197,9 +196,7 @@ class MessageHandlerTest {
     @Test
     @DisplayName("If menu button false keyboard is null")
     void keyboardIsNullWhenMenuNotEnabled() {
-        MessageHandler handler = MessageHandler.builder()
-            .menuButton(false)
-            .build();
+        MessageHandler handler = MessageHandler.builder().menuButton(false).build();
         invokePostConstruct(handler);
         assertNull(TestUtil.getKeyboardFromHandler(handler));
     }
@@ -207,8 +204,7 @@ class MessageHandlerTest {
     @Test
     @DisplayName("Default state is menu")
     void defaultState() {
-        MessageHandler handler = MessageHandler.builder()
-            .build();
+        MessageHandler handler = MessageHandler.builder().build();
         invokePostConstruct(handler);
         assertEquals(State.MENU, handler.nextState());
     }

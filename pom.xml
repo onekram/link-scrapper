@@ -17,9 +17,9 @@
 
     <modules>
         <module>bot</module>
+        <module>core</module>
         <module>report</module>
         <module>scrapper</module>
-        <module>core</module>
     </modules>
 
     <properties>

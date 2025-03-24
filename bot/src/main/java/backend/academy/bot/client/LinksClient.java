@@ -15,19 +15,11 @@ import org.springframework.web.service.annotation.PostExchange;
 public interface LinksClient {
 
     @GetExchange
-    ListLinksResponse getLinks(
-        @RequestHeader("Tg-Chat-Id") Long tgChatId
-    );
+    ListLinksResponse getLinks(@RequestHeader("Tg-Chat-Id") Long tgChatId);
 
     @PostExchange
-    LinkResponse addLink(
-        @RequestHeader("Tg-Chat-Id") Long tgChatId,
-        @RequestBody AddLinkRequest request
-    );
+    LinkResponse addLink(@RequestHeader("Tg-Chat-Id") Long tgChatId, @RequestBody AddLinkRequest request);
 
     @DeleteExchange
-    LinkResponse removeLink(
-        @RequestHeader("Tg-Chat-Id") Long tgChatId,
-        @RequestBody RemoveLinkRequest request
-    );
+    LinkResponse removeLink(@RequestHeader("Tg-Chat-Id") Long tgChatId, @RequestBody RemoveLinkRequest request);
 }

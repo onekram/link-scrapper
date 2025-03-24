@@ -26,51 +26,47 @@ public class LinksService {
     public ListLinksResponse listAll(Long tgChatId) {
         List<Long> linkIds = chatRepository.getLinks(tgChatId);
         List<LinkResponse> linkResponses = linkIds.stream()
-            .map(linksRepository::getLink)
-            .filter(Objects::nonNull)
-            .map(this::recordToResponse)
-            .toList();
+                .map(linksRepository::getLink)
+                .filter(Objects::nonNull)
+                .map(this::recordToResponse)
+                .toList();
         return new ListLinksResponse(linkResponses, linkResponses.size());
     }
 
     public LinkResponse addLink(Long tgChatId, AddLinkRequest request) {
         LinkRecord linkRecord = chatRepository.getLinks(tgChatId).stream()
-            .map(linksRepository::getLink)
-            .filter(Objects::nonNull)
-            .filter(link -> request.getLink().equals(link.getUrl().toString()))
-            .findAny()
-            .orElseGet(() -> {
-                long id = System.currentTimeMillis();
-                LinkRecord record =  linksRepository.addLink(id, request);
-                chatRepository.addLink(tgChatId, record.getId());
-                return record;
-            });
+                .map(linksRepository::getLink)
+                .filter(Objects::nonNull)
+                .filter(link -> request.getLink().equals(link.getUrl().toString()))
+                .findAny()
+                .orElseGet(() -> {
+                    long id = System.currentTimeMillis();
+                    LinkRecord record = linksRepository.addLink(id, request);
+                    chatRepository.addLink(tgChatId, record.getId());
+                    return record;
+                });
         linksRepository.addLink(linkRecord.getId(), request);
         return recordToResponse(linkRecord);
     }
 
     public LinkResponse removeLink(Long tgChatId, RemoveLinkRequest request) {
         LinkRecord record = chatRepository.getLinks(tgChatId).stream()
-            .map(linksRepository::getLink)
-            .filter(Objects::nonNull)
-            .filter(link -> request.getLink().equals(link.getUrl().toString()))
-            .findFirst()
-            .orElseThrow(() -> new NotFoundException(String.format("Не существует ссылки: %s", request.getLink())));
+                .map(linksRepository::getLink)
+                .filter(Objects::nonNull)
+                .filter(link -> request.getLink().equals(link.getUrl().toString()))
+                .findFirst()
+                .orElseThrow(() -> new NotFoundException(String.format("Не существует ссылки: %s", request.getLink())));
         linksRepository.removeLink(record.getId());
         return recordToResponse(record);
     }
 
     public Map<Long, List<LinkRecord>> fetchIdAndLinksByType(LinkType linkType) {
         return chatRepository.fetchAll().stream()
-            .collect(
-                Collectors.toMap(
-                    Function.identity(),
-                    id -> chatRepository.getLinks(id).stream()
+                .collect(Collectors.toMap(Function.identity(), id -> chatRepository.getLinks(id).stream()
                         .map(linksRepository::getLink)
                         .filter(Objects::nonNull)
                         .filter(link -> Objects.equals(link.getType(), linkType))
-                        .toList()
-                ));
+                        .toList()));
     }
 
     private LinkResponse recordToResponse(LinkRecord record) {

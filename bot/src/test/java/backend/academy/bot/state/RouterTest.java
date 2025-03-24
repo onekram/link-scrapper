@@ -1,5 +1,12 @@
 package backend.academy.bot.state;
 
+import static backend.academy.bot.util.TestUtil.generateHandlerContext;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
 import backend.academy.bot.state.handler.Handler;
 import java.util.ArrayList;
 import org.junit.jupiter.api.BeforeEach;
@@ -10,12 +17,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
-import static backend.academy.bot.util.TestUtil.generateHandlerContext;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class RouterTest {
@@ -70,7 +71,6 @@ class RouterTest {
 
         when(handler2.handle(any())).thenReturn(false);
         verify(handler2, never()).nextState();
-
 
         assertEquals(State.MENU, router.process(generateHandlerContext()));
     }

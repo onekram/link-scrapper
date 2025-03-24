@@ -3,14 +3,13 @@ package backend.academy.bot.controller;
 import backend.academy.bot.service.UpdateService;
 import com.pengrad.telegrambot.model.Update;
 import com.pengrad.telegrambot.utility.BotUtils;
+import java.io.BufferedReader;
+import java.io.Reader;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
-
-import java.io.BufferedReader;
-import java.io.Reader;
 
 @Slf4j
 @RequiredArgsConstructor

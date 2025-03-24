@@ -31,46 +31,52 @@ public class UpdatesController {
     private final TelegramBot telegramBot;
 
     @Operation(summary = "Отправить обновление")
-    @ApiResponses(value = {
-        @ApiResponse(
-            responseCode = "200",
-            description = "Обновление обработано"),
-        @ApiResponse(
-            responseCode = "400",
-            description = "Некорректные параметры запроса",
-            content = @Content(
-                mediaType = "application/json",
-                schema = @Schema(implementation = ApiErrorResponse.class))) })
+    @ApiResponses(
+            value = {
+                @ApiResponse(responseCode = "200", description = "Обновление обработано"),
+                @ApiResponse(
+                        responseCode = "400",
+                        description = "Некорректные параметры запроса",
+                        content =
+                                @Content(
+                                        mediaType = "application/json",
+                                        schema = @Schema(implementation = ApiErrorResponse.class)))
+            })
     @PostMapping(
-        value ="/updates",
-        produces = { "application/json" })
+            value = "/updates",
+            produces = {"application/json"})
     public ResponseEntity<Void> sendUpdates(@RequestBody LinkUpdate linkUpdate) {
-        linkUpdate.getTgChatIds().forEach(
-            chatId -> telegramBot.execute(new SendMessage(chatId, "\uD83C\uDD95 " + linkUpdate.getDescription() + " for url " + linkUpdate.getUrl()), new Callback<SendMessage, SendResponse>() {
-                @Override
-                public void onResponse(SendMessage request, SendResponse response) {
-                    log.info("Message sent: {} with response: {}", request, response);
-                }
+        linkUpdate
+                .getTgChatIds()
+                .forEach(chatId -> telegramBot.execute(
+                        new SendMessage(
+                                chatId,
+                                "\uD83C\uDD95 " + linkUpdate.getDescription() + " for url " + linkUpdate.getUrl()),
+                        new Callback<SendMessage, SendResponse>() {
+                            @Override
+                            public void onResponse(SendMessage request, SendResponse response) {
+                                log.info("Message sent: {} with response: {}", request, response);
+                            }
 
-                @Override
-                public void onFailure(SendMessage request, IOException e) {
-                    log.info("Message sent: {} with error", request, e);
-                }
-            }));
+                            @Override
+                            public void onFailure(SendMessage request, IOException e) {
+                                log.info("Message sent: {} with error", request, e);
+                            }
+                        }));
         return ResponseEntity.ok().build();
     }
 
     @ExceptionHandler({MethodArgumentTypeMismatchException.class, HttpMessageNotReadableException.class})
     public ResponseEntity<ApiErrorResponse> invalidParameters(Exception ex) {
         HttpStatus status = HttpStatus.BAD_REQUEST;
-        return ResponseEntity.status(status).body(
-            new ApiErrorResponse(
-                "Некорректные параметры запроса",
-                String.valueOf(status.value()),
-                ex.getClass().getSimpleName(),
-                ex.getMessage(),
-                Stream.of(ex.getStackTrace()).map(StackTraceElement::toString).toList()
-            )
-        );
+        return ResponseEntity.status(status)
+                .body(new ApiErrorResponse(
+                        "Некорректные параметры запроса",
+                        String.valueOf(status.value()),
+                        ex.getClass().getSimpleName(),
+                        ex.getMessage(),
+                        Stream.of(ex.getStackTrace())
+                                .map(StackTraceElement::toString)
+                                .toList()));
     }
 }

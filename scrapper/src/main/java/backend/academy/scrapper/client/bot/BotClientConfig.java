@@ -18,48 +18,32 @@ import reactor.core.publisher.Mono;
 public class BotClientConfig {
 
     @Bean
-    public WebClient botWebClient(ScrapperConfig scrapperConfig) {
+    public WebClient botWebClient(
+            ScrapperConfig scrapperConfig, ExchangeFilterFunction logRequest, ExchangeFilterFunction logResponse) {
         return WebClient.builder()
-            .baseUrl(scrapperConfig.botUrl())
-            .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
-            .defaultHeader(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE)
-            .filter(logRequest())
-            .filter(logResponse())
-            .filter(errorHandler())
-            .build();
-    }
-
-    private ExchangeFilterFunction logRequest() {
-        return ExchangeFilterFunction.ofRequestProcessor(request -> {
-            log.info("Request: {} {}", request.method(), request.url());
-            request.headers().forEach((name, values) ->
-                values.forEach(value -> log.debug("Request header: {}={}", name, value)));
-            return Mono.just(request);
-        });
-    }
-
-    private ExchangeFilterFunction logResponse() {
-        return ExchangeFilterFunction.ofResponseProcessor(response -> {
-            log.info("Response status: {}", response.statusCode());
-            response.headers().asHttpHeaders().forEach((name, values) ->
-                values.forEach(value -> log.debug("Response header: {}={}", name, value)));
-            return Mono.just(response);
-        });
+                .baseUrl(scrapperConfig.botUrl())
+                .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
+                .defaultHeader(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE)
+                .filter(logRequest)
+                .filter(logResponse)
+                .filter(errorHandler())
+                .build();
     }
 
     private ExchangeFilterFunction errorHandler() {
         return ExchangeFilterFunction.ofResponseProcessor(response -> {
             if (response.statusCode().isError()) {
                 return response.bodyToMono(ApiErrorResponse.class)
-                    .flatMap(errorBody -> {
-                        log.error("API Error: {} - {} | Exception name: {} | Exception message: {}",
-                            errorBody.getCode(),
-                            errorBody.getDescription(),
-                            errorBody.getExceptionName(),
-                            errorBody.getExceptionMessage());
-                        return Mono.error(new RuntimeException());
-                    })
-                    .thenReturn(response);
+                        .flatMap(errorBody -> {
+                            log.error(
+                                    "API Error: {} - {} | Exception name: {} | Exception message: {}",
+                                    errorBody.getCode(),
+                                    errorBody.getDescription(),
+                                    errorBody.getExceptionName(),
+                                    errorBody.getExceptionMessage());
+                            return Mono.error(new RuntimeException());
+                        })
+                        .thenReturn(response);
             }
             return Mono.just(response);
         });
@@ -67,9 +51,8 @@ public class BotClientConfig {
 
     @Bean
     public UpdatesClient botClient(WebClient botWebClient) {
-        HttpServiceProxyFactory factory = HttpServiceProxyFactory
-            .builderFor(WebClientAdapter.create(botWebClient))
-            .build();
+        HttpServiceProxyFactory factory = HttpServiceProxyFactory.builderFor(WebClientAdapter.create(botWebClient))
+                .build();
         return factory.createClient(UpdatesClient.class);
     }
 }

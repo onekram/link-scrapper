@@ -1,9 +1,9 @@
 package backend.academy.bot.state;
 
 import backend.academy.bot.state.handler.Handler;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
-import java.util.List;
 
 @Component
 @RequiredArgsConstructor
@@ -12,9 +12,9 @@ public class Router {
 
     public State process(HandlerContext context) {
         return handlers.stream()
-            .filter(handler -> handler.handle(context))
-            .map(Handler::nextState)
-            .findFirst()
-            .orElse(State.MENU);
+                .filter(handler -> handler.handle(context))
+                .map(Handler::nextState)
+                .findFirst()
+                .orElse(State.MENU);
     }
 }

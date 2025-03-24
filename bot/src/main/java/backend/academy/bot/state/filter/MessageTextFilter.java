@@ -1,8 +1,8 @@
 package backend.academy.bot.state.filter;
 
 import backend.academy.bot.state.HandlerContext;
-import lombok.RequiredArgsConstructor;
 import java.util.function.Predicate;
+import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
 public class MessageTextFilter implements Predicate<HandlerContext> {

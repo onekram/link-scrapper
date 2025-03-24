@@ -76,11 +76,14 @@ public class BotService {
     private ExceptionHandler exceptionHandler() {
         return e -> {
             if (e.response() != null) {
-                log.error("Telegram API not responding: {} - {}", e.response().errorCode(), e.response().description());
+                log.error(
+                        "Telegram API not responding: {} - {}",
+                        e.response().errorCode(),
+                        e.response().description());
             } else {
                 String message = Stream.of(e.getStackTrace())
-                    .map(StackTraceElement::toString)
-                    .collect(Collectors.joining("\n"));
+                        .map(StackTraceElement::toString)
+                        .collect(Collectors.joining("\n"));
                 log.error(message);
             }
         };

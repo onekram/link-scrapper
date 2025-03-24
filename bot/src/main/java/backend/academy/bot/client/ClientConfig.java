@@ -18,48 +18,32 @@ import reactor.core.publisher.Mono;
 public class ClientConfig {
 
     @Bean
-    public WebClient webClient(BotConfig botConfig) {
+    public WebClient webClient(
+            BotConfig botConfig, ExchangeFilterFunction logRequest, ExchangeFilterFunction logResponse) {
         return WebClient.builder()
-            .baseUrl(botConfig.scrapperUrl())
-            .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
-            .defaultHeader(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE)
-            .filter(logRequest())
-            .filter(logResponse())
-            .filter(errorHandler())
-            .build();
-    }
-
-    private ExchangeFilterFunction logRequest() {
-        return ExchangeFilterFunction.ofRequestProcessor(request -> {
-            log.info("Request: {} {}", request.method(), request.url());
-            request.headers().forEach((name, values) ->
-                values.forEach(value -> log.debug("Request header: {}={}", name, value)));
-            return Mono.just(request);
-        });
-    }
-
-    private ExchangeFilterFunction logResponse() {
-        return ExchangeFilterFunction.ofResponseProcessor(response -> {
-            log.info("Response status: {}", response.statusCode());
-            response.headers().asHttpHeaders().forEach((name, values) ->
-                values.forEach(value -> log.debug("Response header: {}={}", name, value)));
-            return Mono.just(response);
-        });
+                .baseUrl(botConfig.scrapperUrl())
+                .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
+                .defaultHeader(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE)
+                .filter(logRequest)
+                .filter(logResponse)
+                .filter(errorHandler())
+                .build();
     }
 
     private ExchangeFilterFunction errorHandler() {
         return ExchangeFilterFunction.ofResponseProcessor(response -> {
             if (response.statusCode().isError()) {
                 return response.bodyToMono(ApiErrorResponse.class)
-                    .flatMap(errorBody -> {
-                        log.error("API Error: {} - {} | Exception name: {} | Exception message: {}",
-                            errorBody.getCode(),
-                            errorBody.getDescription(),
-                            errorBody.getExceptionName(),
-                            errorBody.getExceptionMessage());
-                        return Mono.error(new ApiException(errorBody));
-                    })
-                    .thenReturn(response);
+                        .flatMap(errorBody -> {
+                            log.error(
+                                    "API Error: {} - {} | Exception name: {} | Exception message: {}",
+                                    errorBody.getCode(),
+                                    errorBody.getDescription(),
+                                    errorBody.getExceptionName(),
+                                    errorBody.getExceptionMessage());
+                            return Mono.error(new ApiException(errorBody));
+                        })
+                        .thenReturn(response);
             }
             return Mono.just(response);
         });
@@ -67,18 +51,16 @@ public class ClientConfig {
 
     @Bean
     public LinksClient linksClient(WebClient webClient) {
-        HttpServiceProxyFactory factory = HttpServiceProxyFactory
-            .builderFor(WebClientAdapter.create(webClient))
-            .build();
+        HttpServiceProxyFactory factory = HttpServiceProxyFactory.builderFor(WebClientAdapter.create(webClient))
+                .build();
 
         return factory.createClient(LinksClient.class);
     }
 
     @Bean
     public ChatClient chatClient(WebClient webClient) {
-        HttpServiceProxyFactory factory = HttpServiceProxyFactory
-            .builderFor(WebClientAdapter.create(webClient))
-            .build();
+        HttpServiceProxyFactory factory = HttpServiceProxyFactory.builderFor(WebClientAdapter.create(webClient))
+                .build();
 
         return factory.createClient(ChatClient.class);
     }

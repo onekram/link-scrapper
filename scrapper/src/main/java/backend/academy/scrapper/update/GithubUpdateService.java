@@ -10,7 +10,7 @@ import java.util.regex.Matcher;
 import org.springframework.stereotype.Service;
 
 @Service
-public class GithubUpdateService extends AbstractUpdateService{
+public class GithubUpdateService extends AbstractUpdateService {
     private final GithubReposClient githubReposClient;
 
     public GithubUpdateService(LinksService linksService, GithubReposClient githubReposClient) {
@@ -18,6 +18,7 @@ public class GithubUpdateService extends AbstractUpdateService{
         this.githubReposClient = githubReposClient;
     }
 
+    @Override
     protected boolean isUpdated(LinkRecord linkRecord, Instant from) {
         Matcher matcher = LinkType.GITHUB.parseUrl(linkRecord.getUrl().toString());
         if (!matcher.matches()) {

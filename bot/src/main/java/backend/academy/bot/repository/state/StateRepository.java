@@ -1,9 +1,9 @@
 package backend.academy.bot.repository.state;
 
 import backend.academy.bot.state.State;
-import org.springframework.stereotype.Repository;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import org.springframework.stereotype.Repository;
 
 @Repository
 public class StateRepository {
@@ -18,6 +18,6 @@ public class StateRepository {
     }
 
     private StateRecord getStateRecord(Long id) {
-        return db.computeIfAbsent(id, _ -> new StateRecord(State.START));
+        return db.computeIfAbsent(id, ignore -> new StateRecord(State.START));
     }
 }

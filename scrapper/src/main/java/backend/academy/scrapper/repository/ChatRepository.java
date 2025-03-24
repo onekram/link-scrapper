@@ -1,11 +1,11 @@
 package backend.academy.scrapper.repository;
 
-import org.springframework.stereotype.Repository;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import org.springframework.stereotype.Repository;
 
 @Repository
 public class ChatRepository {
@@ -28,7 +28,9 @@ public class ChatRepository {
     }
 
     public void addLink(Long id, Long linkId) {
-        db.computeIfAbsent(id, key -> new ChatRecord(id, new ArrayList<>())).getLinks().add(linkId);
+        db.computeIfAbsent(id, ignored -> new ChatRecord(id, new ArrayList<>()))
+                .getLinks()
+                .add(linkId);
     }
 
     public List<Long> fetchAll() {

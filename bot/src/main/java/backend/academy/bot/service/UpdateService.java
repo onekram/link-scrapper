@@ -8,10 +8,10 @@ import com.pengrad.telegrambot.TelegramBot;
 import com.pengrad.telegrambot.model.Message;
 import com.pengrad.telegrambot.model.Update;
 import com.pengrad.telegrambot.request.SendMessage;
+import java.util.ResourceBundle;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import java.util.ResourceBundle;
 
 @Slf4j
 @Service
@@ -32,11 +32,7 @@ public class UpdateService {
             State currentState = stateRepository.getCurrentState(chatId);
             log.info("Message chatId: {}, current state: {}, text: {}", chatId, currentState, message.text());
 
-            State nextState = router.process(new HandlerContext(
-                message,
-                telegramBot,
-                currentState
-            ));
+            State nextState = router.process(new HandlerContext(message, telegramBot, currentState));
             log.info("Move to state: {}", nextState);
             stateRepository.saveState(chatId, nextState);
         } catch (Exception e) {
