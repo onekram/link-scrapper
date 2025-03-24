@@ -1,5 +1,15 @@
 package backend.academy.bot.state;
 
+import static backend.academy.bot.state.HandlerConfiguration.ADD_LINK_BUILDER;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsString;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
 import backend.academy.bot.service.ChatService;
 import backend.academy.bot.service.LinksService;
 import backend.academy.bot.util.TestUtil;
@@ -25,15 +35,6 @@ import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
-import static backend.academy.bot.state.HandlerConfiguration.ADD_LINK_BUILDER;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.containsString;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
 @SpringBootTest
 class HandlerConfigurationTest {
@@ -82,7 +83,6 @@ class HandlerConfigurationTest {
         checkSentMessageChatId(123L);
         assertKeyboardContainsMenu();
     }
-
 
     @ParameterizedTest(name = "Jump to menu for {0}")
     @MethodSource("allStates")
@@ -196,7 +196,8 @@ class HandlerConfigurationTest {
     @Test
     @DisplayName("Track tags handler")
     void trackTagsHandler() {
-        when(handlerContextParameters.getParameter(ADD_LINK_BUILDER, AddLinkRequest.Builder.class)).thenReturn(builder);
+        when(handlerContextParameters.getParameter(ADD_LINK_BUILDER, AddLinkRequest.Builder.class))
+                .thenReturn(builder);
         State currentState = State.TRACK_TAGS;
         Message message = TestUtil.generateMessage("  tag1   tag2 ", 123L);
         HandlerContext handlerContext = new HandlerContext(message, telegramBot, currentState);
@@ -215,7 +216,8 @@ class HandlerConfigurationTest {
     @Test
     @DisplayName("Track filters handler")
     void trackFiltersHandler() {
-        when(handlerContextParameters.getParameter(ADD_LINK_BUILDER, AddLinkRequest.Builder.class)).thenReturn(builder);
+        when(handlerContextParameters.getParameter(ADD_LINK_BUILDER, AddLinkRequest.Builder.class))
+                .thenReturn(builder);
         AddLinkRequest request = new AddLinkRequest.Builder().link("url").build();
         when(builder.build()).thenReturn(request);
         State currentState = State.TRACK_FILTERS;
@@ -239,8 +241,8 @@ class HandlerConfigurationTest {
     @DisplayName("List of links handler")
     void listHandler() {
         when(linksService.getTrackedLinks(123L))
-            .thenReturn(
-                new ListLinksResponse(List.of(TestUtil.generateLinkResponse("first"), TestUtil.generateLinkResponse("second")), 2));
+                .thenReturn(new ListLinksResponse(
+                        List.of(TestUtil.generateLinkResponse("first"), TestUtil.generateLinkResponse("second")), 2));
         State currentState = State.MENU;
         Message message = TestUtil.generateMessage("/list", 123L);
         HandlerContext handlerContext = new HandlerContext(message, telegramBot, currentState);
@@ -258,9 +260,7 @@ class HandlerConfigurationTest {
     @Test
     @DisplayName("Empty list of links")
     void emptyList() {
-        when(linksService.getTrackedLinks(123L))
-            .thenReturn(
-                new ListLinksResponse(Collections.emptyList(), 0));
+        when(linksService.getTrackedLinks(123L)).thenReturn(new ListLinksResponse(Collections.emptyList(), 0));
         State currentState = State.MENU;
         Message message = TestUtil.generateMessage("/list", 123L);
         HandlerContext handlerContext = new HandlerContext(message, telegramBot, currentState);
@@ -275,13 +275,15 @@ class HandlerConfigurationTest {
         assertKeyboardIsRemoved();
     }
 
-
     @Test
     @DisplayName("Untrack handler")
     void untrackHandler() {
         when(linksService.getTrackedLinks(123L))
-            .thenReturn(
-                new ListLinksResponse(List.of(TestUtil.generateLinkResponse("first-url"), TestUtil.generateLinkResponse("second-url")), 2));
+                .thenReturn(new ListLinksResponse(
+                        List.of(
+                                TestUtil.generateLinkResponse("first-url"),
+                                TestUtil.generateLinkResponse("second-url")),
+                        2));
         State currentState = State.MENU;
         Message message = TestUtil.generateMessage("/untrack", 123L);
         HandlerContext handlerContext = new HandlerContext(message, telegramBot, currentState);
@@ -301,7 +303,7 @@ class HandlerConfigurationTest {
     @DisplayName("Input link to untrack handler")
     void inputLinkToUntrackHandler() {
         when(linksService.untrackLink(eq(123L), any(RemoveLinkRequest.class)))
-            .thenReturn(TestUtil.generateLinkResponse("first-url"));
+                .thenReturn(TestUtil.generateLinkResponse("first-url"));
 
         State currentState = State.UNTRACK_LINK;
         Message message = TestUtil.generateMessage("url", 123L);
@@ -318,9 +320,7 @@ class HandlerConfigurationTest {
     }
 
     private void checkSentMessageResourceBundle(String key) {
-        assertEquals(
-            resourceBundle.getString(key),
-            TestUtil.getText(sendMessage));
+        assertEquals(resourceBundle.getString(key), TestUtil.getText(sendMessage));
     }
 
     private void checkSentMessageChatId(long id) {
