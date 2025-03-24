@@ -38,7 +38,10 @@ data class StackOverflowQuestionsResponse(
 )
 
 data class StackOverflowApiErrorResponse(
+    @JsonProperty("error_id")
     val errorId: Long,
+    @JsonProperty("error_message")
     val errorMessage: String,
+    @JsonProperty("error_name")
     val errorName: String
 )
