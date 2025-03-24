@@ -61,7 +61,7 @@ class LinksControllerTest {
                         LinkType.GITHUB));
         when(linksRepository.getLink(43L))
                 .thenReturn(new LinkRecord(
-                        42L,
+                        43L,
                         new URI("https://another.com"),
                         Collections.emptyList(),
                         Collections.emptyList(),
@@ -114,7 +114,7 @@ class LinksControllerTest {
                         LinkType.GITHUB));
         when(linksRepository.getLink(43L))
                 .thenReturn(new LinkRecord(
-                        42L,
+                        43L,
                         new URI("https://another.com"),
                         Collections.emptyList(),
                         Collections.emptyList(),
@@ -172,7 +172,7 @@ class LinksControllerTest {
                         LinkType.GITHUB));
         when(linksRepository.getLink(43L))
                 .thenReturn(new LinkRecord(
-                        42L,
+                        43L,
                         new URI("https://another.com"),
                         Collections.emptyList(),
                         Collections.emptyList(),
@@ -223,7 +223,7 @@ class LinksControllerTest {
                         LinkType.GITHUB));
         when(linksRepository.getLink(43L))
                 .thenReturn(new LinkRecord(
-                        42L,
+                        43L,
                         new URI("https://another.com"),
                         Collections.emptyList(),
                         Collections.emptyList(),
