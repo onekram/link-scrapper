@@ -10,6 +10,8 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import backend.academy.bot.BotConfig;
+import backend.academy.bot.configuration.BeanConfiguration;
 import backend.academy.bot.service.ChatService;
 import backend.academy.bot.service.LinksService;
 import backend.academy.bot.test.utils.TestUtil;
@@ -34,9 +36,13 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.annotation.Import;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.test.context.bean.override.mockito.MockitoBeans;
 
-@SpringBootTest
+@SpringBootTest(classes = {Router.class, HandlerContextParameters.class})
+@Import({HandlerConfiguration.class, BeanConfiguration.class})
+@MockitoBeans({@MockitoBean(types = BotConfig.class)})
 class HandlerConfigurationTest {
 
     @Autowired
