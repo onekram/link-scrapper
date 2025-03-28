@@ -59,6 +59,7 @@ class LinksServiceTest {
         ArgumentCaptor<LinkRecord> captor = ArgumentCaptor.forClass(LinkRecord.class);
         verify(linksRepository, times(1)).addLink(captor.capture());
         assertThat(captor.getValue().getId()).isNotIn(42L, 43L);
+        verify(chatRepository, times(1)).addLink(1L, response.getId());
     }
 
     @Test
@@ -85,6 +86,7 @@ class LinksServiceTest {
         ArgumentCaptor<LinkRecord> captor = ArgumentCaptor.forClass(LinkRecord.class);
         verify(linksRepository, times(1)).addLink(captor.capture());
         assertEquals(43L, captor.getValue().getId());
+        verify(chatRepository, times(1)).addLink(1L, response.getId());
     }
 
     @Test

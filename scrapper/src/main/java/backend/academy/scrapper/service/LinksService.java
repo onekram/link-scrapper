@@ -44,6 +44,7 @@ public class LinksService {
                 .map(LinkRecord::getId)
                 .orElseGet(System::currentTimeMillis);
         LinkRecord record = linksRepository.addLink(requestToRecord(linkRecordId, request));
+        chatRepository.addLink(tgChatId, linkRecordId);
         return recordToResponse(record);
     }
 
