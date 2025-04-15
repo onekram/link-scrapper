@@ -38,6 +38,7 @@ public class BotService {
             try {
                 useWebhook();
             } catch (WebhookException e) {
+                log.warn("Using update listener despite features.webhook.enabled config due to exception", e);
                 useUpdateListener();
             }
         } else {
