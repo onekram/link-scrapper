@@ -181,7 +181,7 @@ class LinksControllerTest {
                         .header("Tg-Chat-Id", 1L)
                         .content(objectMapper.writeValueAsString(new RemoveLinkRequest("https://doot.com"))))
                 .andExpect(status().is(404))
-                .andExpect(jsonPath("$.description").value("Ссылка не найдена"))
+                .andExpect(jsonPath("$.description").value("Запрашиваемый ресурс не найден"))
                 .andExpect(jsonPath("$.code").value(404))
                 .andExpect(jsonPath("$.exceptionName").value("NotFoundException"))
                 .andExpect(jsonPath("$.exceptionMessage").value("Не существует ссылки: https://doot.com"))

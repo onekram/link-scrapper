@@ -81,7 +81,7 @@ class ChatControllerTest {
 
         mockMvc.perform(delete("/tg-chat/1").contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().is(404))
-                .andExpect(jsonPath("$.description").value("Чат не найден"))
+                .andExpect(jsonPath("$.description").value("Запрашиваемый ресурс не найден"))
                 .andExpect(jsonPath("$.code").value(404))
                 .andExpect(jsonPath("$.exceptionName").value("NotFoundException"))
                 .andExpect(jsonPath("$.exceptionMessage").value("Не существует чата с ID: 1"))
