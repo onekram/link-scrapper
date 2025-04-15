@@ -98,7 +98,6 @@ public class BotService {
                 new BotCommand("help", "See available commands"),
                 new BotCommand("track", "Start tracking link"),
                 new BotCommand("untrack", "Stop tracking link"),
-                new BotCommand("list", "See tracking links"),
                 new BotCommand("list", "See tracking links")));
     }
 }
