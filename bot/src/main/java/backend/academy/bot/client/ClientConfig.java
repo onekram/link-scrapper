@@ -1,6 +1,7 @@
 package backend.academy.bot.client;
 
 import backend.academy.bot.BotConfig;
+import backend.academy.bot.exception.ApiException;
 import backend.academy.model.ApiErrorResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;

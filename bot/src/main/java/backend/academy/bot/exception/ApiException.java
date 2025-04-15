@@ -1,4 +1,4 @@
-package backend.academy.bot.client;
+package backend.academy.bot.exception;
 
 import backend.academy.model.ApiErrorResponse;
 import lombok.Getter;
