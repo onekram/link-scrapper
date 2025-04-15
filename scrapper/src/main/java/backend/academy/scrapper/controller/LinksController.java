@@ -53,9 +53,6 @@ public class LinksController {
             produces = {"application/json"},
             headers = {"Tg-Chat-Id"})
     public ListLinksResponse getLinks(@RequestHeader("Tg-Chat-Id") Long tgChatId) {
-        if (tgChatId < 0) {
-            throw new BadRequestException(String.format("Невалидный идентификатор чата: %s", tgChatId));
-        }
         return linksService.listAll(tgChatId);
     }
 
@@ -83,9 +80,6 @@ public class LinksController {
             headers = {"Tg-Chat-Id"})
     public LinkResponse addLink(
             @RequestHeader("Tg-Chat-Id") Long tgChatId, @RequestBody AddLinkRequest request) {
-        if (tgChatId < 0) {
-            throw new BadRequestException(String.format("Невалидный идентификатор чата: %s", tgChatId));
-        }
         return linksService.addLink(tgChatId, request);
     }
 
@@ -120,9 +114,6 @@ public class LinksController {
             headers = {"Tg-Chat-Id"})
     public LinkResponse removeLink(
             @RequestHeader("Tg-Chat-Id") Long tgChatId, @RequestBody RemoveLinkRequest request) {
-        if (tgChatId < 0) {
-            throw new BadRequestException(String.format("Невалидный идентификатор чата: %s", tgChatId));
-        }
         return linksService.removeLink(tgChatId, request);
     }
 

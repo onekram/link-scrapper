@@ -1,7 +1,6 @@
 package backend.academy.scrapper.controller;
 
 import backend.academy.model.ApiErrorResponse;
-import backend.academy.scrapper.exception.BadRequestException;
 import backend.academy.scrapper.exception.NotFoundException;
 import backend.academy.scrapper.service.ChatService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -41,9 +40,6 @@ public class ChatController {
             value = "/{id}",
             produces = {"application/json"})
     public void registerChat(@PathVariable Long id) {
-        if (id < 0) {
-            throw new BadRequestException(String.format("Невалидный идентификатор чата: %s", id));
-        }
         chatService.register(id);
     }
 
@@ -70,9 +66,6 @@ public class ChatController {
             value = "/{id}",
             produces = {"application/json"})
     public void unRegisterChat(@PathVariable Long id) {
-        if (id < 0) {
-            throw new BadRequestException(String.format("Невалидный идентификатор чата: %s", id));
-        }
         chatService.unRegister(id);
     }
 

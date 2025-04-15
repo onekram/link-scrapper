@@ -27,6 +27,9 @@ public class LinksService {
     private final LinksRepository linksRepository;
 
     public ListLinksResponse listAll(Long tgChatId) {
+        if (tgChatId < 0) {
+            throw new BadRequestException(String.format("Невалидный идентификатор чата: %s", tgChatId));
+        }
         List<LinkResponse> linkResponses = chatRepository.getLinks(tgChatId).stream()
                 .map(linksRepository::getLink)
                 .filter(Objects::nonNull)
@@ -36,6 +39,9 @@ public class LinksService {
     }
 
     public LinkResponse addLink(Long tgChatId, AddLinkRequest request) {
+        if (tgChatId < 0) {
+            throw new BadRequestException(String.format("Невалидный идентификатор чата: %s", tgChatId));
+        }
         Long linkRecordId = chatRepository.getLinks(tgChatId).stream()
                 .map(linksRepository::getLink)
                 .filter(Objects::nonNull)
@@ -49,6 +55,9 @@ public class LinksService {
     }
 
     public LinkResponse removeLink(Long tgChatId, RemoveLinkRequest request) {
+        if (tgChatId < 0) {
+            throw new BadRequestException(String.format("Невалидный идентификатор чата: %s", tgChatId));
+        }
         LinkRecord record = chatRepository.getLinks(tgChatId).stream()
                 .map(linksRepository::getLink)
                 .filter(Objects::nonNull)
