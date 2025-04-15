@@ -52,11 +52,11 @@ public class LinksController {
     @GetMapping(
             produces = {"application/json"},
             headers = {"Tg-Chat-Id"})
-    public ResponseEntity<ListLinksResponse> getLinks(@RequestHeader("Tg-Chat-Id") Long tgChatId) {
+    public ListLinksResponse getLinks(@RequestHeader("Tg-Chat-Id") Long tgChatId) {
         if (tgChatId < 0) {
             throw new BadRequestException(String.format("Невалидный идентификатор чата: %s", tgChatId));
         }
-        return ResponseEntity.ok(linksService.listAll(tgChatId));
+        return linksService.listAll(tgChatId);
     }
 
     @Operation(summary = "Добавить отслеживание ссылки")
@@ -81,12 +81,12 @@ public class LinksController {
             produces = {"application/json"},
             consumes = {"application/json"},
             headers = {"Tg-Chat-Id"})
-    public ResponseEntity<LinkResponse> addLink(
+    public LinkResponse addLink(
             @RequestHeader("Tg-Chat-Id") Long tgChatId, @RequestBody AddLinkRequest request) {
         if (tgChatId < 0) {
             throw new BadRequestException(String.format("Невалидный идентификатор чата: %s", tgChatId));
         }
-        return ResponseEntity.ok(linksService.addLink(tgChatId, request));
+        return linksService.addLink(tgChatId, request);
     }
 
     @Operation(summary = "Убрать отслеживание ссылки")
@@ -118,12 +118,12 @@ public class LinksController {
             produces = {"application/json"},
             consumes = {"application/json"},
             headers = {"Tg-Chat-Id"})
-    public ResponseEntity<LinkResponse> removeLink(
+    public LinkResponse removeLink(
             @RequestHeader("Tg-Chat-Id") Long tgChatId, @RequestBody RemoveLinkRequest request) {
         if (tgChatId < 0) {
             throw new BadRequestException(String.format("Невалидный идентификатор чата: %s", tgChatId));
         }
-        return ResponseEntity.ok(linksService.removeLink(tgChatId, request));
+        return linksService.removeLink(tgChatId, request);
     }
 
     @ExceptionHandler(NotFoundException.class)

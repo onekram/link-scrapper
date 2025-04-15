@@ -40,12 +40,11 @@ public class ChatController {
     @PostMapping(
             value = "/{id}",
             produces = {"application/json"})
-    public ResponseEntity<Void> registerChat(@PathVariable Long id) {
+    public void registerChat(@PathVariable Long id) {
         if (id < 0) {
             throw new BadRequestException(String.format("Невалидный идентификатор чата: %s", id));
         }
         chatService.register(id);
-        return ResponseEntity.ok().build();
     }
 
     @Operation(summary = "Удалить чат")
@@ -70,12 +69,11 @@ public class ChatController {
     @DeleteMapping(
             value = "/{id}",
             produces = {"application/json"})
-    public ResponseEntity<Void> unRegisterChat(@PathVariable Long id) {
+    public void unRegisterChat(@PathVariable Long id) {
         if (id < 0) {
             throw new BadRequestException(String.format("Невалидный идентификатор чата: %s", id));
         }
         chatService.unRegister(id);
-        return ResponseEntity.ok().build();
     }
 
     @ExceptionHandler(NotFoundException.class)

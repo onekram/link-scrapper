@@ -45,7 +45,7 @@ public class UpdatesController {
     @PostMapping(
             value = "/updates",
             produces = {"application/json"})
-    public ResponseEntity<Void> sendUpdates(@RequestBody LinkUpdate linkUpdate) {
+    public void sendUpdates(@RequestBody LinkUpdate linkUpdate) {
         linkUpdate
                 .getTgChatIds()
                 .forEach(chatId -> telegramBot.execute(
@@ -63,7 +63,6 @@ public class UpdatesController {
                                 log.info("Message sent: {} with error", request, e);
                             }
                         }));
-        return ResponseEntity.ok().build();
     }
 
     @ExceptionHandler({MethodArgumentTypeMismatchException.class, HttpMessageNotReadableException.class})
