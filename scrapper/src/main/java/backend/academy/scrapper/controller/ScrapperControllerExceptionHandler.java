@@ -14,7 +14,12 @@ import org.springframework.web.method.annotation.MethodArgumentTypeMismatchExcep
 @RestControllerAdvice
 public class ScrapperControllerExceptionHandler {
 
-    @ExceptionHandler({BadRequestException.class, MethodArgumentTypeMismatchException.class, HttpMessageNotReadableException.class, MissingRequestHeaderException.class})
+    @ExceptionHandler({
+        BadRequestException.class,
+        MethodArgumentTypeMismatchException.class,
+        HttpMessageNotReadableException.class,
+        MissingRequestHeaderException.class
+    })
     public ResponseEntity<ApiErrorResponse> convertPojoExceptionHandler(Exception ex) {
         HttpStatus status = HttpStatus.BAD_REQUEST;
         return ResponseEntity.status(status)
@@ -25,6 +30,6 @@ public class ScrapperControllerExceptionHandler {
     public ResponseEntity<ApiErrorResponse> handleNotFound(NotFoundException ex) {
         HttpStatus status = HttpStatus.NOT_FOUND;
         return ResponseEntity.status(status)
-            .body(ApiErrorResponse.fromException(ex, "Запрашиваемый ресурс не найден", status));
+                .body(ApiErrorResponse.fromException(ex, "Запрашиваемый ресурс не найден", status));
     }
 }

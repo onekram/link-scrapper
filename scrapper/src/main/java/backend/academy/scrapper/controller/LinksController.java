@@ -73,8 +73,7 @@ public class LinksController {
             produces = {"application/json"},
             consumes = {"application/json"},
             headers = {"Tg-Chat-Id"})
-    public LinkResponse addLink(
-            @RequestHeader("Tg-Chat-Id") Long tgChatId, @RequestBody AddLinkRequest request) {
+    public LinkResponse addLink(@RequestHeader("Tg-Chat-Id") Long tgChatId, @RequestBody AddLinkRequest request) {
         return linksService.addLink(tgChatId, request);
     }
 
@@ -107,8 +106,7 @@ public class LinksController {
             produces = {"application/json"},
             consumes = {"application/json"},
             headers = {"Tg-Chat-Id"})
-    public LinkResponse removeLink(
-            @RequestHeader("Tg-Chat-Id") Long tgChatId, @RequestBody RemoveLinkRequest request) {
+    public LinkResponse removeLink(@RequestHeader("Tg-Chat-Id") Long tgChatId, @RequestBody RemoveLinkRequest request) {
         return linksService.removeLink(tgChatId, request);
     }
 }

@@ -15,8 +15,8 @@ public class BeanConfiguration {
     @Bean
     public TelegramBot telegramBot() {
         return new TelegramBot.Builder(botConfig.telegramToken())
-            .apiUrl(botConfig.telegramUrl() + "/bot")
-            .build();
+                .apiUrl(botConfig.telegramUrl() + "/bot")
+                .build();
     }
 
     @Bean
