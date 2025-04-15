@@ -33,7 +33,7 @@ public class UpdateService {
             log.info("Message chatId: {}, current state: {}, text: {}", chatId, currentState, message.text());
 
             State nextState = router.process(new HandlerContext(message, telegramBot, currentState));
-            log.info("Move to state: {}", nextState);
+            log.info("Message chatId: {}, move to state: {}", chatId, nextState);
             stateRepository.saveState(chatId, nextState);
         } catch (Exception e) {
             log.error("Exception while routing occurred", e);
