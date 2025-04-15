@@ -23,12 +23,13 @@ import org.springframework.stereotype.Service;
 @Service
 @RequiredArgsConstructor
 public class LinksService {
+    public static final String INVALID_TG_CHAT_ID_FORMAT_MESSAGE = "Невалидный идентификатор чата: %s";
     private final ChatRepository chatRepository;
     private final LinksRepository linksRepository;
 
     public ListLinksResponse listAll(Long tgChatId) {
         if (tgChatId < 0) {
-            throw new BadRequestException(String.format("Невалидный идентификатор чата: %s", tgChatId));
+            throw new BadRequestException(INVALID_TG_CHAT_ID_FORMAT_MESSAGE.formatted(tgChatId));
         }
         List<LinkResponse> linkResponses = chatRepository.getLinks(tgChatId).stream()
                 .map(linksRepository::getLink)
@@ -40,7 +41,7 @@ public class LinksService {
 
     public LinkResponse addLink(Long tgChatId, AddLinkRequest request) {
         if (tgChatId < 0) {
-            throw new BadRequestException(String.format("Невалидный идентификатор чата: %s", tgChatId));
+            throw new BadRequestException(INVALID_TG_CHAT_ID_FORMAT_MESSAGE.formatted(tgChatId));
         }
         Long linkRecordId = chatRepository.getLinks(tgChatId).stream()
                 .map(linksRepository::getLink)
@@ -56,14 +57,14 @@ public class LinksService {
 
     public LinkResponse removeLink(Long tgChatId, RemoveLinkRequest request) {
         if (tgChatId < 0) {
-            throw new BadRequestException(String.format("Невалидный идентификатор чата: %s", tgChatId));
+            throw new BadRequestException(INVALID_TG_CHAT_ID_FORMAT_MESSAGE.formatted(tgChatId));
         }
         LinkRecord record = chatRepository.getLinks(tgChatId).stream()
                 .map(linksRepository::getLink)
                 .filter(Objects::nonNull)
                 .filter(link -> request.getLink().equals(link.getUrl().toString()))
                 .findFirst()
-                .orElseThrow(() -> new NotFoundException(String.format("Не существует ссылки: %s", request.getLink())));
+                .orElseThrow(() -> new NotFoundException("Не существует ссылки: %s".formatted(request.getLink())));
         linksRepository.removeLink(record.getId());
         return recordToResponse(record);
     }
@@ -86,7 +87,7 @@ public class LinksService {
             LinkType linkType = LinkType.getType(request.getLink()).orElse(null);
             return new LinkRecord(id, new URI(request.getLink()), request.getTags(), request.getFilters(), linkType);
         } catch (URISyntaxException | IllegalArgumentException ex) {
-            throw new BadRequestException(String.format("Невалидная ссылка: %s", request.getLink()));
+            throw new BadRequestException("Невалидная ссылка: %s".formatted(request.getLink()));
         }
     }
 }
