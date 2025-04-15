@@ -5,26 +5,38 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import backend.academy.bot.BotConfig;
+import backend.academy.bot.repository.state.StateRepository;
+import backend.academy.bot.service.UpdateService;
+import backend.academy.bot.state.Router;
 import backend.academy.bot.test.utils.TestUtil;
 import backend.academy.model.LinkUpdate;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.pengrad.telegrambot.TelegramBot;
 import com.pengrad.telegrambot.request.SendMessage;
 import java.util.List;
+import java.util.ResourceBundle;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.context.annotation.Description;
+import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.test.context.bean.override.mockito.MockitoBeans;
 import org.springframework.test.web.servlet.MockMvc;
 
 @WebMvcTest(UpdatesController.class)
+@Import({UpdateService.class})
+@MockitoBeans({
+    @MockitoBean(types = Router.class),
+    @MockitoBean(types = StateRepository.class)})
 class UpdatesControllerTest {
 
     @Autowired
@@ -36,10 +48,14 @@ class UpdatesControllerTest {
     @MockitoBean
     private TelegramBot telegramBot;
 
+    @MockitoBean
+    private ResourceBundle resourceBundle;
+
     @Test
     @Description("Updates for chatIds 123 and 456")
     void happyPath() throws Exception {
         LinkUpdate request = TestUtil.generateLinkUpdate(123L, 456L);
+        when(resourceBundle.getString("update.format.message")).thenReturn("%s and %s");
 
         mockMvc.perform(post("/updates")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -56,10 +72,10 @@ class UpdatesControllerTest {
 
         assertThat(sentMessages.getFirst())
                 .extracting(TestUtil::getText)
-                .isEqualTo("\uD83C\uDD95 description for url url");
+                .isEqualTo("description and url");
         assertThat(sentMessages.getLast())
                 .extracting(TestUtil::getText)
-                .isEqualTo("\uD83C\uDD95 description for url url");
+                .isEqualTo("description and url");
     }
 
     @Test
