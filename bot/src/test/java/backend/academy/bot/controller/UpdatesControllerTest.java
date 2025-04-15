@@ -10,7 +10,6 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import backend.academy.bot.BotConfig;
 import backend.academy.bot.repository.state.StateRepository;
 import backend.academy.bot.service.UpdateService;
 import backend.academy.bot.state.Router;
@@ -34,9 +33,7 @@ import org.springframework.test.web.servlet.MockMvc;
 
 @WebMvcTest(UpdatesController.class)
 @Import({UpdateService.class})
-@MockitoBeans({
-    @MockitoBean(types = Router.class),
-    @MockitoBean(types = StateRepository.class)})
+@MockitoBeans({@MockitoBean(types = Router.class), @MockitoBean(types = StateRepository.class)})
 class UpdatesControllerTest {
 
     @Autowired
@@ -70,12 +67,8 @@ class UpdatesControllerTest {
         assertThat(sentMessages.getFirst()).extracting(TestUtil::getId).isEqualTo(123L);
         assertThat(sentMessages.getLast()).extracting(TestUtil::getId).isEqualTo(456L);
 
-        assertThat(sentMessages.getFirst())
-                .extracting(TestUtil::getText)
-                .isEqualTo("description and url");
-        assertThat(sentMessages.getLast())
-                .extracting(TestUtil::getText)
-                .isEqualTo("description and url");
+        assertThat(sentMessages.getFirst()).extracting(TestUtil::getText).isEqualTo("description and url");
+        assertThat(sentMessages.getLast()).extracting(TestUtil::getText).isEqualTo("description and url");
     }
 
     @Test

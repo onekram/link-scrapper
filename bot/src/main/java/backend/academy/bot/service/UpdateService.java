@@ -10,9 +10,9 @@ import com.pengrad.telegrambot.TelegramBot;
 import com.pengrad.telegrambot.model.Message;
 import com.pengrad.telegrambot.model.Update;
 import com.pengrad.telegrambot.request.SendMessage;
+import com.pengrad.telegrambot.response.SendResponse;
 import java.io.IOException;
 import java.util.ResourceBundle;
-import com.pengrad.telegrambot.response.SendResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -48,21 +48,23 @@ public class UpdateService {
 
     public void updateProcess(LinkUpdate linkUpdate) {
         linkUpdate
-            .getTgChatIds()
-            .forEach(chatId -> telegramBot.execute(
-                new SendMessage(
-                    chatId,
-                    resourceBundle.getString("update.format.message").formatted(linkUpdate.getDescription(), linkUpdate.getUrl())),
-                new Callback<SendMessage, SendResponse>() {
-                    @Override
-                    public void onResponse(SendMessage request, SendResponse response) {
-                        log.info("Message sent: {} with response: {}", request, response);
-                    }
+                .getTgChatIds()
+                .forEach(chatId -> telegramBot.execute(
+                        new SendMessage(
+                                chatId,
+                                resourceBundle
+                                        .getString("update.format.message")
+                                        .formatted(linkUpdate.getDescription(), linkUpdate.getUrl())),
+                        new Callback<SendMessage, SendResponse>() {
+                            @Override
+                            public void onResponse(SendMessage request, SendResponse response) {
+                                log.info("Message sent: {} with response: {}", request, response);
+                            }
 
-                    @Override
-                    public void onFailure(SendMessage request, IOException e) {
-                        log.error("Message sent: {} with error", request, e);
-                    }
-                }));
+                            @Override
+                            public void onFailure(SendMessage request, IOException e) {
+                                log.error("Message sent: {} with error", request, e);
+                            }
+                        }));
     }
 }
