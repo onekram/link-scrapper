@@ -2,8 +2,10 @@ package backend.academy.bot.service;
 
 import static backend.academy.bot.test.utils.LoggerTestUtil.appenderContainsLog;
 import static backend.academy.bot.test.utils.LoggerTestUtil.getListAppender;
+import static backend.academy.bot.test.utils.TestUtil.generateLinkUpdate;
 import static backend.academy.bot.test.utils.TestUtil.generateMessage;
 import static backend.academy.bot.test.utils.TestUtil.generateUpdate;
+import static org.awaitility.Awaitility.await;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
@@ -23,7 +25,9 @@ import com.pengrad.telegrambot.TelegramBot;
 import com.pengrad.telegrambot.model.Message;
 import com.pengrad.telegrambot.model.Update;
 import com.pengrad.telegrambot.request.SendMessage;
+import java.util.List;
 import java.util.ResourceBundle;
+import java.util.concurrent.TimeUnit;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -110,5 +114,23 @@ class UpdateServiceTest {
         assertEquals("Error", TestUtil.getText(sendMessage));
 
         assertTrue(appenderContainsLog(appender, Level.ERROR, "Exception while routing occurred"));
+    }
+
+    @Test
+    @DisplayName("Update send update for received linkUpdate message")
+    void sendUpdatesToChats() {
+        var linkUpdate = generateLinkUpdate(1L, 2L, 3L, 4L);
+        when(resourceBundle.getString("update.format.message")).thenReturn("%s and %s");
+        updateService.updateProcess(linkUpdate);
+
+        ArgumentCaptor<SendMessage> argumentCaptor = ArgumentCaptor.forClass(SendMessage.class);
+        verify(telegramBot, times(4)).execute(argumentCaptor.capture(), any());
+
+        var values = argumentCaptor.getAllValues().iterator();
+        for (var i : List.of(1L, 2L, 3L, 4L)) {
+            SendMessage sendMessage = values.next();
+            assertEquals("description and url", TestUtil.getText(sendMessage));
+            assertEquals(i, TestUtil.getId(sendMessage));
+        }
     }
 }

@@ -1,18 +1,13 @@
 package backend.academy.bot.controller;
 
+import backend.academy.bot.service.UpdateService;
 import backend.academy.model.ApiErrorResponse;
 import backend.academy.model.LinkUpdate;
-import com.pengrad.telegrambot.Callback;
-import com.pengrad.telegrambot.TelegramBot;
-import com.pengrad.telegrambot.request.SendMessage;
-import com.pengrad.telegrambot.response.SendResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
-import java.io.IOException;
-import java.util.stream.Stream;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -28,7 +23,7 @@ import org.springframework.web.method.annotation.MethodArgumentTypeMismatchExcep
 @Slf4j
 @RequiredArgsConstructor
 public class UpdatesController {
-    private final TelegramBot telegramBot;
+    private final UpdateService updateService;
 
     @Operation(summary = "Отправить обновление")
     @ApiResponses(
@@ -46,36 +41,13 @@ public class UpdatesController {
             value = "/updates",
             produces = {"application/json"})
     public void sendUpdates(@RequestBody LinkUpdate linkUpdate) {
-        linkUpdate
-                .getTgChatIds()
-                .forEach(chatId -> telegramBot.execute(
-                        new SendMessage(
-                                chatId,
-                                "\uD83C\uDD95 " + linkUpdate.getDescription() + " for url " + linkUpdate.getUrl()),
-                        new Callback<SendMessage, SendResponse>() {
-                            @Override
-                            public void onResponse(SendMessage request, SendResponse response) {
-                                log.info("Message sent: {} with response: {}", request, response);
-                            }
-
-                            @Override
-                            public void onFailure(SendMessage request, IOException e) {
-                                log.info("Message sent: {} with error", request, e);
-                            }
-                        }));
+        updateService.updateProcess(linkUpdate);
     }
 
     @ExceptionHandler({MethodArgumentTypeMismatchException.class, HttpMessageNotReadableException.class})
     public ResponseEntity<ApiErrorResponse> invalidParameters(Exception ex) {
         HttpStatus status = HttpStatus.BAD_REQUEST;
         return ResponseEntity.status(status)
-                .body(new ApiErrorResponse(
-                        "Некорректные параметры запроса",
-                        String.valueOf(status.value()),
-                        ex.getClass().getSimpleName(),
-                        ex.getMessage(),
-                        Stream.of(ex.getStackTrace())
-                                .map(StackTraceElement::toString)
-                                .toList()));
+                .body(ApiErrorResponse.fromException(ex, "Некорректные параметры запроса", status));
     }
 }
