@@ -83,7 +83,8 @@ public class BotService {
                 log.error(
                         "Telegram API not responding: {} - {}",
                         e.response().errorCode(),
-                        e.response().description());
+                        e.response().description(),
+                        e);
             } else {
                 String message = Stream.of(e.getStackTrace())
                         .map(StackTraceElement::toString)
