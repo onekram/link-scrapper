@@ -5,19 +5,14 @@ import backend.academy.model.ApiErrorResponse;
 import backend.academy.model.LinkResponse;
 import backend.academy.model.ListLinksResponse;
 import backend.academy.model.RemoveLinkRequest;
-import backend.academy.scrapper.exception.BadRequestException;
-import backend.academy.scrapper.exception.NotFoundException;
 import backend.academy.scrapper.service.LinksService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
-import java.util.stream.Stream;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -115,18 +110,5 @@ public class LinksController {
     public LinkResponse removeLink(
             @RequestHeader("Tg-Chat-Id") Long tgChatId, @RequestBody RemoveLinkRequest request) {
         return linksService.removeLink(tgChatId, request);
-    }
-
-    @ExceptionHandler(NotFoundException.class)
-    public ResponseEntity<ApiErrorResponse> handleNotFound(NotFoundException ex) {
-        return ResponseEntity.status(ex.getStatus())
-                .body(new ApiErrorResponse(
-                        "Ссылка не найдена",
-                        String.valueOf(ex.getStatus().value()),
-                        ex.getClass().getSimpleName(),
-                        ex.getMessage(),
-                        Stream.of(ex.getStackTrace())
-                                .map(StackTraceElement::toString)
-                                .toList()));
     }
 }

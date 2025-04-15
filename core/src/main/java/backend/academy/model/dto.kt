@@ -1,12 +1,28 @@
 package backend.academy.model
 
+import org.springframework.http.HttpStatus
+
 data class ApiErrorResponse (
     val description: String,
     val code: String,
     val exceptionName: String,
     val exceptionMessage: String,
     val stacktrace: List<String>
-)
+) {
+    companion object {
+        @JvmStatic
+        fun fromException(exception: Exception, description: String, status: HttpStatus): ApiErrorResponse {
+            return ApiErrorResponse(
+                description = description,
+                code = status.value().toString(),
+                exceptionName = exception.javaClass.simpleName,
+                exceptionMessage = exception.message?: "",
+                stacktrace = exception.stackTrace.map { it.toString() }
+            )
+        }
+    }
+}
+
 data class LinkResponse (
     val id: Long,
     val url: String,
