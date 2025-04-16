@@ -18,3 +18,14 @@
 Для работы требуется БД `PostgreSQL`. Присутствует опциональная зависимость на `Kafka`.
 
 Для дополнительной справки: [HELP.md](./HELP.md)
+
+## Запуск на локальной машине
+
+- Запуск [bot](bot/src/main/java/backend/academy/bot/BotApplication.java)
+  - Указать переменную окружения *TELEGRAM_TOKEN*
+  - Запустить SpringBootApplication
+- Запуск [scrapper](scrapper/src/main/java/backend/academy/scrapper/ScrapperApplication.java)
+  - Указать переменную окружения *SO_ACCESS_TOKEN*
+  - Указать переменную окружения *SO_TOKEN_KEY*
+- Запустить SpringBootApplication
+

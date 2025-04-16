@@ -17,6 +17,7 @@
 
     <modules>
         <module>bot</module>
+        <module>core</module>
         <module>report</module>
         <module>scrapper</module>
     </modules>
@@ -191,6 +192,7 @@
                             <path>
                                 <groupId>org.projectlombok</groupId>
                                 <artifactId>lombok</artifactId>
+                                <version>1.18.36</version>
                             </path>
                             <path>
                                 <groupId>com.google.errorprone</groupId>

@@ -1,5 +1,15 @@
 app:
   telegram-token: ${TELEGRAM_TOKEN} # env variable
+  scrapper-url: "http://localhost:8081"
+  telegram-url: "https://api.telegram.org"
+
+features:
+  webhook:
+    enabled: false
+
+logging:
+  level:
+    root: info
 
 spring:
   application:
