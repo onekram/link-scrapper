@@ -37,10 +37,10 @@ public class BotClientConfig {
                         .flatMap(errorBody -> {
                             log.error(
                                     "API Error: {} - {} | Exception name: {} | Exception message: {}",
-                                    errorBody.getCode(),
-                                    errorBody.getDescription(),
-                                    errorBody.getExceptionName(),
-                                    errorBody.getExceptionMessage());
+                                    errorBody.code(),
+                                    errorBody.description(),
+                                    errorBody.exceptionName(),
+                                    errorBody.exceptionMessage());
                             return Mono.error(new RuntimeException());
                         })
                         .thenReturn(response);

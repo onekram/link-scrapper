@@ -1,5 +1,6 @@
 package backend.academy.scrapper.repository;
 
+import backend.academy.scrapper.repository.record.ChatRecord;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -16,7 +17,7 @@ public class ChatRepository {
         if (record == null) {
             return Collections.emptyList();
         }
-        return record.getLinks();
+        return record.links();
     }
 
     public void saveUser(Long id) {
@@ -29,7 +30,7 @@ public class ChatRepository {
 
     public void addLink(Long id, Long linkId) {
         db.computeIfAbsent(id, ignored -> new ChatRecord(id, new ArrayList<>()))
-                .getLinks()
+                .links()
                 .add(linkId);
     }
 

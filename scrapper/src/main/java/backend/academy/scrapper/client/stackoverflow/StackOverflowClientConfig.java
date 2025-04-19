@@ -58,9 +58,9 @@ public class StackOverflowClientConfig {
                         .flatMap(errorBody -> {
                             log.error(
                                     "API Error: {} | Error name: {} | Message: {}",
-                                    errorBody.getErrorId(),
-                                    errorBody.getErrorName(),
-                                    errorBody.getErrorMessage());
+                                    errorBody.errorId(),
+                                    errorBody.errorName(),
+                                    errorBody.errorMessage());
                             return Mono.error(new RuntimeException());
                         })
                         .thenReturn(response);

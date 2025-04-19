@@ -11,7 +11,7 @@ public class ParametersRepository {
     private final Map<Long, ParametersRecord> map = new ConcurrentHashMap<>();
 
     public Optional<HandlerContextParameters> getContextParameters(Long key) {
-        return Optional.ofNullable(map.get(key)).map(ParametersRecord::getParameters);
+        return Optional.ofNullable(map.get(key)).map(ParametersRecord::parameters);
     }
 
     public void save(Long key, HandlerContextParameters parameters) {

@@ -2,8 +2,8 @@ package backend.academy.scrapper.service;
 
 import backend.academy.scrapper.exception.BadRequestException;
 import backend.academy.scrapper.exception.NotFoundException;
-import backend.academy.scrapper.repository.ChatRecord;
 import backend.academy.scrapper.repository.ChatRepository;
+import backend.academy.scrapper.repository.record.ChatRecord;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 

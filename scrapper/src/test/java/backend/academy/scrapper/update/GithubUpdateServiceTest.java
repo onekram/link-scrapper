@@ -8,7 +8,7 @@ import backend.academy.model.LinkUpdate;
 import backend.academy.scrapper.client.github.GithubReposClient;
 import backend.academy.scrapper.client.model.GithubRepositoryResponse;
 import backend.academy.scrapper.parser.LinkType;
-import backend.academy.scrapper.repository.LinkRecord;
+import backend.academy.scrapper.repository.record.LinkRecord;
 import backend.academy.scrapper.service.LinksService;
 import java.net.URI;
 import java.time.Instant;

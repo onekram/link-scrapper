@@ -37,7 +37,7 @@ public class GithubClientConfig {
             if (response.statusCode().isError()) {
                 return response.bodyToMono(GithubApiError.class)
                         .flatMap(errorBody -> {
-                            log.error("API Error: {} | Message: {}", errorBody.getStatus(), errorBody.getMessage());
+                            log.error("API Error: {} | Message: {}", errorBody.status(), errorBody.message());
                             return Mono.error(new RuntimeException());
                         })
                         .thenReturn(response);

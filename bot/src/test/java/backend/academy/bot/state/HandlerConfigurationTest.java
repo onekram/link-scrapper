@@ -194,7 +194,7 @@ class HandlerConfigurationTest {
 
         ArgumentCaptor<AddLinkRequest.Builder> captor = ArgumentCaptor.forClass(AddLinkRequest.Builder.class);
         verify(handlerContextParameters, times(1)).setParameter(eq(ADD_LINK_BUILDER), captor.capture());
-        assertEquals("url", captor.getValue().build().getLink());
+        assertEquals("url", captor.getValue().build().link());
         checkSentMessageResourceBundle("input.tags.message");
         checkSentMessageChatId(123L);
         assertKeyboardContainsMenu();
@@ -226,7 +226,7 @@ class HandlerConfigurationTest {
     void trackFiltersHandler() {
         when(handlerContextParameters.getParameter(ADD_LINK_BUILDER, AddLinkRequest.Builder.class))
                 .thenReturn(builder);
-        AddLinkRequest request = new AddLinkRequest.Builder().link("url").build();
+        AddLinkRequest request = AddLinkRequest.builder().link("url").build();
         when(builder.build()).thenReturn(request);
         State currentState = State.TRACK_FILTERS;
         Message message = TestUtil.generateMessage("  filter1   filter2  ", 123L);

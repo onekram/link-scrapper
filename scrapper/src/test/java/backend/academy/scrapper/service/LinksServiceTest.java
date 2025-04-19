@@ -12,8 +12,8 @@ import backend.academy.model.LinkResponse;
 import backend.academy.model.RemoveLinkRequest;
 import backend.academy.scrapper.parser.LinkType;
 import backend.academy.scrapper.repository.ChatRepository;
-import backend.academy.scrapper.repository.LinkRecord;
 import backend.academy.scrapper.repository.LinksRepository;
+import backend.academy.scrapper.repository.record.LinkRecord;
 import backend.academy.scrapper.test.util.TestUtil;
 import java.util.Collections;
 import java.util.List;
@@ -48,18 +48,19 @@ class LinksServiceTest {
 
         LinkResponse response = linksService.addLink(
                 1L,
-                new AddLinkRequest.Builder()
+                AddLinkRequest.builder()
                         .link("https://third.com")
+                        .filters(Collections.emptyList())
                         .tags(List.of("tag23"))
                         .build());
-        assertThat(response.getId()).isNotIn(42L, 43L);
-        assertEquals("https://third.com", response.getUrl());
-        assertEquals(List.of("tag23"), response.getTags());
+        assertThat(response.id()).isNotIn(42L, 43L);
+        assertEquals("https://third.com", response.url());
+        assertEquals(List.of("tag23"), response.tags());
 
         ArgumentCaptor<LinkRecord> captor = ArgumentCaptor.forClass(LinkRecord.class);
         verify(linksRepository, times(1)).addLink(captor.capture());
-        assertThat(captor.getValue().getId()).isNotIn(42L, 43L);
-        verify(chatRepository, times(1)).addLink(1L, response.getId());
+        assertThat(captor.getValue().id()).isNotIn(42L, 43L);
+        verify(chatRepository, times(1)).addLink(1L, response.id());
     }
 
     @Test
@@ -74,19 +75,20 @@ class LinksServiceTest {
 
         LinkResponse response = linksService.addLink(
                 1L,
-                new AddLinkRequest.Builder()
+                AddLinkRequest.builder()
                         .link("https://another.com")
+                        .tags(Collections.emptyList())
                         .filters(List.of("newFilter"))
                         .build());
 
-        assertEquals(43L, response.getId());
-        assertEquals("https://another.com", response.getUrl());
-        assertEquals(List.of("newFilter"), response.getFilters());
+        assertEquals(43L, response.id());
+        assertEquals("https://another.com", response.url());
+        assertEquals(List.of("newFilter"), response.filters());
 
         ArgumentCaptor<LinkRecord> captor = ArgumentCaptor.forClass(LinkRecord.class);
         verify(linksRepository, times(1)).addLink(captor.capture());
-        assertEquals(43L, captor.getValue().getId());
-        verify(chatRepository, times(1)).addLink(1L, response.getId());
+        assertEquals(43L, captor.getValue().id());
+        verify(chatRepository, times(1)).addLink(1L, response.id());
     }
 
     @Test
@@ -100,9 +102,9 @@ class LinksServiceTest {
 
         LinkResponse response = linksService.removeLink(1L, new RemoveLinkRequest("https://another.com"));
 
-        assertEquals(43L, response.getId());
-        assertEquals("https://another.com", response.getUrl());
-        assertEquals(List.of("oldTag"), response.getTags());
+        assertEquals(43L, response.id());
+        assertEquals("https://another.com", response.url());
+        assertEquals(List.of("oldTag"), response.tags());
 
         verify(linksRepository, times(1)).removeLink(43L);
     }

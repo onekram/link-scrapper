@@ -1,7 +1,7 @@
 package backend.academy.scrapper.test.util;
 
 import backend.academy.scrapper.parser.LinkType;
-import backend.academy.scrapper.repository.LinkRecord;
+import backend.academy.scrapper.repository.record.LinkRecord;
 import java.net.URI;
 import java.util.Collections;
 import java.util.List;

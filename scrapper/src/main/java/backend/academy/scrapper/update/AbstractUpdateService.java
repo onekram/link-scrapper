@@ -2,7 +2,7 @@ package backend.academy.scrapper.update;
 
 import backend.academy.model.LinkUpdate;
 import backend.academy.scrapper.parser.LinkType;
-import backend.academy.scrapper.repository.LinkRecord;
+import backend.academy.scrapper.repository.record.LinkRecord;
 import backend.academy.scrapper.service.LinksService;
 import java.time.Instant;
 import java.util.List;
@@ -20,7 +20,7 @@ public abstract class AbstractUpdateService implements UpdateService {
                 .flatMap(entry -> entry.getValue().stream().map(link -> Map.entry(entry.getKey(), link)))
                 .filter(entry -> isUpdated(entry.getValue(), from))
                 .collect(Collectors.groupingBy(
-                        entry -> entry.getValue().getUrl().toString(),
+                        entry -> entry.getValue().url().toString(),
                         Collectors.mapping(Map.Entry::getKey, Collectors.toList())))
                 .entrySet()
                 .stream()

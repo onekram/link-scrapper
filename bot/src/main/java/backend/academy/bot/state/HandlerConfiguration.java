@@ -88,7 +88,7 @@ public class HandlerConfiguration {
                 .method(handlerContext -> {
                     Long id = handlerContext.message().chat().id();
                     ListLinksResponse response = linksService.getTrackedLinks(id);
-                    String links = response.getLinks().stream()
+                    String links = response.links().stream()
                             .map(MessageUtil::linkMessage)
                             .collect(Collectors.joining("\n"));
                     return new SendMessage(id, links.isEmpty() ? resourceBundle.getString("no.links.message") : links);
@@ -117,7 +117,7 @@ public class HandlerConfiguration {
                 .method(handlerContext -> {
                     Long id = handlerContext.message().chat().id();
                     String textLink = handlerContext.message().text().strip();
-                    AddLinkRequest.Builder builder = new AddLinkRequest.Builder().link(textLink);
+                    AddLinkRequest.Builder builder = AddLinkRequest.builder().link(textLink);
                     handlerContextParameters.setParameter(ADD_LINK_BUILDER, builder);
                     return new SendMessage(id, resourceBundle.getString("input.tags.message"));
                 })
@@ -173,8 +173,8 @@ public class HandlerConfiguration {
                 .nextState(State.UNTRACK_LINK)
                 .method(handlerContext -> {
                     Long id = handlerContext.message().chat().id();
-                    String[] links = linksService.getTrackedLinks(id).getLinks().stream()
-                            .map(LinkResponse::getUrl)
+                    String[] links = linksService.getTrackedLinks(id).links().stream()
+                            .map(LinkResponse::url)
                             .toArray(String[]::new);
                     return new SendMessage(id, resourceBundle.getString("untrack.links.message"))
                             .replyMarkup(
@@ -193,7 +193,7 @@ public class HandlerConfiguration {
                     Long chatId = message.chat().id();
                     LinkResponse linkResponse = linksService.untrackLink(chatId, new RemoveLinkRequest(message.text()));
                     return new SendMessage(
-                            chatId, resourceBundle.getString("unsubscribed.message") + " " + linkResponse.getUrl());
+                            chatId, resourceBundle.getString("unsubscribed.message") + " " + linkResponse.url());
                 })
                 .keyboard(new ReplyKeyboardRemove())
                 .build();

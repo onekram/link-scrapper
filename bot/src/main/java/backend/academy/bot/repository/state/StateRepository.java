@@ -14,7 +14,7 @@ public class StateRepository {
     }
 
     public State getCurrentState(Long id) {
-        return getStateRecord(id).getCurrent();
+        return getStateRecord(id).current();
     }
 
     private StateRecord getStateRecord(Long id) {

@@ -9,8 +9,8 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import backend.academy.scrapper.repository.ChatRecord;
 import backend.academy.scrapper.repository.ChatRepository;
+import backend.academy.scrapper.repository.record.ChatRecord;
 import backend.academy.scrapper.service.ChatService;
 import java.util.List;
 import org.junit.jupiter.api.Test;

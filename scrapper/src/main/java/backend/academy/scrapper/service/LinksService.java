@@ -8,8 +8,8 @@ import backend.academy.scrapper.exception.BadRequestException;
 import backend.academy.scrapper.exception.NotFoundException;
 import backend.academy.scrapper.parser.LinkType;
 import backend.academy.scrapper.repository.ChatRepository;
-import backend.academy.scrapper.repository.LinkRecord;
 import backend.academy.scrapper.repository.LinksRepository;
+import backend.academy.scrapper.repository.record.LinkRecord;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.List;
@@ -46,9 +46,9 @@ public class LinksService {
         Long linkRecordId = chatRepository.getLinks(tgChatId).stream()
                 .map(linksRepository::getLink)
                 .filter(Objects::nonNull)
-                .filter(link -> request.getLink().equals(link.getUrl().toString()))
+                .filter(link -> request.link().equals(link.url().toString()))
                 .findAny()
-                .map(LinkRecord::getId)
+                .map(LinkRecord::id)
                 .orElseGet(System::currentTimeMillis);
         LinkRecord record = linksRepository.addLink(requestToRecord(linkRecordId, request));
         chatRepository.addLink(tgChatId, linkRecordId);
@@ -62,10 +62,10 @@ public class LinksService {
         LinkRecord record = chatRepository.getLinks(tgChatId).stream()
                 .map(linksRepository::getLink)
                 .filter(Objects::nonNull)
-                .filter(link -> request.getLink().equals(link.getUrl().toString()))
+                .filter(link -> request.link().equals(link.url().toString()))
                 .findFirst()
-                .orElseThrow(() -> new NotFoundException("Не существует ссылки: %s".formatted(request.getLink())));
-        linksRepository.removeLink(record.getId());
+                .orElseThrow(() -> new NotFoundException("Не существует ссылки: %s".formatted(request.link())));
+        linksRepository.removeLink(record.id());
         return recordToResponse(record);
     }
 
@@ -74,20 +74,20 @@ public class LinksService {
                 .collect(Collectors.toMap(Function.identity(), id -> chatRepository.getLinks(id).stream()
                         .map(linksRepository::getLink)
                         .filter(Objects::nonNull)
-                        .filter(link -> Objects.equals(link.getType(), linkType))
+                        .filter(link -> Objects.equals(link.type(), linkType))
                         .toList()));
     }
 
     private LinkResponse recordToResponse(LinkRecord record) {
-        return new LinkResponse(record.getId(), record.getUrl().toString(), record.getTags(), record.getFilters());
+        return new LinkResponse(record.id(), record.url().toString(), record.tags(), record.filters());
     }
 
     private LinkRecord requestToRecord(Long id, AddLinkRequest request) {
         try {
-            LinkType linkType = LinkType.getType(request.getLink()).orElse(null);
-            return new LinkRecord(id, new URI(request.getLink()), request.getTags(), request.getFilters(), linkType);
+            LinkType linkType = LinkType.getType(request.link()).orElse(null);
+            return new LinkRecord(id, new URI(request.link()), request.tags(), request.filters(), linkType);
         } catch (URISyntaxException | IllegalArgumentException ex) {
-            throw new BadRequestException("Невалидная ссылка: %s".formatted(request.getLink()));
+            throw new BadRequestException("Невалидная ссылка: %s".formatted(request.link()));
         }
     }
 }

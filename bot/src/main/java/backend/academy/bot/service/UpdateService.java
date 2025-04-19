@@ -48,13 +48,13 @@ public class UpdateService {
 
     public void updateProcess(LinkUpdate linkUpdate) {
         linkUpdate
-                .getTgChatIds()
+                .tgChatIds()
                 .forEach(chatId -> telegramBot.execute(
                         new SendMessage(
                                 chatId,
                                 resourceBundle
                                         .getString("update.format.message")
-                                        .formatted(linkUpdate.getDescription(), linkUpdate.getUrl())),
+                                        .formatted(linkUpdate.description(), linkUpdate.url())),
                         new Callback<SendMessage, SendResponse>() {
                             @Override
                             public void onResponse(SendMessage request, SendResponse response) {
