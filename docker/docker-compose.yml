@@ -1,0 +1,31 @@
+services:
+  postgres:
+    image: postgres:15-alpine
+    container_name: postgres
+    environment:
+      POSTGRES_DB: ${LOCAL_POSTGRES_DB}
+      POSTGRES_USER: ${LOCAL_POSTGRES_USER}
+      POSTGRES_PASSWORD: ${LOCAL_POSTGRES_PASSWORD}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  liquibase-migrations:
+    image: liquibase/liquibase:4.29
+    container_name: migrations
+    depends_on:
+      - postgres
+    command:
+      - --searchPath=/changesets
+      - --changelog-file=master.yml
+      - --driver=org.postgresql.Driver
+      - --url=jdbc:postgresql://postgres:5432/${LOCAL_POSTGRES_DB}
+      - --username=${LOCAL_POSTGRES_USER}
+      - --password=${LOCAL_POSTGRES_PASSWORD}
+      - update
+    volumes:
+      - ../migrations:/changesets
+
+volumes:
+  postgres_data:
