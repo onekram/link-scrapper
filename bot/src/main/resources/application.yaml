@@ -1,6 +1,6 @@
 app:
-  telegram-token: ${TELEGRAM_TOKEN} # env variable
-  scrapper-url: "http://localhost:8081"
+  telegram-token: ${TELEGRAM_TOKEN}
+  scrapper-url: ${SCRAPPER_URL}
   telegram-url: "https://api.telegram.org"
 
 features:

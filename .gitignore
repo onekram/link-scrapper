@@ -24,4 +24,4 @@ dependency-reduced-pom.xml
 hs_err_pid*
 
 ### Docker environments ###
-docker/.env
+.env
