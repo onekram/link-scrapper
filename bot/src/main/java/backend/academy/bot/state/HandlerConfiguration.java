@@ -136,9 +136,10 @@ public class HandlerConfiguration {
                 .method(handlerContext -> {
                     Long chatId = handlerContext.message().chat().id();
                     String text = handlerContext.message().text().strip();
-                    AddLinkRequest.Builder builder =
-                        contextRepository.getContext(chatId, AddLinkRequest.Builder.class)
-                            .orElseThrow(() -> new RuntimeException("No AddLinkRequest building exist for chatId: " + chatId));
+                    AddLinkRequest.Builder builder = contextRepository
+                            .getContext(chatId, AddLinkRequest.Builder.class)
+                            .orElseThrow(() ->
+                                    new RuntimeException("No AddLinkRequest building exist for chatId: " + chatId));
                     builder.tags(List.of(text.split("\\s+")));
                     contextRepository.setContext(chatId, builder);
                     return new SendMessage(chatId, resourceBundle.getString("input.filters.message"));
@@ -156,9 +157,10 @@ public class HandlerConfiguration {
                 .method(handlerContext -> {
                     Long chatId = handlerContext.message().chat().id();
                     String text = handlerContext.message().text().strip();
-                    AddLinkRequest.Builder builder =
-                            contextRepository.getContext(chatId, AddLinkRequest.Builder.class)
-                                .orElseThrow(() -> new RuntimeException("No AddLinkRequest building exist for chatId: " + chatId));
+                    AddLinkRequest.Builder builder = contextRepository
+                            .getContext(chatId, AddLinkRequest.Builder.class)
+                            .orElseThrow(() ->
+                                    new RuntimeException("No AddLinkRequest building exist for chatId: " + chatId));
                     builder.filters(List.of(text.split("\\s+")));
                     contextRepository.deleteContext(chatId, AddLinkRequest.Builder.class);
                     AddLinkRequest addLinkRequest = builder.build();

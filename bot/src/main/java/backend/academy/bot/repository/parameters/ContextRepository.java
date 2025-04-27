@@ -1,10 +1,10 @@
 package backend.academy.bot.repository.parameters;
 
-import java.util.Optional;
 import com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility;
 import com.fasterxml.jackson.annotation.PropertyAccessor;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import java.util.Optional;
 import org.springframework.data.redis.core.HashOperations;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Repository;
@@ -24,22 +24,18 @@ public class ContextRepository {
             hashOperations.put(chatId, context.getClass(), objectMapper.writeValueAsString(context));
         } catch (JsonProcessingException e) {
             throw new RuntimeException(
-                "Fail to serialize object: %s for chatId: %s".formatted(context.getClass(), chatId),
-                e);
+                    "Fail to serialize object: %s for chatId: %s".formatted(context.getClass(), chatId), e);
         }
     }
 
     public <T> Optional<T> getContext(Long chatId, Class<T> token) {
-        return Optional.ofNullable(hashOperations.get(chatId, token))
-            .map(s -> {
-                try {
-                    return objectMapper.readValue(s, token);
-                } catch (JsonProcessingException e) {
-                    throw new RuntimeException(
-                        "Fail to deserialize object: %s for chatId: %s".formatted(token, chatId),
-                        e);
-                }
-            });
+        return Optional.ofNullable(hashOperations.get(chatId, token)).map(s -> {
+            try {
+                return objectMapper.readValue(s, token);
+            } catch (JsonProcessingException e) {
+                throw new RuntimeException("Fail to deserialize object: %s for chatId: %s".formatted(token, chatId), e);
+            }
+        });
     }
 
     public void deleteContext(Long chatId, Class<?> token) {

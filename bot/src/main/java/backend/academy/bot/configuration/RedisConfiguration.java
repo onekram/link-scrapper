@@ -14,7 +14,8 @@ import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSeriali
 @EnableRedisRepositories
 public class RedisConfiguration {
     @Bean
-    public RedisTemplate<Long, Object> redisTemplateContext(RedisConnectionFactory connectionFactory, ObjectMapper objectMapper) {
+    public RedisTemplate<Long, Object> redisTemplateContext(
+            RedisConnectionFactory connectionFactory, ObjectMapper objectMapper) {
         RedisTemplate<Long, Object> template = new RedisTemplate<>();
         template.setConnectionFactory(connectionFactory);
         ObjectMapper contextObjectMapper = objectMapper.copy().setVisibility(PropertyAccessor.FIELD, Visibility.ANY);

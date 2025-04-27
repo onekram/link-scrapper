@@ -5,10 +5,4 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.redis.core.RedisHash;
 
 @RedisHash("chat_state")
-public record StateEntity(
-    @Id
-    Long chatId,
-    State state
-) {
-}
-
+public record StateEntity(@Id Long chatId, State state) {}

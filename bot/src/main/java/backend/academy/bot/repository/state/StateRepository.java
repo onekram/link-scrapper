@@ -4,5 +4,4 @@ import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface StateRepository extends CrudRepository<StateEntity, Long> {
-}
+public interface StateRepository extends CrudRepository<StateEntity, Long> {}

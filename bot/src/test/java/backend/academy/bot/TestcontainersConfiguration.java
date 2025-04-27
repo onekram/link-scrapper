@@ -34,19 +34,24 @@ class TestcontainersConfiguration {
     @RestartScope
     GenericContainer<?> wireMockContainer() {
         return new GenericContainer<>(DockerImageName.parse("wiremock/wiremock:2.31.0"))
-            .withExposedPorts(8080)
-            .withCopyToContainer(
-                MountableFile.forClasspathResource("wiremock/mappings/"),
-                "/home/wiremock/mappings/"
-            )
-            .withCommand("--verbose");
+                .withExposedPorts(8080)
+                .withCopyToContainer(
+                        MountableFile.forClasspathResource("wiremock/mappings/"), "/home/wiremock/mappings/")
+                .withCommand("--verbose");
     }
 
     @Bean
-    DynamicPropertyRegistrar testPropertiesRegistrar(@Qualifier("wireMockContainer") GenericContainer<?> wiremockContainer) {
+    DynamicPropertyRegistrar testPropertiesRegistrar(
+            @Qualifier("wireMockContainer") GenericContainer<?> wiremockContainer) {
         return registry -> {
-            registry.add("app.scrapper-url", () -> TestUtil.createHttpAddress(wiremockContainer.getHost(), wiremockContainer.getMappedPort(8080)));
-            registry.add("app.telegram-url", () -> TestUtil.createHttpAddress(wiremockContainer.getHost(), wiremockContainer.getMappedPort(8080)));
+            registry.add(
+                    "app.scrapper-url",
+                    () -> TestUtil.createHttpAddress(
+                            wiremockContainer.getHost(), wiremockContainer.getMappedPort(8080)));
+            registry.add(
+                    "app.telegram-url",
+                    () -> TestUtil.createHttpAddress(
+                            wiremockContainer.getHost(), wiremockContainer.getMappedPort(8080)));
         };
     }
 }

@@ -1,6 +1,5 @@
 package backend.academy.bot.state;
 
-import static backend.academy.bot.state.HandlerConfiguration.ADD_LINK_BUILDER;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -206,8 +205,7 @@ class HandlerConfigurationTest {
     @Test
     @DisplayName("Track tags handler")
     void trackTagsHandler() {
-        when(contextRepository.getContext(123L, AddLinkRequest.Builder.class))
-                .thenReturn(Optional.of(builder));
+        when(contextRepository.getContext(123L, AddLinkRequest.Builder.class)).thenReturn(Optional.of(builder));
         State currentState = State.TRACK_TAGS;
         Message message = TestUtil.generateMessage("  tag1   tag2 ", 123L);
         HandlerContext handlerContext = new HandlerContext(message, telegramBot, currentState);
@@ -226,8 +224,7 @@ class HandlerConfigurationTest {
     @Test
     @DisplayName("Track filters handler")
     void trackFiltersHandler() {
-        when(contextRepository.getContext(123L, AddLinkRequest.Builder.class))
-                .thenReturn(Optional.of(builder));
+        when(contextRepository.getContext(123L, AddLinkRequest.Builder.class)).thenReturn(Optional.of(builder));
         AddLinkRequest request = AddLinkRequest.builder().link("url").build();
         when(builder.build()).thenReturn(request);
         State currentState = State.TRACK_FILTERS;

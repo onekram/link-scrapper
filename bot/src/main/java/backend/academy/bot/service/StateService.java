@@ -13,10 +13,7 @@ public class StateService {
     private final StateRepository stateRepository;
 
     public State getState(Long chatId) {
-        return stateRepository
-            .findById(chatId)
-            .map(StateEntity::state)
-            .orElse(INIT_STATE);
+        return stateRepository.findById(chatId).map(StateEntity::state).orElse(INIT_STATE);
     }
 
     public void setState(Long chatId, State newState) {
