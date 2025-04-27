@@ -1,9 +1,5 @@
 package backend.academy.bot.test.utils;
 
-import static org.junit.jupiter.api.Assertions.assertInstanceOf;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
 import backend.academy.bot.state.HandlerContext;
 import backend.academy.bot.state.State;
 import backend.academy.bot.state.handler.MessageHandler;
@@ -18,6 +14,7 @@ import com.pengrad.telegrambot.model.request.KeyboardButton;
 import com.pengrad.telegrambot.model.request.ReplyKeyboardMarkup;
 import com.pengrad.telegrambot.model.request.ReplyKeyboardRemove;
 import com.pengrad.telegrambot.request.BaseRequest;
+import java.net.URI;
 import java.util.Collections;
 import java.util.List;
 import java.util.Random;
@@ -27,6 +24,9 @@ import java.util.stream.Stream;
 import lombok.SneakyThrows;
 import lombok.experimental.UtilityClass;
 import org.springframework.test.util.ReflectionTestUtils;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @UtilityClass
 public class TestUtil {
@@ -133,5 +133,9 @@ public class TestUtil {
                         return buttonText.contains(text);
                     }));
         }
+    }
+
+    public static String createHttpAddress(String host, int port) {
+        return "http://%s:%d".formatted(host, port);
     }
 }
