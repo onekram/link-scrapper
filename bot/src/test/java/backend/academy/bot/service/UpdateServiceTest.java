@@ -14,7 +14,6 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import backend.academy.bot.repository.state.StateRepository;
 import backend.academy.bot.state.HandlerContext;
 import backend.academy.bot.state.Router;
 import backend.academy.bot.state.State;
@@ -44,7 +43,7 @@ class UpdateServiceTest {
     private Router router;
 
     @Mock
-    private StateRepository stateRepository;
+    private StateService stateService;
 
     @Mock
     private ResourceBundle resourceBundle;
@@ -59,8 +58,8 @@ class UpdateServiceTest {
 
         updateService.updateProcess(update);
 
-        verify(stateRepository, never()).getCurrentState(any());
-        verify(stateRepository, never()).saveState(any(), any());
+        verify(stateService, never()).getState(any());
+        verify(stateService, never()).setState(any(), any());
         verify(router, never()).process(any());
         verify(telegramBot, never()).execute(any());
     }
@@ -75,13 +74,13 @@ class UpdateServiceTest {
 
         State state = State.TRACK_FILTERS;
         State nextState = State.MENU;
-        when(stateRepository.getCurrentState(anyLong())).thenReturn(state);
+        when(stateService.getState(anyLong())).thenReturn(state);
         when(router.process(any())).thenReturn(nextState);
 
         updateService.updateProcess(update);
 
         verify(router).process(new HandlerContext(message, telegramBot, state));
-        verify(stateRepository).saveState(123L, nextState);
+        verify(stateService).setState(123L, nextState);
         verify(telegramBot, never()).execute(any());
 
         assertTrue(appenderContainsLog(
@@ -99,14 +98,14 @@ class UpdateServiceTest {
         Update update = generateUpdate(message);
 
         State state = State.TRACK_FILTERS;
-        when(stateRepository.getCurrentState(anyLong())).thenReturn(state);
+        when(stateService.getState(anyLong())).thenReturn(state);
         when(router.process(any())).thenThrow(new RuntimeException("exception"));
         when(resourceBundle.getString("error.message")).thenReturn("Error");
 
         updateService.updateProcess(update);
 
         ArgumentCaptor<SendMessage> argumentCaptor = ArgumentCaptor.forClass(SendMessage.class);
-        verify(stateRepository, times(1)).saveState(123L, State.MENU);
+        verify(stateService, times(1)).setState(123L, State.MENU);
         verify(telegramBot, times(1)).execute(argumentCaptor.capture());
         SendMessage sendMessage = argumentCaptor.getValue();
         assertEquals("Error", TestUtil.getText(sendMessage));

@@ -12,6 +12,7 @@ import static org.mockito.Mockito.when;
 
 import backend.academy.bot.BotConfig;
 import backend.academy.bot.configuration.BeanConfiguration;
+import backend.academy.bot.repository.parameters.ContextRepository;
 import backend.academy.bot.service.ChatService;
 import backend.academy.bot.service.LinksService;
 import backend.academy.bot.test.utils.TestUtil;
@@ -25,6 +26,7 @@ import com.pengrad.telegrambot.request.SendMessage;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.ResourceBundle;
 import java.util.stream.Stream;
 import org.junit.jupiter.api.BeforeEach;
@@ -40,7 +42,7 @@ import org.springframework.context.annotation.Import;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.bean.override.mockito.MockitoBeans;
 
-@SpringBootTest(classes = {Router.class, HandlerContextParameters.class})
+@SpringBootTest(classes = {Router.class})
 @Import({HandlerConfiguration.class, BeanConfiguration.class})
 @MockitoBeans({@MockitoBean(types = BotConfig.class)})
 class HandlerConfigurationTest {
@@ -58,7 +60,7 @@ class HandlerConfigurationTest {
     private TelegramBot telegramBot;
 
     @MockitoBean
-    private HandlerContextParameters handlerContextParameters;
+    private ContextRepository contextRepository;
 
     @Mock
     private AddLinkRequest.Builder builder;
@@ -193,7 +195,7 @@ class HandlerConfigurationTest {
         updateCaptor();
 
         ArgumentCaptor<AddLinkRequest.Builder> captor = ArgumentCaptor.forClass(AddLinkRequest.Builder.class);
-        verify(handlerContextParameters, times(1)).setParameter(eq(ADD_LINK_BUILDER), captor.capture());
+        verify(contextRepository, times(1)).setContext(eq(123L), captor.capture());
         assertEquals("url", captor.getValue().build().link());
         checkSentMessageResourceBundle("input.tags.message");
         checkSentMessageChatId(123L);
@@ -204,8 +206,8 @@ class HandlerConfigurationTest {
     @Test
     @DisplayName("Track tags handler")
     void trackTagsHandler() {
-        when(handlerContextParameters.getParameter(ADD_LINK_BUILDER, AddLinkRequest.Builder.class))
-                .thenReturn(builder);
+        when(contextRepository.getContext(123L, AddLinkRequest.Builder.class))
+                .thenReturn(Optional.of(builder));
         State currentState = State.TRACK_TAGS;
         Message message = TestUtil.generateMessage("  tag1   tag2 ", 123L);
         HandlerContext handlerContext = new HandlerContext(message, telegramBot, currentState);
@@ -214,7 +216,7 @@ class HandlerConfigurationTest {
 
         assertEquals(State.TRACK_FILTERS, nextState);
         updateCaptor();
-        verify(handlerContextParameters, times(1)).getParameter(ADD_LINK_BUILDER, AddLinkRequest.Builder.class);
+        verify(contextRepository, times(1)).getContext(123L, AddLinkRequest.Builder.class);
         verify(builder, times(1)).tags(List.of("tag1", "tag2"));
         checkSentMessageResourceBundle("input.filters.message");
         checkSentMessageChatId(123L);
@@ -224,8 +226,8 @@ class HandlerConfigurationTest {
     @Test
     @DisplayName("Track filters handler")
     void trackFiltersHandler() {
-        when(handlerContextParameters.getParameter(ADD_LINK_BUILDER, AddLinkRequest.Builder.class))
-                .thenReturn(builder);
+        when(contextRepository.getContext(123L, AddLinkRequest.Builder.class))
+                .thenReturn(Optional.of(builder));
         AddLinkRequest request = AddLinkRequest.builder().link("url").build();
         when(builder.build()).thenReturn(request);
         State currentState = State.TRACK_FILTERS;
@@ -236,7 +238,7 @@ class HandlerConfigurationTest {
 
         assertEquals(State.MENU, nextState);
         updateCaptor();
-        verify(handlerContextParameters, times(1)).getParameter(ADD_LINK_BUILDER, AddLinkRequest.Builder.class);
+        verify(contextRepository, times(1)).getContext(123L, AddLinkRequest.Builder.class);
         verify(builder, times(1)).filters(List.of("filter1", "filter2"));
         verify(builder, times(1)).build();
         verify(linksService, times(1)).trackLink(123L, request);

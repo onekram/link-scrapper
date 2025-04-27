@@ -1,5 +1,6 @@
 package backend.academy.bot.state;
 
+import backend.academy.bot.repository.parameters.ContextRepository;
 import backend.academy.bot.service.ChatService;
 import backend.academy.bot.service.LinksService;
 import backend.academy.bot.state.filter.MessageTextFilter;
@@ -28,7 +29,6 @@ import org.springframework.context.annotation.Configuration;
 public class HandlerConfiguration {
     public static final @NotNull String ADD_LINK_BUILDER = "addLinkBuilder";
 
-    private final HandlerContextParameters handlerContextParameters;
     private final ResourceBundle resourceBundle;
 
     @Bean
@@ -110,16 +110,16 @@ public class HandlerConfiguration {
     }
 
     @Bean
-    public Handler linkHandler() {
+    public Handler linkHandler(ContextRepository contextRepository) {
         return MessageHandler.builder()
                 .withFilter(new StateFilter(State.TRACK_LINK))
                 .nextState(State.TRACK_TAGS)
                 .method(handlerContext -> {
-                    Long id = handlerContext.message().chat().id();
+                    Long chatId = handlerContext.message().chat().id();
                     String textLink = handlerContext.message().text().strip();
                     AddLinkRequest.Builder builder = AddLinkRequest.builder().link(textLink);
-                    handlerContextParameters.setParameter(ADD_LINK_BUILDER, builder);
-                    return new SendMessage(id, resourceBundle.getString("input.tags.message"));
+                    contextRepository.setContext(chatId, builder);
+                    return new SendMessage(chatId, resourceBundle.getString("input.tags.message"));
                 })
                 .keyboard(new ReplyKeyboardMarkup("Work", "Study")
                         .oneTimeKeyboard(true)
@@ -129,17 +129,19 @@ public class HandlerConfiguration {
     }
 
     @Bean
-    public Handler tagsHandler() {
+    public Handler tagsHandler(ContextRepository contextRepository) {
         return MessageHandler.builder()
                 .withFilter(new StateFilter(State.TRACK_TAGS))
                 .nextState(State.TRACK_FILTERS)
                 .method(handlerContext -> {
-                    Long id = handlerContext.message().chat().id();
+                    Long chatId = handlerContext.message().chat().id();
                     String text = handlerContext.message().text().strip();
                     AddLinkRequest.Builder builder =
-                            handlerContextParameters.getParameter(ADD_LINK_BUILDER, AddLinkRequest.Builder.class);
+                        contextRepository.getContext(chatId, AddLinkRequest.Builder.class)
+                            .orElseThrow(() -> new RuntimeException("No AddLinkRequest building exist for chatId: " + chatId));
                     builder.tags(List.of(text.split("\\s+")));
-                    return new SendMessage(id, resourceBundle.getString("input.filters.message"));
+                    contextRepository.setContext(chatId, builder);
+                    return new SendMessage(chatId, resourceBundle.getString("input.filters.message"));
                 })
                 .menuButton(true)
                 .keyboard(new ReplyKeyboardRemove())
@@ -147,19 +149,22 @@ public class HandlerConfiguration {
     }
 
     @Bean
-    public Handler filterHandler(LinksService linksService) {
+    public Handler filterHandler(LinksService linksService, ContextRepository contextRepository) {
         return MessageHandler.builder()
                 .withFilter(new StateFilter(State.TRACK_FILTERS))
                 .nextState(State.MENU)
                 .method(handlerContext -> {
-                    Long id = handlerContext.message().chat().id();
+                    Long chatId = handlerContext.message().chat().id();
                     String text = handlerContext.message().text().strip();
                     AddLinkRequest.Builder builder =
-                            handlerContextParameters.getParameter(ADD_LINK_BUILDER, AddLinkRequest.Builder.class);
+                            contextRepository.getContext(chatId, AddLinkRequest.Builder.class)
+                                .orElseThrow(() -> new RuntimeException("No AddLinkRequest building exist for chatId: " + chatId));
                     builder.filters(List.of(text.split("\\s+")));
-                    handlerContextParameters.clearParameter(ADD_LINK_BUILDER);
-                    linksService.trackLink(id, builder.build());
-                    return new SendMessage(id, resourceBundle.getString("saved.message"));
+                    contextRepository.deleteContext(chatId, AddLinkRequest.Builder.class);
+                    AddLinkRequest addLinkRequest = builder.build();
+                    contextRepository.setContext(chatId, addLinkRequest);
+                    linksService.trackLink(chatId, addLinkRequest);
+                    return new SendMessage(chatId, resourceBundle.getString("saved.message"));
                 })
                 .keyboard(new ReplyKeyboardRemove())
                 .build();

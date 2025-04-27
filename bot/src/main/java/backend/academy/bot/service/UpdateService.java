@@ -1,6 +1,5 @@
 package backend.academy.bot.service;
 
-import backend.academy.bot.repository.state.StateRepository;
 import backend.academy.bot.state.HandlerContext;
 import backend.academy.bot.state.Router;
 import backend.academy.bot.state.State;
@@ -23,7 +22,7 @@ import org.springframework.stereotype.Service;
 public class UpdateService {
     private final TelegramBot telegramBot;
     private final Router router;
-    private final StateRepository stateRepository;
+    private final StateService stateService;
     private final ResourceBundle resourceBundle;
 
     public void updateProcess(Update update) {
@@ -33,16 +32,16 @@ public class UpdateService {
         }
         long chatId = message.chat().id();
         try {
-            State currentState = stateRepository.getCurrentState(chatId);
+            State currentState = stateService.getState(chatId);
             log.info("Message chatId: {}, current state: {}, text: {}", chatId, currentState, message.text());
 
             State nextState = router.process(new HandlerContext(message, telegramBot, currentState));
             log.info("Message chatId: {}, move to state: {}", chatId, nextState);
-            stateRepository.saveState(chatId, nextState);
+            stateService.setState(chatId, nextState);
         } catch (Exception e) {
             log.error("Exception while routing occurred", e);
             telegramBot.execute(new SendMessage(chatId, resourceBundle.getString("error.message")));
-            stateRepository.saveState(chatId, State.MENU);
+            stateService.setState(chatId, State.MENU);
         }
     }
 
