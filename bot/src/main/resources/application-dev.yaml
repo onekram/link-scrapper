@@ -4,13 +4,6 @@ app:
   telegram-url: "https://api.telegram.org"
 
 spring:
-  liquibase:
-    enabled: true
-  jpa:
-    hibernate:
-      ddl-auto: validate
-    open-in-view: false
-    show-sql: true
   data:
     redis:
       host: ${REDIS_HOST}

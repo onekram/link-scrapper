@@ -9,6 +9,8 @@ logging:
 spring:
   application:
     name: Bot
+  liquibase:
+    enabled: false
   jackson:
     deserialization:
       fail-on-unknown-properties: true

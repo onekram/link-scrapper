@@ -1,19 +1,16 @@
 app:
   telegram-token: "mock_token"
-  scrapper-url: "http://localhost:8083"
-  telegram-url: "http://localhost:8083"
+  scrapper-url: ${wiremock.url}
+  telegram-url: ${wiremock.url}
+
+wiremock:
+  url: "http://localhost:8083"
 
 features:
   webhook:
     enabled: false
 
 spring:
-  liquibase:
-    enabled: false
-  jpa:
-    hibernate:
-      ddl-auto: create-drop
-    open-in-view: false
   data:
     redis:
       host: localhost
