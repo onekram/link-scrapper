@@ -16,3 +16,8 @@ spring:
     hibernate:
       ddl-auto: create-drop
     open-in-view: false
+
+springdoc:
+  swagger-ui:
+    enabled: false
+    path: /swagger-ui
