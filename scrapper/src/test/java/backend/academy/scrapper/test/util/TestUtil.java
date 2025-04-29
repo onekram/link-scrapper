@@ -33,4 +33,8 @@ public class TestUtil {
     public static long generateLong() {
         return new Random().nextLong(1L, 1000L);
     }
+
+    public static String createHttpAddress(String host, int port) {
+        return "http://%s:%d".formatted(host, port);
+    }
 }

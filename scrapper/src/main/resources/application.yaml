@@ -1,13 +1,3 @@
-app:
-  github-token: ${GITHUB_TOKEN}
-  stackoverflow:
-    key: ${SO_TOKEN_KEY}
-    access-token: ${SO_ACCESS_TOKEN}
-  github-api-url: "https://api.github.com"
-  bot-url: ${BOT_URL}
-  fixed-rate-scheduling: 4000
-  stack-overflow-api-url: "https://api.stackexchange.com/2.3"
-
 spring:
   application:
     name: Scrapper

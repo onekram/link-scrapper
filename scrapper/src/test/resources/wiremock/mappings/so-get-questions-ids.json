@@ -1,0 +1,30 @@
+{
+    "name": "Check question update",
+    "request": {
+        "method": "GET",
+        "urlPattern": "/questions/.*\\?site=stackoverflow&access_token=.*&key=.*",
+        "headers": {
+            "Content-Type": {
+                "equalTo": "application/json"
+            },
+            "Accept": {
+                "equalTo": "application/json"
+            }
+        }
+    },
+    "response": {
+        "status": 200,
+        "headers": {
+            "Content-Type": "application/json"
+        },
+        "jsonBody": {
+            "items": [
+                {
+                    "question_id": 1,
+                    "link": "https://stackoverflow.com/questions/1",
+                    "last_activity_date": "{{now format='epoch'}}"
+                }
+            ]
+        }
+    }
+}

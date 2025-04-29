@@ -1,0 +1,21 @@
+{
+    "name": "Send updates to bot",
+    "request": {
+        "method": "POST",
+        "urlPathPattern": "/updates",
+        "headers": {
+            "Content-Type": {
+                "equalTo": "application/json"
+            },
+            "Accept": {
+                "equalTo": "application/json"
+            }
+        }
+    },
+    "response": {
+        "status": 200,
+        "headers": {
+            "Content-Type": "application/json"
+        }
+    }
+}

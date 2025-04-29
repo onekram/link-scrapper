@@ -1,0 +1,28 @@
+{
+    "name": "Check repos update",
+    "request": {
+        "method": "GET",
+        "urlPathPattern": "/repos/.*/.*",
+        "headers": {
+            "Authorization": {
+                "equalTo": "Bearer gh_mock_token"
+            },
+            "Accept": {
+                "equalTo": "application/vnd.github+json"
+            },
+            "X-GitHub-Api-Version": {
+                "equalTo": "2022-11-28"
+            }
+        }
+    },
+    "response": {
+        "status": 200,
+        "headers": {
+            "Content-Type": "application/json"
+        },
+        "jsonBody": {
+            "updated_at": "{{now format='epoch'}}"
+        },
+        "transformers": ["response-template"]
+    }
+}
