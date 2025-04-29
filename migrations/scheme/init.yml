@@ -8,56 +8,55 @@ databaseChangeLog:
               CREATE SCHEMA IF NOT EXISTS subscription;
         - sql:
             sql: |
-              CREATE TABLE IF NOT EXISTS subscription.user (
-                id INT PRIMARY KEY NOT NULL,
-                name VARCHAR(255) NOT NULL,
+              CREATE TABLE IF NOT EXISTS subscription.chat (
+                id BIGINT PRIMARY KEY NOT NULL,
                 created_at TIMESTAMP NOT NULL
               );
         - sql:
             sql: |
               CREATE TABLE IF NOT EXISTS subscription.link (
-                id INT PRIMARY KEY NOT NULL,
-                address VARCHAR(255) NOT NULL,
+                id BIGSERIAL PRIMARY KEY NOT NULL,
+                url VARCHAR(255) NOT NULL,
                 created_at TIMESTAMP NOT NULL
               );
         - sql:
             sql: |
               CREATE TABLE IF NOT EXISTS subscription.tag (
-                id INT PRIMARY KEY NOT NULL,
+                id BIGSERIAL PRIMARY KEY NOT NULL,
                 name VARCHAR(255) NOT NULL,
                 created_at TIMESTAMP NOT NULL
               );
         - sql:
             sql: |
               CREATE TABLE IF NOT EXISTS subscription.filter (
-                id INT PRIMARY KEY NOT NULL,
+                id BIGSERIAL PRIMARY KEY NOT NULL,
                 name VARCHAR(255) NOT NULL,
                 created_at TIMESTAMP NOT NULL
               );
         - sql:
             sql: |
-              CREATE TABLE IF NOT EXISTS subscription.link_to_tag (
-                link_id INT NOT NULL,
-                tag_id INT NOT NULL,
+              CREATE TABLE IF NOT EXISTS subscription.link_tag (
+                link_id BIGINT NOT NULL,
+                tag_id BIGINT NOT NULL,
                 PRIMARY KEY (link_id, tag_id),
-                CONSTRAINT fk_link_to_tag_link FOREIGN KEY (link_id) REFERENCES subscription.link(id) ON DELETE CASCADE,
-                CONSTRAINT fk_link_to_tag_tag FOREIGN KEY (tag_id) REFERENCES subscription.tag(id) ON DELETE CASCADE
+                CONSTRAINT fk_link_tag_link FOREIGN KEY (link_id) REFERENCES subscription.link(id) ON DELETE CASCADE,
+                CONSTRAINT fk_link_tag_tag FOREIGN KEY (tag_id) REFERENCES subscription.tag(id) ON DELETE CASCADE
               );
         - sql:
             sql: |
-              CREATE TABLE IF NOT EXISTS subscription.link_to_filter (
-                link_id INT NOT NULL,
-                filter_id INT NOT NULL,
+              CREATE TABLE IF NOT EXISTS subscription.link_filter (
+                link_id BIGINT NOT NULL,
+                filter_id BIGINT NOT NULL,
                 PRIMARY KEY (link_id, filter_id),
-                CONSTRAINT fk_link_to_tag_link FOREIGN KEY (link_id) REFERENCES subscription.link(id) ON DELETE CASCADE,
-                CONSTRAINT fk_link_to_filter_filter FOREIGN KEY (filter_id) REFERENCES subscription.filter(id) ON DELETE CASCADE
+                CONSTRAINT fk_link_filter_link FOREIGN KEY (link_id) REFERENCES subscription.link(id) ON DELETE CASCADE,
+                CONSTRAINT fk_link_filter_filter FOREIGN KEY (filter_id) REFERENCES subscription.filter(id) ON DELETE CASCADE
               );
         - sql:
             sql: |
               CREATE TABLE IF NOT EXISTS subscription.subscription (
-                user_id INT NOT NULL,
-                link_id INT NOT NULL,
-                PRIMARY KEY (user_id, link_id),
-                CONSTRAINT fk_subscription_user FOREIGN KEY (user_id) REFERENCES subscription.user(id) ON DELETE CASCADE,
+                chat_id BIGINT NOT NULL,
+                link_id BIGINT NOT NULL,
+                PRIMARY KEY (chat_id, link_id),
+                CONSTRAINT fk_subscription_chat FOREIGN KEY (chat_id) REFERENCES subscription.chat(id) ON DELETE CASCADE,
                 CONSTRAINT fk_subscription_link FOREIGN KEY (link_id) REFERENCES subscription.link(id) ON DELETE CASCADE
               );

@@ -45,33 +45,10 @@ class TestcontainersConfiguration {
         return new KafkaContainer("apache/kafka-native:3.8.1").withExposedPorts(9092);
     }
 
-
-    @Bean
-    @RestartScope
-    GenericContainer<?> liquibaseContainer(PostgreSQLContainer<?> postgres) {
-        return new GenericContainer<>(DockerImageName.parse("liquibase/liquibase:4.29"))
-            .dependsOn(postgres)
-            .withNetwork(TEST_NETWORK)
-            .withNetworkAliases("liquibase")
-            .withCopyFileToContainer(
-                MountableFile.forHostPath("migrations"),
-                "/changesets"
-            )
-            .withCommand(
-            "--searchPath=/changesets",
-                "--changelog-file=master.yml",
-                "--driver=org.postgresql.Driver",
-                "--url=jdbc:postgresql://postgres:5432/scrapper",
-                "--username=postgres",
-                "--password=test",
-                "update"
-            );
-    }
-
     @Bean
     @RestartScope
     GenericContainer<?> wireMockContainer() {
-        return new GenericContainer<>(DockerImageName.parse("wiremock/wiremock:latest"))
+        return new GenericContainer<>(DockerImageName.parse("wiremock/wiremock:3.13.0-alpine"))
             .withExposedPorts(8080)
             .withCopyToContainer(
                 MountableFile.forClasspathResource("wiremock/mappings/"), "/home/wiremock/mappings/")
@@ -79,11 +56,20 @@ class TestcontainersConfiguration {
     }
 
     @Bean
-    DynamicPropertyRegistrar testPropertiesRegistrar(
+    DynamicPropertyRegistrar wiremockPropertyRegistrar(
         @Qualifier("wireMockContainer") GenericContainer<?> wiremockContainer) {
         return registry -> registry.add(
             "wiremock.url",
             () -> TestUtil.createHttpAddress(
                 wiremockContainer.getHost(), wiremockContainer.getMappedPort(8080)));
+    }
+
+    @Bean
+    DynamicPropertyRegistrar datasourcePropertyRegistrar(PostgreSQLContainer<?> postgresContainer) {
+        return registry -> {
+            registry.add("spring.datasource.url", postgresContainer::getJdbcUrl);
+            registry.add("spring.datasource.username", postgresContainer::getUsername);
+            registry.add("spring.datasource.password", postgresContainer::getPassword);
+        };
     }
 }

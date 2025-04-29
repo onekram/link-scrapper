@@ -12,10 +12,18 @@ wiremock:
   url: "http://localhost:8083"
 
 spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/scrapper
+    username: user
+    password: password
+    driver-class-name: org.postgresql.Driver
   jpa:
     hibernate:
-      ddl-auto: create-drop
+      ddl-auto: validate
     open-in-view: false
+  liquibase:
+    enabled: true
+    change-log: file:./migrations/master.yml
 
 springdoc:
   swagger-ui:

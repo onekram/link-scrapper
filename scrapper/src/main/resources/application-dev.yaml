@@ -9,6 +9,8 @@ app:
   stack-overflow-api-url: ${SO_API_URL}
 
 spring:
+  liquibase:
+    enabled: false
   jpa:
     hibernate:
       ddl-auto: validate
