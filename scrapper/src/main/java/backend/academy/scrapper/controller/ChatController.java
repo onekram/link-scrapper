@@ -7,7 +7,9 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import jakarta.validation.constraints.Positive;
 import lombok.RequiredArgsConstructor;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -17,6 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/tg-chat")
 @RequiredArgsConstructor
+@Validated
 public class ChatController {
     private final ChatService chatService;
 
@@ -35,7 +38,7 @@ public class ChatController {
     @PostMapping(
             value = "/{id}",
             produces = {"application/json"})
-    public void registerChat(@PathVariable Long id) {
+    public void registerChat(@PathVariable @Positive(message = "Невалидный идентификатор чата") Long id) {
         chatService.register(id);
     }
 
@@ -61,7 +64,7 @@ public class ChatController {
     @DeleteMapping(
             value = "/{id}",
             produces = {"application/json"})
-    public void unRegisterChat(@PathVariable Long id) {
+    public void unRegisterChat(@PathVariable @Positive(message = "Невалидный идентификатор чата") Long id) {
         chatService.unRegister(id);
     }
 }

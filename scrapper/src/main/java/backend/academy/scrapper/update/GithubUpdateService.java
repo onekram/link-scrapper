@@ -3,7 +3,7 @@ package backend.academy.scrapper.update;
 import backend.academy.scrapper.client.github.GithubReposClient;
 import backend.academy.scrapper.client.model.GithubRepositoryResponse;
 import backend.academy.scrapper.parser.LinkType;
-import backend.academy.scrapper.repository.record.LinkRecord;
+import backend.academy.scrapper.repository.entity.Link;
 import backend.academy.scrapper.service.LinksService;
 import java.time.Instant;
 import java.util.regex.Matcher;
@@ -19,8 +19,8 @@ public class GithubUpdateService extends AbstractUpdateService {
     }
 
     @Override
-    protected boolean isUpdated(LinkRecord linkRecord, Instant from) {
-        Matcher matcher = LinkType.GITHUB.parseUrl(linkRecord.url().toString());
+    protected boolean isUpdated(Link link, Instant from) {
+        Matcher matcher = LinkType.GITHUB.parseUrl(link.url());
         if (!matcher.matches()) {
             throw new IllegalStateException("Link of GITHUB type doesn't match pattern");
         }

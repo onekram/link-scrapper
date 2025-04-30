@@ -1,28 +1,39 @@
 package backend.academy.scrapper.repository.entity;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.Table;
-import lombok.Getter;
-import lombok.Setter;
 import java.time.Instant;
 import java.util.HashSet;
 import java.util.Set;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Getter
 @Setter
+@NoArgsConstructor
 @Entity
 @Table(schema = "subscription")
 public class Filter {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(nullable = false)
     private Long id;
 
     @ManyToMany(mappedBy = "filters")
     private Set<Link> links = new HashSet<>();
 
+    private String name;
+
+    @Column(nullable = false)
     private Instant createdAt = Instant.now();
+
+    public Filter(String name) {
+        this.name = name;
+    }
 }

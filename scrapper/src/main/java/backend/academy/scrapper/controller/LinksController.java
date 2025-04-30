@@ -11,7 +11,9 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import jakarta.validation.constraints.Positive;
 import lombok.RequiredArgsConstructor;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -23,6 +25,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/links")
 @RequiredArgsConstructor
+@Validated
 public class LinksController {
     private final LinksService linksService;
 
@@ -47,7 +50,8 @@ public class LinksController {
     @GetMapping(
             produces = {"application/json"},
             headers = {"Tg-Chat-Id"})
-    public ListLinksResponse getLinks(@RequestHeader("Tg-Chat-Id") Long tgChatId) {
+    public ListLinksResponse getLinks(
+            @RequestHeader("Tg-Chat-Id") @Positive(message = "Невалидный идентификатор чата") Long tgChatId) {
         return linksService.listAll(tgChatId);
     }
 
@@ -73,7 +77,9 @@ public class LinksController {
             produces = {"application/json"},
             consumes = {"application/json"},
             headers = {"Tg-Chat-Id"})
-    public LinkResponse addLink(@RequestHeader("Tg-Chat-Id") Long tgChatId, @RequestBody AddLinkRequest request) {
+    public LinkResponse addLink(
+            @RequestHeader("Tg-Chat-Id") @Positive(message = "Невалидный идентификатор чата") Long tgChatId,
+            @RequestBody AddLinkRequest request) {
         return linksService.addLink(tgChatId, request);
     }
 
@@ -106,7 +112,9 @@ public class LinksController {
             produces = {"application/json"},
             consumes = {"application/json"},
             headers = {"Tg-Chat-Id"})
-    public LinkResponse removeLink(@RequestHeader("Tg-Chat-Id") Long tgChatId, @RequestBody RemoveLinkRequest request) {
+    public LinkResponse removeLink(
+            @RequestHeader("Tg-Chat-Id") @Positive(message = "Невалидный идентификатор чата") Long tgChatId,
+            @RequestBody RemoveLinkRequest request) {
         return linksService.removeLink(tgChatId, request);
     }
 }

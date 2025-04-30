@@ -16,7 +16,7 @@ import org.testcontainers.utility.MountableFile;
 
 @TestConfiguration(proxyBeanMethods = false)
 class TestcontainersConfiguration {
-    private static final  Network TEST_NETWORK = Network.newNetwork();
+    private static final Network TEST_NETWORK = Network.newNetwork();
 
     @Bean
     @RestartScope
@@ -30,12 +30,12 @@ class TestcontainersConfiguration {
     @ServiceConnection
     PostgreSQLContainer<?> postgresContainer() {
         return new PostgreSQLContainer<>("postgres:17-alpine")
-            .withExposedPorts(5432)
-            .withDatabaseName("scrapper")
-            .withUsername("postgres")
-            .withPassword("test")
-            .withNetwork(TEST_NETWORK)
-            .withNetworkAliases("postgres");
+                .withExposedPorts(5432)
+                .withDatabaseName("scrapper")
+                .withUsername("postgres")
+                .withPassword("test")
+                .withNetwork(TEST_NETWORK)
+                .withNetworkAliases("postgres");
     }
 
     @Bean
@@ -49,19 +49,18 @@ class TestcontainersConfiguration {
     @RestartScope
     GenericContainer<?> wireMockContainer() {
         return new GenericContainer<>(DockerImageName.parse("wiremock/wiremock:3.13.0-alpine"))
-            .withExposedPorts(8080)
-            .withCopyToContainer(
-                MountableFile.forClasspathResource("wiremock/mappings/"), "/home/wiremock/mappings/")
-            .withCommand("--verbose");
+                .withExposedPorts(8080)
+                .withCopyToContainer(
+                        MountableFile.forClasspathResource("wiremock/mappings/"), "/home/wiremock/mappings/")
+                .withCommand("--verbose");
     }
 
     @Bean
     DynamicPropertyRegistrar wiremockPropertyRegistrar(
-        @Qualifier("wireMockContainer") GenericContainer<?> wiremockContainer) {
+            @Qualifier("wireMockContainer") GenericContainer<?> wiremockContainer) {
         return registry -> registry.add(
-            "wiremock.url",
-            () -> TestUtil.createHttpAddress(
-                wiremockContainer.getHost(), wiremockContainer.getMappedPort(8080)));
+                "wiremock.url",
+                () -> TestUtil.createHttpAddress(wiremockContainer.getHost(), wiremockContainer.getMappedPort(8080)));
     }
 
     @Bean

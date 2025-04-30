@@ -10,28 +10,32 @@ databaseChangeLog:
             sql: |
               CREATE TABLE IF NOT EXISTS subscription.chat (
                 id BIGINT PRIMARY KEY NOT NULL,
-                created_at TIMESTAMP NOT NULL
+                created_at TIMESTAMP NOT NULL DEFAULT now()
               );
+        - sql:
+            sql: |
+              CREATE TYPE subscription.link_type AS ENUM ('GITHUB', 'STACK_OVERFLOW');
         - sql:
             sql: |
               CREATE TABLE IF NOT EXISTS subscription.link (
                 id BIGSERIAL PRIMARY KEY NOT NULL,
                 url VARCHAR(255) NOT NULL,
-                created_at TIMESTAMP NOT NULL
+                type subscription.link_type,
+                created_at TIMESTAMP NOT NULL DEFAULT now()
               );
         - sql:
             sql: |
               CREATE TABLE IF NOT EXISTS subscription.tag (
                 id BIGSERIAL PRIMARY KEY NOT NULL,
                 name VARCHAR(255) NOT NULL,
-                created_at TIMESTAMP NOT NULL
+                created_at TIMESTAMP NOT NULL DEFAULT now()
               );
         - sql:
             sql: |
               CREATE TABLE IF NOT EXISTS subscription.filter (
                 id BIGSERIAL PRIMARY KEY NOT NULL,
                 name VARCHAR(255) NOT NULL,
-                created_at TIMESTAMP NOT NULL
+                created_at TIMESTAMP NOT NULL DEFAULT now()
               );
         - sql:
             sql: |

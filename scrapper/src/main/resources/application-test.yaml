@@ -23,7 +23,7 @@ spring:
     open-in-view: false
   liquibase:
     enabled: true
-    change-log: file:./migrations/master.yml
+    change-log: file:../migrations/master.yml
 
 springdoc:
   swagger-ui:

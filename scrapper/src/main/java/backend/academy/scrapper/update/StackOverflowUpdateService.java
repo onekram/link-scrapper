@@ -3,7 +3,7 @@ package backend.academy.scrapper.update;
 import backend.academy.scrapper.client.model.StackOverflowQuestionsResponse;
 import backend.academy.scrapper.client.stackoverflow.StackOverflowQuestionClient;
 import backend.academy.scrapper.parser.LinkType;
-import backend.academy.scrapper.repository.record.LinkRecord;
+import backend.academy.scrapper.repository.entity.Link;
 import backend.academy.scrapper.service.LinksService;
 import java.time.Instant;
 import java.util.regex.Matcher;
@@ -22,8 +22,8 @@ public class StackOverflowUpdateService extends AbstractUpdateService {
     }
 
     @Override
-    protected boolean isUpdated(LinkRecord linkRecord, Instant from) {
-        Matcher matcher = LinkType.STACK_OVERFLOW.parseUrl(linkRecord.url().toString());
+    protected boolean isUpdated(Link link, Instant from) {
+        Matcher matcher = LinkType.STACK_OVERFLOW.parseUrl(link.url());
         if (!matcher.matches()) {
             throw new IllegalStateException("Link of STACK_OVERFLOW type doesn't match pattern");
         }

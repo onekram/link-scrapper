@@ -1,8 +1,8 @@
 package backend.academy.scrapper.controller;
 
 import backend.academy.model.ApiErrorResponse;
-import backend.academy.scrapper.exception.BadRequestException;
 import backend.academy.scrapper.exception.NotFoundException;
+import jakarta.validation.ConstraintViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
@@ -15,10 +15,10 @@ import org.springframework.web.method.annotation.MethodArgumentTypeMismatchExcep
 public class ScrapperControllerExceptionHandler {
 
     @ExceptionHandler({
-        BadRequestException.class,
         MethodArgumentTypeMismatchException.class,
         HttpMessageNotReadableException.class,
-        MissingRequestHeaderException.class
+        MissingRequestHeaderException.class,
+        ConstraintViolationException.class
     })
     public ResponseEntity<ApiErrorResponse> convertPojoExceptionHandler(Exception ex) {
         HttpStatus status = HttpStatus.BAD_REQUEST;

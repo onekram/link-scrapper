@@ -4,90 +4,99 @@ import backend.academy.model.AddLinkRequest;
 import backend.academy.model.LinkResponse;
 import backend.academy.model.ListLinksResponse;
 import backend.academy.model.RemoveLinkRequest;
-import backend.academy.scrapper.exception.BadRequestException;
 import backend.academy.scrapper.exception.NotFoundException;
 import backend.academy.scrapper.parser.LinkType;
 import backend.academy.scrapper.repository.ChatRepository;
-import backend.academy.scrapper.repository.LinksRepository;
-import backend.academy.scrapper.repository.record.LinkRecord;
-import java.net.URI;
-import java.net.URISyntaxException;
+import backend.academy.scrapper.repository.EntityByNameFinderAndSaver;
+import backend.academy.scrapper.repository.FilterRepository;
+import backend.academy.scrapper.repository.LinkRepository;
+import backend.academy.scrapper.repository.TagRepository;
+import backend.academy.scrapper.repository.entity.Chat;
+import backend.academy.scrapper.repository.entity.Filter;
+import backend.academy.scrapper.repository.entity.Link;
+import backend.academy.scrapper.repository.entity.Tag;
 import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
 public class LinksService {
-    public static final String INVALID_TG_CHAT_ID_FORMAT_MESSAGE = "Невалидный идентификатор чата: %s";
     private final ChatRepository chatRepository;
-    private final LinksRepository linksRepository;
+    private final LinkRepository linkRepository;
+    private final TagRepository tagRepository;
+    private final FilterRepository filterRepository;
 
     public ListLinksResponse listAll(Long tgChatId) {
-        if (tgChatId < 0) {
-            throw new BadRequestException(INVALID_TG_CHAT_ID_FORMAT_MESSAGE.formatted(tgChatId));
-        }
-        List<LinkResponse> linkResponses = chatRepository.getLinks(tgChatId).stream()
-                .map(linksRepository::getLink)
-                .filter(Objects::nonNull)
-                .map(this::recordToResponse)
-                .toList();
-        return new ListLinksResponse(linkResponses, linkResponses.size());
+        return chatRepository
+                .findById(tgChatId)
+                .map(chat -> new ListLinksResponse(
+                        chat.links().stream().map(this::linkToResponse).toList(),
+                        chat.links().size()))
+                .orElse(new ListLinksResponse(List.of(), 0));
     }
 
+    @Transactional
     public LinkResponse addLink(Long tgChatId, AddLinkRequest request) {
-        if (tgChatId < 0) {
-            throw new BadRequestException(INVALID_TG_CHAT_ID_FORMAT_MESSAGE.formatted(tgChatId));
-        }
-        Long linkRecordId = chatRepository.getLinks(tgChatId).stream()
-                .map(linksRepository::getLink)
-                .filter(Objects::nonNull)
-                .filter(link -> request.link().equals(link.url().toString()))
-                .findAny()
-                .map(LinkRecord::id)
-                .orElseGet(System::currentTimeMillis);
-        LinkRecord record = linksRepository.addLink(requestToRecord(linkRecordId, request));
-        chatRepository.addLink(tgChatId, linkRecordId);
-        return recordToResponse(record);
+        Chat chat = chatRepository.findById(tgChatId).orElseGet(() -> chatRepository.save(new Chat(tgChatId)));
+        Set<Tag> tags = findByNameOrCreate(request.tags(), tagRepository, Tag::new);
+        Set<Filter> filters = findByNameOrCreate(request.filters(), filterRepository, Filter::new);
+
+        Link newLink = chat.links().stream()
+                .filter(link -> request.link().equals(link.url()))
+                .findFirst()
+                .map(link -> {
+                    link.tags().addAll(tags);
+                    link.filters().addAll(filters);
+                    return link;
+                })
+                .orElse(new Link(request.link(), tags, filters));
+
+        chat.links().add(newLink);
+        newLink.chats().add(chat);
+        return linkToResponse(newLink);
     }
 
+    @Transactional
     public LinkResponse removeLink(Long tgChatId, RemoveLinkRequest request) {
-        if (tgChatId < 0) {
-            throw new BadRequestException(INVALID_TG_CHAT_ID_FORMAT_MESSAGE.formatted(tgChatId));
-        }
-        LinkRecord record = chatRepository.getLinks(tgChatId).stream()
-                .map(linksRepository::getLink)
-                .filter(Objects::nonNull)
-                .filter(link -> request.link().equals(link.url().toString()))
+        Chat chat = chatRepository
+                .findById(tgChatId)
+                .orElseThrow(() -> new NotFoundException("Не существует чата: %s".formatted(tgChatId)));
+
+        Link targetLink = chat.links().stream()
+                .filter(link -> request.link().equals(link.url()))
                 .findFirst()
                 .orElseThrow(() -> new NotFoundException("Не существует ссылки: %s".formatted(request.link())));
-        linksRepository.removeLink(record.id());
-        return recordToResponse(record);
-    }
 
-    public Map<Long, List<LinkRecord>> fetchIdAndLinksByType(LinkType linkType) {
-        return chatRepository.fetchAll().stream()
-                .collect(Collectors.toMap(Function.identity(), id -> chatRepository.getLinks(id).stream()
-                        .map(linksRepository::getLink)
-                        .filter(Objects::nonNull)
-                        .filter(link -> Objects.equals(link.type(), linkType))
-                        .toList()));
-    }
+        chat.links().remove(targetLink);
+        targetLink.chats().remove(chat);
 
-    private LinkResponse recordToResponse(LinkRecord record) {
-        return new LinkResponse(record.id(), record.url().toString(), record.tags(), record.filters());
-    }
-
-    private LinkRecord requestToRecord(Long id, AddLinkRequest request) {
-        try {
-            LinkType linkType = LinkType.getType(request.link()).orElse(null);
-            return new LinkRecord(id, new URI(request.link()), request.tags(), request.filters(), linkType);
-        } catch (URISyntaxException | IllegalArgumentException ex) {
-            throw new BadRequestException("Невалидная ссылка: %s".formatted(request.link()));
+        if (targetLink.chats().isEmpty()) {
+            linkRepository.delete(targetLink);
         }
+        return linkToResponse(targetLink);
+    }
+
+    public List<Link> findAllByType(LinkType linkType) {
+        return linkRepository.findAllByType(linkType);
+    }
+
+    private LinkResponse linkToResponse(Link link) {
+        return new LinkResponse(
+                link.id(),
+                link.url(),
+                link.tags().stream().map(Tag::name).toList(),
+                link.filters().stream().map(Filter::name).toList());
+    }
+
+    private static <T> Set<T> findByNameOrCreate(
+            List<String> names, EntityByNameFinderAndSaver<T> repository, Function<String, T> constructor) {
+        return names.stream()
+                .map(name -> repository.findByName(name).orElseGet(() -> repository.save(constructor.apply(name))))
+                .collect(Collectors.toSet());
     }
 }

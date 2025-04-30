@@ -11,7 +11,6 @@ import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.kafka.KafkaContainer;
 import org.testcontainers.utility.DockerImageName;
 import org.testcontainers.utility.MountableFile;
-import java.util.List;
 
 // isolated from the "scrapper" module's containers!
 @TestConfiguration(proxyBeanMethods = false)
@@ -46,7 +45,6 @@ class TestcontainersConfiguration {
             @Qualifier("wireMockContainer") GenericContainer<?> wiremockContainer) {
         return registry -> registry.add(
                 "wiremock.url",
-                () -> TestUtil.createHttpAddress(
-                        wiremockContainer.getHost(), wiremockContainer.getMappedPort(8080)));
+                () -> TestUtil.createHttpAddress(wiremockContainer.getHost(), wiremockContainer.getMappedPort(8080)));
     }
 }

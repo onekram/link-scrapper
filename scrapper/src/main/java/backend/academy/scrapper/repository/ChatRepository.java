@@ -1,40 +1,12 @@
 package backend.academy.scrapper.repository;
 
-import backend.academy.scrapper.repository.record.ChatRecord;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
+import backend.academy.scrapper.repository.entity.Chat;
+import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public class ChatRepository {
-    private final Map<Long, ChatRecord> db = new ConcurrentHashMap<>();
+public interface ChatRepository extends JpaRepository<Chat, Long> {
+    void deleteChatById(Long id);
 
-    public List<Long> getLinks(Long id) {
-        ChatRecord record = db.get(id);
-        if (record == null) {
-            return Collections.emptyList();
-        }
-        return record.links();
-    }
-
-    public void saveUser(Long id) {
-        db.putIfAbsent(id, new ChatRecord(id, new ArrayList<>()));
-    }
-
-    public ChatRecord removeUser(Long id) {
-        return db.remove(id);
-    }
-
-    public void addLink(Long id, Long linkId) {
-        db.computeIfAbsent(id, ignored -> new ChatRecord(id, new ArrayList<>()))
-                .links()
-                .add(linkId);
-    }
-
-    public List<Long> fetchAll() {
-        return db.keySet().stream().toList();
-    }
+    boolean existsChatById(Long id);
 }

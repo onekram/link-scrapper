@@ -1,8 +1,10 @@
 package backend.academy.scrapper.controller;
 
-import static org.mockito.ArgumentMatchers.any;
+import static backend.academy.scrapper.test.util.TestUtil.generateLinkResponse;
+import static backend.academy.scrapper.test.util.TestUtil.generateListLinksResponse;
+import static org.hamcrest.Matchers.containsString;
 import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.Mockito.never;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
@@ -15,18 +17,14 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import backend.academy.model.AddLinkRequest;
 import backend.academy.model.RemoveLinkRequest;
-import backend.academy.scrapper.repository.ChatRepository;
-import backend.academy.scrapper.repository.LinksRepository;
-import backend.academy.scrapper.service.ChatService;
+import backend.academy.scrapper.exception.NotFoundException;
 import backend.academy.scrapper.service.LinksService;
-import backend.academy.scrapper.test.util.TestUtil;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.Collections;
-import java.util.List;
+import java.util.Map;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
@@ -34,7 +32,6 @@ import org.springframework.test.web.servlet.MockMvc;
 
 @ActiveProfiles("test")
 @WebMvcTest(LinksController.class)
-@Import({ChatService.class, LinksService.class})
 class LinksControllerTest {
 
     @Autowired
@@ -44,22 +41,19 @@ class LinksControllerTest {
     private ObjectMapper objectMapper;
 
     @MockitoBean
-    private ChatRepository chatRepository;
-
-    @MockitoBean
-    private LinksRepository linksRepository;
+    private LinksService linksService;
 
     @Test
     void getLinksOk() throws Exception {
-        when(chatRepository.getLinks(1L)).thenReturn(List.of(42L, 43L));
-        mockGetLink(42L, "https://dot.com");
-        mockGetLink(43L, "https://another.com");
+        when(linksService.listAll(1L))
+                .thenReturn(generateListLinksResponse(
+                        Map.entry(42L, "https://dot.com"), Map.entry(43L, "https://another.com")));
+
         mockMvc.perform(get("/links").contentType(MediaType.APPLICATION_JSON).header("Tg-Chat-Id", 1L))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.size").value(2));
 
-        verify(chatRepository, times(1)).getLinks(1L);
-        verify(linksRepository, times(2)).getLink(anyLong());
+        verify(linksService, times(1)).listAll(anyLong());
     }
 
     @Test
@@ -68,12 +62,11 @@ class LinksControllerTest {
                 .andExpect(status().is(400))
                 .andExpect(jsonPath("$.description").value("Некорректные параметры запроса"))
                 .andExpect(jsonPath("$.code").value(400))
-                .andExpect(jsonPath("$.exceptionName").value("BadRequestException"))
-                .andExpect(jsonPath("$.exceptionMessage").value("Невалидный идентификатор чата: -1"))
+                .andExpect(jsonPath("$.exceptionName").value("ConstraintViolationException"))
+                .andExpect(jsonPath("$.exceptionMessage", containsString("Невалидный идентификатор чата")))
                 .andExpect(jsonPath("$.stacktrace").isArray());
 
-        verifyNoInteractions(chatRepository);
-        verifyNoInteractions(linksRepository);
+        verifyNoInteractions(linksService);
     }
 
     @Test
@@ -86,16 +79,15 @@ class LinksControllerTest {
                 .andExpect(jsonPath("$.exceptionMessage").exists())
                 .andExpect(jsonPath("$.stacktrace").isArray());
 
-        verifyNoInteractions(chatRepository);
-        verifyNoInteractions(linksRepository);
+        verifyNoInteractions(linksService);
     }
 
     @Test
     void addLinkOk() throws Exception {
-        when(chatRepository.getLinks(1L)).thenReturn(List.of(42L, 43L));
-        mockGetLink(42L, "https://dot.com");
-        mockGetLink(43L, "https://another.com");
-        when(linksRepository.addLink(any())).thenAnswer(invocation -> invocation.getArgument(0));
+        AddLinkRequest request =
+                new AddLinkRequest("https://third.com", Collections.emptyList(), Collections.emptyList());
+        when(linksService.addLink(1L, request)).thenReturn(generateLinkResponse(42L, "https://third.com"));
+
         mockMvc.perform(post("/links")
                         .contentType(MediaType.APPLICATION_JSON)
                         .header("Tg-Chat-Id", 1L)
@@ -105,8 +97,7 @@ class LinksControllerTest {
                 .andExpect(jsonPath("$.id").exists())
                 .andExpect(jsonPath("$.url").value("https://third.com"));
 
-        verify(chatRepository, times(1)).getLinks(1L);
-        verify(linksRepository, times(2)).getLink(anyLong());
+        verify(linksService, times(1)).addLink(anyLong(), eq(request));
     }
 
     @Test
@@ -130,24 +121,23 @@ class LinksControllerTest {
                 .andExpect(jsonPath("$.exceptionMessage").exists())
                 .andExpect(jsonPath("$.stacktrace").isArray());
 
-        verifyNoInteractions(chatRepository);
-        verifyNoInteractions(linksRepository);
+        verifyNoInteractions(linksService);
     }
 
     @Test
     void removeLinkOk() throws Exception {
-        when(chatRepository.getLinks(1L)).thenReturn(List.of(42L, 43L));
-        mockGetLink(42L, "https://dot.com");
-        mockGetLink(43L, "https://another.com");
+        RemoveLinkRequest request = new RemoveLinkRequest("https://dot.com");
+        when(linksService.removeLink(1L, request)).thenReturn(generateLinkResponse(42L, "https://dot.com"));
+
         mockMvc.perform(delete("/links")
                         .contentType(MediaType.APPLICATION_JSON)
                         .header("Tg-Chat-Id", 1L)
-                        .content(objectMapper.writeValueAsString(new RemoveLinkRequest("https://dot.com"))))
+                        .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(42L))
                 .andExpect(jsonPath("$.url").value("https://dot.com"));
 
-        verify(linksRepository, times(1)).removeLink(42L);
+        verify(linksService, times(1)).removeLink(1L, request);
     }
 
     @Test
@@ -169,30 +159,24 @@ class LinksControllerTest {
                 .andExpect(jsonPath("$.exceptionMessage").exists())
                 .andExpect(jsonPath("$.stacktrace").isArray());
 
-        verifyNoInteractions(chatRepository);
-        verifyNoInteractions(linksRepository);
+        verifyNoInteractions(linksService);
     }
 
     @Test
     void removeLinkNotFound() throws Exception {
-        when(chatRepository.getLinks(1L)).thenReturn(List.of(42L, 43L));
-        mockGetLink(42L, "https://dot.com");
-        mockGetLink(43L, "https://another.com");
+        RemoveLinkRequest request = new RemoveLinkRequest("https://doot.com");
+        when(linksService.removeLink(1L, request))
+                .thenThrow(new NotFoundException("Не существует ссылки: %s".formatted(request.link())));
+
         mockMvc.perform(delete("/links")
                         .contentType(MediaType.APPLICATION_JSON)
                         .header("Tg-Chat-Id", 1L)
-                        .content(objectMapper.writeValueAsString(new RemoveLinkRequest("https://doot.com"))))
+                        .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().is(404))
                 .andExpect(jsonPath("$.description").value("Запрашиваемый ресурс не найден"))
                 .andExpect(jsonPath("$.code").value(404))
                 .andExpect(jsonPath("$.exceptionName").value("NotFoundException"))
                 .andExpect(jsonPath("$.exceptionMessage").value("Не существует ссылки: https://doot.com"))
                 .andExpect(jsonPath("$.stacktrace").isArray());
-
-        verify(linksRepository, never()).removeLink(anyLong());
-    }
-
-    private void mockGetLink(long id, String url) {
-        when(linksRepository.getLink(id)).thenReturn(TestUtil.generateLinkRecord(id, url));
     }
 }

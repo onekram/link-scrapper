@@ -2,12 +2,11 @@ package backend.academy.scrapper.update;
 
 import backend.academy.model.LinkUpdate;
 import backend.academy.scrapper.parser.LinkType;
-import backend.academy.scrapper.repository.record.LinkRecord;
+import backend.academy.scrapper.repository.entity.Chat;
+import backend.academy.scrapper.repository.entity.Link;
 import backend.academy.scrapper.service.LinksService;
 import java.time.Instant;
 import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
@@ -16,23 +15,21 @@ public abstract class AbstractUpdateService implements UpdateService {
 
     @Override
     public List<LinkUpdate> getUpdates(Instant from) {
-        return linksService.fetchIdAndLinksByType(getLinkType()).entrySet().stream()
-                .flatMap(entry -> entry.getValue().stream().map(link -> Map.entry(entry.getKey(), link)))
-                .filter(entry -> isUpdated(entry.getValue(), from))
-                .collect(Collectors.groupingBy(
-                        entry -> entry.getValue().url().toString(),
-                        Collectors.mapping(Map.Entry::getKey, Collectors.toList())))
-                .entrySet()
-                .stream()
+        return linksService.findAllByType(getLinkType()).stream()
+                .filter(link -> isUpdated(link, from))
                 .map(this::buildLinkUpdate)
                 .toList();
     }
 
-    private LinkUpdate buildLinkUpdate(Map.Entry<String, List<Long>> entry) {
-        return new LinkUpdate(System.currentTimeMillis(), entry.getKey(), getMessage(), entry.getValue());
+    private LinkUpdate buildLinkUpdate(Link link) {
+        return new LinkUpdate(
+                System.currentTimeMillis(),
+                link.url(),
+                getMessage(),
+                link.chats().stream().map(Chat::id).toList());
     }
 
-    protected abstract boolean isUpdated(LinkRecord linkRecord, Instant from);
+    protected abstract boolean isUpdated(Link link, Instant from);
 
     protected abstract LinkType getLinkType();
 

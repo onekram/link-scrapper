@@ -1,5 +1,6 @@
 package backend.academy.scrapper.update;
 
+import static backend.academy.scrapper.test.util.TestUtil.generateLink;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
@@ -8,14 +9,9 @@ import backend.academy.model.LinkUpdate;
 import backend.academy.scrapper.client.github.GithubReposClient;
 import backend.academy.scrapper.client.model.GithubRepositoryResponse;
 import backend.academy.scrapper.parser.LinkType;
-import backend.academy.scrapper.repository.record.LinkRecord;
 import backend.academy.scrapper.service.LinksService;
-import java.net.URI;
 import java.time.Instant;
-import java.util.Collections;
 import java.util.List;
-import java.util.Map;
-import lombok.SneakyThrows;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -38,16 +34,11 @@ class GithubUpdateServiceTest {
     @Test
     @DisplayName("Correct list of updated links")
     void getListUpdateCorrect() {
-        when(linksService.fetchIdAndLinksByType(LinkType.GITHUB))
-                .thenReturn(Map.of(
-                        123L,
-                                List.of(
-                                        generateLinkRecord(1L, "https://github.com/onekram/game"),
-                                        generateLinkRecord(2L, "https://github.com/onekram/hamarch")),
-                        453L,
-                                List.of(
-                                        generateLinkRecord(5L, "https://github.com/onekram/factorization"),
-                                        generateLinkRecord(10L, "https://github.com/onekram/game"))));
+        when(linksService.findAllByType(LinkType.GITHUB))
+                .thenReturn(List.of(
+                        generateLink("https://github.com/onekram/game", 123L, 453L),
+                        generateLink("https://github.com/onekram/factorization", 453L),
+                        generateLink("https://github.com/onekram/hamarch", 123L)));
         Instant now = Instant.now();
         when(githubReposClient.checkForUpdates(any(), any())).thenReturn(new GithubRepositoryResponse(now));
 
@@ -61,10 +52,5 @@ class GithubUpdateServiceTest {
                         new LinkUpdate(0L, "https://github.com/onekram/game", "Github updates", List.of(123L, 453L)),
                         new LinkUpdate(0L, "https://github.com/onekram/factorization", "Github updates", List.of(453L)),
                         new LinkUpdate(0L, "https://github.com/onekram/hamarch", "Github updates", List.of(123L))));
-    }
-
-    @SneakyThrows
-    private LinkRecord generateLinkRecord(Long id, String url) {
-        return new LinkRecord(id, new URI(url), Collections.emptyList(), Collections.emptyList(), LinkType.GITHUB);
     }
 }
