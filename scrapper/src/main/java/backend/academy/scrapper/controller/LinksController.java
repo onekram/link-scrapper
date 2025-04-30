@@ -11,6 +11,7 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.Positive;
 import lombok.RequiredArgsConstructor;
 import org.springframework.validation.annotation.Validated;
@@ -79,7 +80,7 @@ public class LinksController {
             headers = {"Tg-Chat-Id"})
     public LinkResponse addLink(
             @RequestHeader("Tg-Chat-Id") @Positive(message = "Невалидный идентификатор чата") Long tgChatId,
-            @RequestBody AddLinkRequest request) {
+            @Valid @RequestBody AddLinkRequest request) {
         return linksService.addLink(tgChatId, request);
     }
 
