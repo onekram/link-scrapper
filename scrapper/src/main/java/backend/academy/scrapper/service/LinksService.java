@@ -49,12 +49,10 @@ public class LinksService {
         Link newLink = chat.links().stream()
                 .filter(link -> request.link().equals(link.url()))
                 .findFirst()
-                .map(link -> {
-                    link.tags().addAll(tags);
-                    link.filters().addAll(filters);
-                    return link;
-                })
-                .orElse(linkRepository.save(new Link(request.link(), tags, filters)));
+                .orElseGet(() -> linkRepository.save(new Link(request.link(), tags, filters)));
+
+        newLink.tags(tags);
+        newLink.filters(filters);
 
         chat.links().add(newLink);
         newLink.chats().add(chat);
