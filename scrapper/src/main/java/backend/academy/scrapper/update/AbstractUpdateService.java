@@ -8,12 +8,14 @@ import backend.academy.scrapper.service.LinksService;
 import java.time.Instant;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springframework.transaction.annotation.Transactional;
 
 @RequiredArgsConstructor
 public abstract class AbstractUpdateService implements UpdateService {
     private final LinksService linksService;
 
     @Override
+    @Transactional
     public List<LinkUpdate> getUpdates(Instant from) {
         return linksService.findAllByType(getLinkType()).stream()
                 .filter(link -> isUpdated(link, from))
