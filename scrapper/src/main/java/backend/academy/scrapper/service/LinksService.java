@@ -54,7 +54,7 @@ public class LinksService {
                     link.filters().addAll(filters);
                     return link;
                 })
-                .orElse(new Link(request.link(), tags, filters));
+                .orElse(linkRepository.save(new Link(request.link(), tags, filters)));
 
         chat.links().add(newLink);
         newLink.chats().add(chat);
