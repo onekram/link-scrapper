@@ -62,13 +62,4 @@ class TestcontainersConfiguration {
                 "wiremock.url",
                 () -> TestUtil.createHttpAddress(wiremockContainer.getHost(), wiremockContainer.getMappedPort(8080)));
     }
-
-    @Bean
-    DynamicPropertyRegistrar datasourcePropertyRegistrar(PostgreSQLContainer<?> postgresContainer) {
-        return registry -> {
-            registry.add("spring.datasource.url", postgresContainer::getJdbcUrl);
-            registry.add("spring.datasource.username", postgresContainer::getUsername);
-            registry.add("spring.datasource.password", postgresContainer::getPassword);
-        };
-    }
 }
