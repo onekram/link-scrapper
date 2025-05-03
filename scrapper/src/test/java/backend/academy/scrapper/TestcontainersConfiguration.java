@@ -1,7 +1,7 @@
 package backend.academy.scrapper;
 
 import backend.academy.scrapper.test.util.TestUtil;
-import org.springframework.beans.factory.annotation.Qualifier;
+import com.github.tomakehurst.wiremock.client.WireMock;
 import org.springframework.boot.devtools.restart.RestartScope;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.boot.testcontainers.service.connection.ServiceConnection;
@@ -56,10 +56,12 @@ class TestcontainersConfiguration {
     }
 
     @Bean
-    DynamicPropertyRegistrar wiremockPropertyRegistrar(
-            @Qualifier("wireMockContainer") GenericContainer<?> wiremockContainer) {
+    DynamicPropertyRegistrar wiremockPropertyRegistrar(GenericContainer<?> wireMockContainer) {
+        String host = wireMockContainer.getHost();
+        Integer port = wireMockContainer.getMappedPort(8080);
+        WireMock.configureFor(host, port);
         return registry -> registry.add(
                 "wiremock.url",
-                () -> TestUtil.createHttpAddress(wiremockContainer.getHost(), wiremockContainer.getMappedPort(8080)));
+                () -> TestUtil.createHttpAddress(host, port));
     }
 }
