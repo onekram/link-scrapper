@@ -17,6 +17,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.IntStream;
+import com.github.tomakehurst.wiremock.client.WireMock;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -32,7 +33,10 @@ import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.support.TransactionTemplate;
+import static com.github.tomakehurst.wiremock.client.WireMock.containing;
+import static com.github.tomakehurst.wiremock.client.WireMock.equalTo;
 import static com.github.tomakehurst.wiremock.client.WireMock.getRequestedFor;
+import static com.github.tomakehurst.wiremock.client.WireMock.matchingJsonPath;
 import static com.github.tomakehurst.wiremock.client.WireMock.postRequestedFor;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlMatching;
 import static com.github.tomakehurst.wiremock.client.WireMock.verify;
@@ -89,7 +93,7 @@ class ScrapperApplicationTests {
         transactionTemplate.executeWithoutResult(ignored -> {
             Instant fiveSecondsAgo = Instant.now().minusSeconds(5);
             assertThat(chatRepository.findAll())
-                .satisfiesExactly(
+                .satisfiesExactlyInAnyOrder(
                     chat -> {
                         assertThat(chat.id()).isEqualTo(1L);
                         assertThat(chat.createdAt()).isAfterOrEqualTo(fiveSecondsAgo);
@@ -182,55 +186,87 @@ class ScrapperApplicationTests {
         chatRepository.flush();
         linkRepository.flush();
 
-        HttpHeaders headers = new HttpHeaders();
-        headers.set("Tg-Chat-Id", "1");
-        headers.set("Content-Type", "application/json");
-        AddLinkRequest addLinkRequest = new AddLinkRequest("https://third.com/onekram/game",
-            List.of("tag1"),
-            List.of("filter1"));
-        HttpEntity<AddLinkRequest> requestEntity = new HttpEntity<>(addLinkRequest, headers);
-
-        ResponseEntity<LinkResponse> response = testRestTemplate.exchange(
-            "/links",
-            HttpMethod.POST,
-            requestEntity,
-            LinkResponse.class
-        );
-
-        assertThat(response)
-            .satisfies(r -> {
-                assertThat(r.getStatusCode()).isEqualTo(HttpStatus.OK);
-                assertThat(r.getBody()).isNotNull();
-                assertThat(r.getBody().url()).isEqualTo("https://third.com/onekram/game");
-                assertThat(r.getBody().tags()).containsOnly("tag1");
-                assertThat(r.getBody().filters()).containsOnly("filter1");
-            });
+        addLinkRequest("https://third.com/onekram/game", 1L);
 
         transactionTemplate.executeWithoutResult((ignored) -> {
             assertThat(chatRepository.findAll())
                 .singleElement()
-                .extracting(Chat::id)
-                .isEqualTo(1L);
+                .satisfies(c -> {
+                    assertThat(c.id()).isEqualTo(1L);
+                    assertThat(c.links())
+                        .extracting(Link::url)
+                        .containsExactlyInAnyOrder("https://third.com/onekram/game", "https://www.google.com", "https://www.github.com");
+                });
 
             assertThat(linkRepository.findAll())
                 .satisfiesOnlyOnce(link -> {
                     assertThat(link.url()).isEqualTo("https://third.com/onekram/game");
-                    assertThat(link.tags()).map(Tag::name).containsOnly("tag1");
-                    assertThat(link.filters()).map(Filter::name).containsOnly("filter1");
+                    assertThat(link.chats()).extracting(Chat::id).containsExactly(1L);
+                    assertThat(link.tags()).map(Tag::name).containsExactly("tag1");
+                    assertThat(link.filters()).map(Filter::name).containsExactly("filter1");
                 });
 
             assertThat(tagRepository.findAll())
                 .singleElement()
                 .satisfies(filter -> {
                     assertThat(filter.name()).isEqualTo("tag1");
-                    assertThat(filter.links()).extracting(Link::url).containsOnly("https://third.com/onekram/game");
+                    assertThat(filter.links())
+                        .extracting(Link::url)
+                        .containsExactly("https://third.com/onekram/game");
                 });
 
             assertThat(filterRepository.findAll())
                 .singleElement()
                 .satisfies(filter -> {
                     assertThat(filter.name()).isEqualTo("filter1");
-                    assertThat(filter.links()).extracting(Link::url).containsOnly("https://third.com/onekram/game");
+                    assertThat(filter.links())
+                        .extracting(Link::url)
+                        .containsExactly("https://third.com/onekram/game");
+                });
+        });
+
+        addLinkRequest("https://third.com/onekram/game", 2L);
+        transactionTemplate.executeWithoutResult((ignored) -> {
+            assertThat(chatRepository.findAll())
+                .hasSize(2)
+                .satisfiesExactlyInAnyOrder(
+                    c -> {
+                        assertThat(c.id()).isEqualTo(1L);
+                        assertThat(c.links())
+                            .extracting(Link::url)
+                            .containsExactlyInAnyOrder("https://third.com/onekram/game", "https://www.google.com", "https://www.github.com");
+                    }, c -> {
+                        assertThat(c.id()).isEqualTo(2L);
+                        assertThat(c.links())
+                            .extracting(Link::url)
+                            .containsExactlyInAnyOrder("https://third.com/onekram/game");
+                    }
+                );
+
+            assertThat(linkRepository.findAll())
+                .satisfiesOnlyOnce(link -> {
+                    assertThat(link.url()).isEqualTo("https://third.com/onekram/game");
+                    assertThat(link.chats()).extracting(Chat::id).containsExactlyInAnyOrder(2L);
+                    assertThat(link.tags()).map(Tag::name).containsExactly("tag1");
+                    assertThat(link.filters()).map(Filter::name).containsExactly("filter1");
+                });
+
+            assertThat(tagRepository.findAll())
+                .singleElement()
+                .satisfies(filter -> {
+                    assertThat(filter.name()).isEqualTo("tag1");
+                    assertThat(filter.links())
+                        .extracting(Link::url)
+                        .containsExactly("https://third.com/onekram/game", "https://third.com/onekram/game");
+                });
+
+            assertThat(filterRepository.findAll())
+                .singleElement()
+                .satisfies(filter -> {
+                    assertThat(filter.name()).isEqualTo("filter1");
+                    assertThat(filter.links())
+                        .extracting(Link::url)
+                        .containsExactly("https://third.com/onekram/game", "https://third.com/onekram/game");
                 });
         });
     }
@@ -289,10 +325,38 @@ class ScrapperApplicationTests {
     @Test
     @DisplayName("Scheduling request to github")
     void scheduleRequestToGithub() {
+        addLinkRequest("https://github.com/onekram/game", 1L);
+        await()
+            .atMost(2, TimeUnit.SECONDS)
+            .pollInterval(100, TimeUnit.MILLISECONDS)
+            .untilAsserted(() -> {
+                verify(1, getRequestedFor(urlMatching("/repos/onekram/game")));
+                verify(1, postRequestedFor(urlMatching("/updates"))
+                    .withRequestBody(matchingJsonPath("$.url", equalTo("https://github.com/onekram/game")))
+                    .withRequestBody(matchingJsonPath("$.tgChatIds", containing("1"))));
+            });
+        WireMock.reset();
+
+        addLinkRequest("https://github.com/onekram/game", 2L);
+        await()
+            .atMost(2, TimeUnit.SECONDS)
+            .pollInterval(100, TimeUnit.MILLISECONDS)
+            .untilAsserted(() -> {
+                verify(2, getRequestedFor(urlMatching("/repos/onekram/game")));
+                verify(1, postRequestedFor(urlMatching("/updates"))
+                    .withRequestBody(matchingJsonPath("$.url", equalTo("https://github.com/onekram/game")))
+                    .withRequestBody(matchingJsonPath("$.tgChatIds", containing("1"))));
+                verify(1, postRequestedFor(urlMatching("/updates"))
+                    .withRequestBody(matchingJsonPath("$.url", equalTo("https://github.com/onekram/game")))
+                    .withRequestBody(matchingJsonPath("$.tgChatIds", containing("2"))));
+            });
+    }
+
+    private void addLinkRequest(String url, Long tgChatId) {
         HttpHeaders headers = new HttpHeaders();
-        headers.set("Tg-Chat-Id", "1");
+        headers.set("Tg-Chat-Id", tgChatId.toString());
         headers.set("Content-Type", "application/json");
-        AddLinkRequest addLinkRequest = new AddLinkRequest("https://github.com/onekram/game",
+        AddLinkRequest addLinkRequest = new AddLinkRequest(url,
             List.of("tag1"),
             List.of("filter1"));
         HttpEntity<AddLinkRequest> requestEntity = new HttpEntity<>(addLinkRequest, headers);
@@ -308,17 +372,9 @@ class ScrapperApplicationTests {
             .satisfies(r -> {
                 assertThat(r.getStatusCode()).isEqualTo(HttpStatus.OK);
                 assertThat(r.getBody()).isNotNull();
-                assertThat(r.getBody().url()).isEqualTo("https://github.com/onekram/game");
-                assertThat(r.getBody().tags()).containsOnly("tag1");
-                assertThat(r.getBody().filters()).containsOnly("filter1");
-            });
-
-        await()
-            .atMost(6, TimeUnit.SECONDS)
-            .pollInterval(1, TimeUnit.SECONDS)
-            .untilAsserted(() -> {
-                verify(1, getRequestedFor(urlMatching("/repos/onekram/game")));
-                verify(1, postRequestedFor(urlMatching("/updates")));
+                assertThat(r.getBody().url()).isEqualTo(url);
+                assertThat(r.getBody().tags()).containsExactly("tag1");
+                assertThat(r.getBody().filters()).containsExactly("filter1");
             });
     }
 }
