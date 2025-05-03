@@ -1,12 +1,5 @@
 package backend.academy.scrapper.service;
 
-import static backend.academy.scrapper.test.util.TestUtil.generateChat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.Mockito.verifyNoInteractions;
-import static org.mockito.Mockito.when;
-
 import backend.academy.model.AddLinkRequest;
 import backend.academy.model.LinkResponse;
 import backend.academy.model.RemoveLinkRequest;
@@ -14,7 +7,11 @@ import backend.academy.scrapper.exception.NotFoundException;
 import backend.academy.scrapper.repository.ChatRepository;
 import backend.academy.scrapper.repository.FilterRepository;
 import backend.academy.scrapper.repository.LinkRepository;
+import backend.academy.scrapper.repository.SubscriptionRepository;
 import backend.academy.scrapper.repository.TagRepository;
+import backend.academy.scrapper.repository.entity.Chat;
+import backend.academy.scrapper.repository.entity.Link;
+import backend.academy.scrapper.repository.entity.Subscription;
 import backend.academy.scrapper.repository.entity.Tag;
 import java.util.Collections;
 import java.util.List;
@@ -25,6 +22,14 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import static backend.academy.scrapper.test.util.TestUtil.generateChat;
+import static backend.academy.scrapper.test.util.TestUtil.generateLink;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.verifyNoInteractions;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class LinksServiceTest {
@@ -41,16 +46,22 @@ class LinksServiceTest {
     @Mock
     private FilterRepository filterRepository;
 
+    @Mock
+    private SubscriptionRepository subscriptionRepository;
+
     @InjectMocks
     private LinksService linksService;
 
     @Test
-    @DisplayName("Add  link")
+    @DisplayName("Add link")
     void notPresentLink() {
+        Chat chat = generateChat(1L, "https://dot.com", "https://another.com");
         when(chatRepository.findById(1L))
-                .thenReturn(Optional.of(generateChat(1L, "https://dot.com", "https://another.com")));
+                .thenReturn(Optional.of(chat));
         when(tagRepository.findByName("tag23")).thenReturn(Optional.of(new Tag("tag23")));
-
+        Link link = generateLink("https://third.com", 1);
+        when(linkRepository.findByUrl("https://third.com")).thenReturn(Optional.of(link));
+        when(subscriptionRepository.findByChatAndLink(any(), any())).thenReturn(Optional.of(new Subscription(chat, link)));
         LinkResponse response = linksService.addLink(
                 1L,
                 AddLinkRequest.builder()
@@ -86,7 +97,5 @@ class LinksServiceTest {
         assertThatThrownBy(() -> linksService.removeLink(1L, new RemoveLinkRequest("https://third.com")))
                 .isInstanceOf(NotFoundException.class)
                 .hasMessageContaining("Не существует ссылки: https://third.com");
-
-        verifyNoInteractions(linkRepository);
     }
 }

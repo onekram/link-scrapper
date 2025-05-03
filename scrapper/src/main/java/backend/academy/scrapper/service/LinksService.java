@@ -10,10 +10,12 @@ import backend.academy.scrapper.repository.ChatRepository;
 import backend.academy.scrapper.repository.EntityByNameFinderAndSaver;
 import backend.academy.scrapper.repository.FilterRepository;
 import backend.academy.scrapper.repository.LinkRepository;
+import backend.academy.scrapper.repository.SubscriptionRepository;
 import backend.academy.scrapper.repository.TagRepository;
 import backend.academy.scrapper.repository.entity.Chat;
 import backend.academy.scrapper.repository.entity.Filter;
 import backend.academy.scrapper.repository.entity.Link;
+import backend.academy.scrapper.repository.entity.Subscription;
 import backend.academy.scrapper.repository.entity.Tag;
 import java.util.List;
 import java.util.Set;
@@ -30,66 +32,62 @@ public class LinksService {
     private final LinkRepository linkRepository;
     private final TagRepository tagRepository;
     private final FilterRepository filterRepository;
+    private final SubscriptionRepository subscriptionRepository;
 
     @Transactional
     public ListLinksResponse listAll(Long tgChatId) {
         return chatRepository
                 .findById(tgChatId)
                 .map(chat -> new ListLinksResponse(
-                        chat.links().stream().map(this::linkToResponse).toList(),
-                        chat.links().size()))
+                        chat.subscriptions().stream().map(this::createLinkResponse).toList(),
+                        chat.subscriptions().size()))
                 .orElse(new ListLinksResponse(List.of(), 0));
     }
 
     @Transactional
     public LinkResponse addLink(Long tgChatId, AddLinkRequest request) {
         Chat chat = chatRepository.findById(tgChatId).orElseGet(() -> chatRepository.save(new Chat(tgChatId)));
+        Link link = linkRepository.findByUrl(request.link()).orElseGet(() -> linkRepository.save(new Link(request.link())));
         Set<Tag> tags = findByNameOrCreate(request.tags(), tagRepository, Tag::new);
         Set<Filter> filters = findByNameOrCreate(request.filters(), filterRepository, Filter::new);
 
-        Link newLink = chat.links().stream()
-                .filter(link -> request.link().equals(link.url()))
-                .findFirst()
-                .orElseGet(() -> linkRepository.save(new Link(request.link(), tags, filters)));
+        Subscription subscription = subscriptionRepository.findByChatAndLink(chat, link)
+            .orElseGet(() -> subscriptionRepository.save(new Subscription(chat, link)));
 
-        newLink.tags(tags);
-        newLink.filters(filters);
+        subscription.tags(tags);
+        subscription.filters(filters);
 
-        chat.links().add(newLink);
-        newLink.chats().add(chat);
-        return linkToResponse(newLink);
+        return createLinkResponse(subscription);
     }
 
     @Transactional
     public LinkResponse removeLink(Long tgChatId, RemoveLinkRequest request) {
-        Chat chat = chatRepository
-                .findById(tgChatId)
+        Chat chat = chatRepository.findById(tgChatId)
                 .orElseThrow(() -> new NotFoundException("Не существует чата: %s".formatted(tgChatId)));
+        Link link = linkRepository.findByUrl(request.link())
+            .orElseThrow(() -> new NotFoundException("Не существует ссылки: %s".formatted(request.link())));
+        Subscription subscription = subscriptionRepository.findByChatAndLink(chat, link)
+            .orElseThrow(() -> new NotFoundException("Не существует ссылки: %s".formatted(request.link())));
 
-        Link targetLink = chat.links().stream()
-                .filter(link -> request.link().equals(link.url()))
-                .findFirst()
-                .orElseThrow(() -> new NotFoundException("Не существует ссылки: %s".formatted(request.link())));
+        LinkResponse linkResponse = createLinkResponse(subscription);
 
-        chat.links().remove(targetLink);
-        targetLink.chats().remove(chat);
-
-        if (targetLink.chats().isEmpty()) {
-            linkRepository.delete(targetLink);
+        link.subscriptions().remove(subscription);
+        if (link.subscriptions().isEmpty()) {
+            linkRepository.delete(link);
         }
-        return linkToResponse(targetLink);
+        return linkResponse;
     }
 
     public List<Link> findAllByType(LinkType linkType) {
         return linkRepository.findAllByType(linkType);
     }
 
-    private LinkResponse linkToResponse(Link link) {
+    private LinkResponse createLinkResponse(Subscription subscription) {
         return new LinkResponse(
-                link.id(),
-                link.url(),
-                link.tags().stream().map(Tag::name).toList(),
-                link.filters().stream().map(Filter::name).toList());
+                subscription.link().id(),
+                subscription.link().url(),
+                subscription.tags().stream().map(Tag::name).toList(),
+                subscription.filters().stream().map(Filter::name).toList());
     }
 
     private static <T> Set<T> findByNameOrCreate(

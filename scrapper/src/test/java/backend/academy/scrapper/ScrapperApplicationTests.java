@@ -7,17 +7,19 @@ import backend.academy.model.RemoveLinkRequest;
 import backend.academy.scrapper.repository.ChatRepository;
 import backend.academy.scrapper.repository.FilterRepository;
 import backend.academy.scrapper.repository.LinkRepository;
+import backend.academy.scrapper.repository.SubscriptionRepository;
 import backend.academy.scrapper.repository.TagRepository;
 import backend.academy.scrapper.repository.entity.Chat;
 import backend.academy.scrapper.repository.entity.Filter;
 import backend.academy.scrapper.repository.entity.Link;
+import backend.academy.scrapper.repository.entity.Subscription;
 import backend.academy.scrapper.repository.entity.Tag;
+import com.github.tomakehurst.wiremock.client.WireMock;
 import java.time.Instant;
-import java.util.Collections;
+import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.IntStream;
-import com.github.tomakehurst.wiremock.client.WireMock;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -59,6 +61,9 @@ class ScrapperApplicationTests {
 
     @Autowired
     private FilterRepository filterRepository;
+
+    @Autowired
+    private SubscriptionRepository subscriptionRepository;
 
     @Autowired
     private TestRestTemplate testRestTemplate;
@@ -130,20 +135,7 @@ class ScrapperApplicationTests {
     @Test
     @DisplayName("Get all chat links")
     void listLink() {
-        Chat chat = chatRepository.save(new Chat(1L));
-        Link first = linkRepository.save(new Link("https://www.google.com", Collections.emptySet(), Collections.emptySet()));
-        Link second = linkRepository.save(new Link("https://www.github.com", Collections.emptySet(), Collections.emptySet()));
-
-        chat.links().add(first);
-        chat.links().add(second);
-        first.chats().add(chat);
-        second.chats().add(chat);
-        chatRepository.save(chat);
-        linkRepository.save(first);
-        linkRepository.save(second);
-
-        chatRepository.flush();
-        linkRepository.flush();
+        saveChatWithTrackedUrls(1L, "https://www.google.com", "https://www.github.com");
 
         HttpHeaders headers = new HttpHeaders();
         headers.set("Tg-Chat-Id", "1");
@@ -171,20 +163,7 @@ class ScrapperApplicationTests {
     @Test
     @DisplayName("Add link")
     void addLink() {
-        Chat chat = chatRepository.save(new Chat(1L));
-        Link first = linkRepository.save(new Link("https://www.google.com", Collections.emptySet(), Collections.emptySet()));
-        Link second = linkRepository.save(new Link("https://www.github.com", Collections.emptySet(), Collections.emptySet()));
-
-        chat.links().add(first);
-        chat.links().add(second);
-        first.chats().add(chat);
-        second.chats().add(chat);
-        chatRepository.save(chat);
-        linkRepository.save(first);
-        linkRepository.save(second);
-
-        chatRepository.flush();
-        linkRepository.flush();
+        saveChatWithTrackedUrls(1L, "https://www.google.com", "https://www.github.com");
 
         addLinkRequest("https://third.com/onekram/game", 1L);
 
@@ -193,35 +172,50 @@ class ScrapperApplicationTests {
                 .singleElement()
                 .satisfies(c -> {
                     assertThat(c.id()).isEqualTo(1L);
-                    assertThat(c.links())
-                        .extracting(Link::url)
-                        .containsExactlyInAnyOrder("https://third.com/onekram/game", "https://www.google.com", "https://www.github.com");
+                    assertThat(c.subscriptions())
+                        .satisfiesExactlyInAnyOrder(s -> {
+                            assertThat(s.link().url()).isEqualTo("https://third.com/onekram/game");
+                            assertThat(s.chat().id()).isEqualTo(1L);
+                            assertThat(s.tags()).isNotNull().extracting(Tag::name).containsExactly("tag1");
+                            assertThat(s.filters()).isNotNull().extracting(Filter::name).containsExactly("filter1");
+                        }, s -> {
+                            assertThat(s.link().url()).isEqualTo("https://www.google.com");
+                            assertThat(s.chat().id()).isEqualTo(1L);
+                            assertThat(s.tags()).isEmpty();
+                            assertThat(s.filters()).isEmpty();
+                        }, s -> {
+                            assertThat(s.link().url()).isEqualTo("https://www.github.com");
+                            assertThat(s.chat().id()).isEqualTo(1L);
+                            assertThat(s.tags()).isEmpty();
+                            assertThat(s.filters()).isEmpty();
+                        });
                 });
 
             assertThat(linkRepository.findAll())
-                .satisfiesOnlyOnce(link -> {
-                    assertThat(link.url()).isEqualTo("https://third.com/onekram/game");
-                    assertThat(link.chats()).extracting(Chat::id).containsExactly(1L);
-                    assertThat(link.tags()).map(Tag::name).containsExactly("tag1");
-                    assertThat(link.filters()).map(Filter::name).containsExactly("filter1");
-                });
+                .hasSize(3)
+                .extracting(Link::url)
+                .containsExactlyInAnyOrder("https://third.com/onekram/game", "https://www.google.com", "https://www.github.com");
 
             assertThat(tagRepository.findAll())
                 .singleElement()
-                .satisfies(filter -> {
-                    assertThat(filter.name()).isEqualTo("tag1");
-                    assertThat(filter.links())
+                .satisfies(tag -> {
+                    assertThat(tag.name()).isEqualTo("tag1");
+                    assertThat(tag.subscriptions())
+                        .singleElement()
+                        .extracting(Subscription::link)
                         .extracting(Link::url)
-                        .containsExactly("https://third.com/onekram/game");
+                        .isEqualTo("https://third.com/onekram/game");
                 });
 
             assertThat(filterRepository.findAll())
                 .singleElement()
                 .satisfies(filter -> {
                     assertThat(filter.name()).isEqualTo("filter1");
-                    assertThat(filter.links())
+                    assertThat(filter.subscriptions())
+                        .singleElement()
+                        .extracting(Subscription::link)
                         .extracting(Link::url)
-                        .containsExactly("https://third.com/onekram/game");
+                        .isEqualTo("https://third.com/onekram/game");
                 });
         });
 
@@ -232,41 +226,44 @@ class ScrapperApplicationTests {
                 .satisfiesExactlyInAnyOrder(
                     c -> {
                         assertThat(c.id()).isEqualTo(1L);
-                        assertThat(c.links())
+                        assertThat(c.subscriptions())
+                            .extracting(Subscription::link)
                             .extracting(Link::url)
                             .containsExactlyInAnyOrder("https://third.com/onekram/game", "https://www.google.com", "https://www.github.com");
                     }, c -> {
                         assertThat(c.id()).isEqualTo(2L);
-                        assertThat(c.links())
+                        assertThat(c.subscriptions())
+                            .extracting(Subscription::link)
                             .extracting(Link::url)
                             .containsExactlyInAnyOrder("https://third.com/onekram/game");
                     }
                 );
 
             assertThat(linkRepository.findAll())
-                .satisfiesOnlyOnce(link -> {
-                    assertThat(link.url()).isEqualTo("https://third.com/onekram/game");
-                    assertThat(link.chats()).extracting(Chat::id).containsExactlyInAnyOrder(2L);
-                    assertThat(link.tags()).map(Tag::name).containsExactly("tag1");
-                    assertThat(link.filters()).map(Filter::name).containsExactly("filter1");
-                });
+                .hasSize(3)
+                .extracting(Link::url)
+                .containsExactlyInAnyOrder("https://third.com/onekram/game", "https://www.google.com", "https://www.github.com");
 
             assertThat(tagRepository.findAll())
                 .singleElement()
-                .satisfies(filter -> {
-                    assertThat(filter.name()).isEqualTo("tag1");
-                    assertThat(filter.links())
+                .satisfies(tag -> {
+                    assertThat(tag.name()).isEqualTo("tag1");
+                    assertThat(tag.subscriptions())
+                        .hasSize(2)
+                        .extracting(Subscription::link)
                         .extracting(Link::url)
-                        .containsExactly("https://third.com/onekram/game", "https://third.com/onekram/game");
+                        .containsOnly("https://third.com/onekram/game");
                 });
 
             assertThat(filterRepository.findAll())
                 .singleElement()
                 .satisfies(filter -> {
                     assertThat(filter.name()).isEqualTo("filter1");
-                    assertThat(filter.links())
+                    assertThat(filter.subscriptions())
+                        .hasSize(2)
+                        .extracting(Subscription::link)
                         .extracting(Link::url)
-                        .containsExactly("https://third.com/onekram/game", "https://third.com/onekram/game");
+                        .containsOnly("https://third.com/onekram/game");
                 });
         });
     }
@@ -274,20 +271,7 @@ class ScrapperApplicationTests {
     @Test
     @DisplayName("Delete link")
     void deleteLink() {
-        Chat chat = chatRepository.save(new Chat(1L));
-        Link first = linkRepository.save(new Link("https://www.google.com", Collections.emptySet(), Collections.emptySet()));
-        Link second = linkRepository.save(new Link("https://www.github.com", Collections.emptySet(), Collections.emptySet()));
-
-        chat.links().add(first);
-        chat.links().add(second);
-        first.chats().add(chat);
-        second.chats().add(chat);
-        chatRepository.save(chat);
-        linkRepository.save(first);
-        linkRepository.save(second);
-
-        chatRepository.flush();
-        linkRepository.flush();
+        saveChatWithTrackedUrls(1L, "https://www.google.com", "https://www.github.com");
 
         HttpHeaders headers = new HttpHeaders();
         headers.set("Tg-Chat-Id", "1");
@@ -319,6 +303,12 @@ class ScrapperApplicationTests {
                 .singleElement()
                 .extracting(Link::url)
                 .isEqualTo("https://www.google.com");
+
+            assertThat(subscriptionRepository.findAll())
+                .singleElement()
+                .extracting(Subscription::link)
+                .extracting(Link::url)
+                .isEqualTo("https://www.google.com");
         });
     }
 
@@ -326,8 +316,7 @@ class ScrapperApplicationTests {
     @DisplayName("Scheduling request to github")
     void scheduleRequestToGithub() {
         addLinkRequest("https://github.com/onekram/game", 1L);
-        await()
-            .atMost(2, TimeUnit.SECONDS)
+        await().atMost(2, TimeUnit.SECONDS)
             .pollInterval(100, TimeUnit.MILLISECONDS)
             .untilAsserted(() -> {
                 verify(1, getRequestedFor(urlMatching("/repos/onekram/game")));
@@ -338,16 +327,30 @@ class ScrapperApplicationTests {
         WireMock.reset();
 
         addLinkRequest("https://github.com/onekram/game", 2L);
-        await()
-            .atMost(2, TimeUnit.SECONDS)
+        await().atMost(2, TimeUnit.SECONDS)
             .pollInterval(100, TimeUnit.MILLISECONDS)
             .untilAsserted(() -> {
-                verify(2, getRequestedFor(urlMatching("/repos/onekram/game")));
+                verify(1, getRequestedFor(urlMatching("/repos/onekram/game")));
                 verify(1, postRequestedFor(urlMatching("/updates"))
                     .withRequestBody(matchingJsonPath("$.url", equalTo("https://github.com/onekram/game")))
-                    .withRequestBody(matchingJsonPath("$.tgChatIds", containing("1"))));
+                    .withRequestBody(matchingJsonPath("$.tgChatIds", containing("1")))
+                    .withRequestBody(matchingJsonPath("$.tgChatIds", containing("2"))));
+            });
+
+        WireMock.reset();
+
+        addLinkRequest("https://github.com/oleg/tbank", 2L);
+        await().atMost(2, TimeUnit.SECONDS)
+            .pollInterval(100, TimeUnit.MILLISECONDS)
+            .untilAsserted(() -> {
+                verify(1, getRequestedFor(urlMatching("/repos/onekram/game")));
+                verify(1, getRequestedFor(urlMatching("/repos/oleg/tbank")));
                 verify(1, postRequestedFor(urlMatching("/updates"))
                     .withRequestBody(matchingJsonPath("$.url", equalTo("https://github.com/onekram/game")))
+                    .withRequestBody(matchingJsonPath("$.tgChatIds", containing("1")))
+                    .withRequestBody(matchingJsonPath("$.tgChatIds", containing("2"))));
+                verify(1, postRequestedFor(urlMatching("/updates"))
+                    .withRequestBody(matchingJsonPath("$.url", equalTo("https://github.com/oleg/tbank")))
                     .withRequestBody(matchingJsonPath("$.tgChatIds", containing("2"))));
             });
     }
@@ -376,5 +379,16 @@ class ScrapperApplicationTests {
                 assertThat(r.getBody().tags()).containsExactly("tag1");
                 assertThat(r.getBody().filters()).containsExactly("filter1");
             });
+    }
+
+
+    private void saveChatWithTrackedUrls(long id, String... urls) {
+        transactionTemplate.executeWithoutResult((ignored) -> {
+            Chat chat = chatRepository.save(new Chat(id));
+            Arrays.stream(urls)
+                .map(url -> linkRepository.save(new Link(url)))
+                .map(link -> subscriptionRepository.save(new Subscription(chat, link)))
+                .forEach(chat.subscriptions()::add);
+        });
     }
 }

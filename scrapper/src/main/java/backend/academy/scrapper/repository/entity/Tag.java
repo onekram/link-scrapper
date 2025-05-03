@@ -25,10 +25,11 @@ public class Tag {
     @Column(nullable = false)
     private Long id;
 
-    @ManyToMany(mappedBy = "tags")
-    private Set<Link> links = new HashSet<>();
-
+    @Column(nullable = false, unique = true)
     private String name;
+
+    @ManyToMany(mappedBy = "tags")
+    private Set<Subscription> subscriptions = new HashSet<>();
 
     @Column(nullable = false)
     private Instant createdAt = Instant.now();

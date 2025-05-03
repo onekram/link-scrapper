@@ -4,6 +4,7 @@ import backend.academy.model.LinkResponse;
 import backend.academy.model.ListLinksResponse;
 import backend.academy.scrapper.repository.entity.Chat;
 import backend.academy.scrapper.repository.entity.Link;
+import backend.academy.scrapper.repository.entity.Subscription;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -31,12 +32,14 @@ public class TestUtil {
     }
 
     public static Link generateLink(String url, long... chats) {
-        return new Link(url, Collections.emptySet(), Collections.emptySet())
-                .chats(Arrays.stream(chats).mapToObj(id -> new Chat().id(id)).collect(Collectors.toSet()));
+        Link link = new Link(url);
+        link.subscriptions(Arrays.stream(chats).mapToObj(id -> new Subscription(new Chat(id), link)).collect(Collectors.toSet()));
+        return link;
     }
 
     public static Chat generateChat(long id, String... urls) {
-        return new Chat(id)
-                .links(Arrays.stream(urls).map(url -> generateLink(url, id)).collect(Collectors.toSet()));
+        Chat chat = new Chat(id);
+        chat.subscriptions(Arrays.stream(urls).map(url -> new Subscription(chat, generateLink(url, id))).collect(Collectors.toSet()));
+        return chat;
     }
 }

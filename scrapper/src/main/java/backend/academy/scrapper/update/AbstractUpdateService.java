@@ -4,6 +4,7 @@ import backend.academy.model.LinkUpdate;
 import backend.academy.scrapper.parser.LinkType;
 import backend.academy.scrapper.repository.entity.Chat;
 import backend.academy.scrapper.repository.entity.Link;
+import backend.academy.scrapper.repository.entity.Subscription;
 import backend.academy.scrapper.service.LinksService;
 import java.time.Instant;
 import java.util.List;
@@ -28,7 +29,10 @@ public abstract class AbstractUpdateService implements UpdateService {
                 System.currentTimeMillis(),
                 link.url(),
                 getMessage(),
-                link.chats().stream().map(Chat::id).toList());
+                link.subscriptions().stream()
+                    .map(Subscription::chat)
+                    .map(Chat::id)
+                    .toList());
     }
 
     protected abstract boolean isUpdated(Link link, Instant from);
