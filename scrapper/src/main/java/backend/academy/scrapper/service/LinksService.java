@@ -31,6 +31,7 @@ public class LinksService {
     private final TagRepository tagRepository;
     private final FilterRepository filterRepository;
 
+    @Transactional
     public ListLinksResponse listAll(Long tgChatId) {
         return chatRepository
                 .findById(tgChatId)
