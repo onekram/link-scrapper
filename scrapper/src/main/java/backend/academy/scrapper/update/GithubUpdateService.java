@@ -50,7 +50,7 @@ public class GithubUpdateService extends AbstractUpdateService {
         link.updatedAt(Stream.of(githubPrResponses, githubIssueResponses)
             .flatMap(List::stream)
             .map(GithubResponse::updatedAt)
-            .max(Comparator.naturalOrder()).orElse(Instant.EPOCH));
+            .max(Comparator.naturalOrder()).orElse(link.updatedAt()));
 
         return Stream.of(githubPrResponses, githubIssueResponses)
             .flatMap(List::stream)

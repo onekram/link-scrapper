@@ -25,7 +25,7 @@ databaseChangeLog:
                 url VARCHAR(255) NOT NULL,
                 type subscription.link_type,
                 created_at TIMESTAMP NOT NULL DEFAULT now(),
-                updated_at TIMESTAMP NOT NULL DEFAULT TIMESTAMP '1970-01-01 00:00:00',
+                updated_at TIMESTAMP NOT NULL DEFAULT now(),
                 CONSTRAINT link_url_key UNIQUE (url)
               );
 
