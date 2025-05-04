@@ -46,6 +46,9 @@ public class Link {
     @Column(nullable = false)
     private Instant createdAt = Instant.now();
 
+    @Column
+    private Instant updatedAt = Instant.EPOCH;
+
     public Link(String url) {
         this.url = url;
         this.type = LinkType.getType(url).orElse(null);

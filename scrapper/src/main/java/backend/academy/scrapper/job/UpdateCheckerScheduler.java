@@ -21,6 +21,6 @@ public class UpdateCheckerScheduler {
     @Scheduled(fixedRateString = "${app.fixed-rate-scheduling}")
     public void checkRepositoryUpdates() {
         Instant from = Instant.now().minusMillis(scrapperConfig.fixedRateScheduling());
-        updateServiceSet.forEach(service -> service.getUpdates(from).forEach(updatesClient::updates));
+        updateServiceSet.forEach(service -> service.getUpdates().forEach(updatesClient::updates));
     }
 }

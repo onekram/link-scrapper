@@ -62,7 +62,7 @@ public class TestUtil {
     }
 
     public static LinkUpdate generateLinkUpdate(Long... ids) {
-        return new LinkUpdate(42L, "url", "description", List.of(ids));
+        return new LinkUpdate("resourceUrl", "description", List.of(ids));
     }
 
     public static Long getId(BaseRequest<?, ?> sendMessage) {

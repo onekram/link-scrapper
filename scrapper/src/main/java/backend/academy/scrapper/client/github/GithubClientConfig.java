@@ -1,7 +1,7 @@
 package backend.academy.scrapper.client.github;
 
 import backend.academy.scrapper.ScrapperConfig;
-import backend.academy.scrapper.client.model.GithubApiError;
+import backend.academy.scrapper.client.model.github.GithubApiError;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

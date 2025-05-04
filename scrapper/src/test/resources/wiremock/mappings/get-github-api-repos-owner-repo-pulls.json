@@ -1,0 +1,39 @@
+{
+    "name": "Check repos pulls update",
+    "request": {
+        "method": "GET",
+        "urlPathPattern": "/repos/.*/.*/pulls[^/]*",
+        "headers": {
+            "Authorization": {
+                "equalTo": "Bearer gh_mock_token"
+            },
+            "Accept": {
+                "equalTo": "application/vnd.github+json"
+            },
+            "X-GitHub-Api-Version": {
+                "equalTo": "2022-11-28"
+            }
+        }
+    },
+    "response": {
+        "status": 200,
+        "headers": {
+            "Content-Type": "application/json"
+        },
+        "jsonBody": [
+            {
+                "title": "Super pull request",
+                "user": {
+                    "login": "onekram",
+                    "html_url": "https://github.com/onekram"
+                },
+                "body": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam viverra rhoncus magna nec feugiat. Maecenas sit amet scelerisque tellus. Pellentesque finibus neque tellus, sed congue lorem accumsan in. Nulla nec ante cursus, lacinia lectus quis, mollis orci. Aliquam imperdiet mauris at massa vestibulum pulvinar. Aenean in porta dui, sed malesuada erat. Nulla consectetur tempus ipsum in aliquam. Nullam suscipit porttitor tortor, at porta orci convallis at.\n\nQuisque egestas justo id varius laoreet. Fusce tempor ultrices mi. Duis quis risus orci. Vestibulum accumsan porttitor lorem, ac sagittis odio rutrum ut. Mauris velit velit, congue sed feugiat id, ultrices eget eros. Phasellus nulla sem, maximus quis dui in, tincidunt porta augue. Fusce suscipit odio mi, eget lobortis quam imperdiet in. Integer in mi at odio gravida tempus. Nam vel ligula at tellus eleifend porta luctus ut turpis. Praesent nulla lectus, cursus sed consectetur ac, porta vitae massa. Etiam id sagittis ipsum, vitae semper nisi. Sed tempor dictum lacus, in dictum dolor placerat eu. In hac habitasse platea dictumst. Ut viverra scelerisque dui, eu dictum quam faucibus ac. Sed ullamcorper nisl nulla, eu malesuada magna interdum nec. Mauris ac neque at lorem imperdiet sodales at a lectus. Nunc tellus urna, accumsan quis iaculis.",
+                "html_url": "https://github.com/onekram/game/pull/1",
+                "updated_at": "{{now}}"
+            }
+        ],
+        "transformers": [
+            "response-template"
+        ]
+    }
+}

@@ -6,8 +6,10 @@ import backend.academy.bot.state.State;
 import backend.academy.model.LinkUpdate;
 import com.pengrad.telegrambot.Callback;
 import com.pengrad.telegrambot.TelegramBot;
+import com.pengrad.telegrambot.model.LinkPreviewOptions;
 import com.pengrad.telegrambot.model.Message;
 import com.pengrad.telegrambot.model.Update;
+import com.pengrad.telegrambot.model.request.ParseMode;
 import com.pengrad.telegrambot.request.SendMessage;
 import com.pengrad.telegrambot.response.SendResponse;
 import java.io.IOException;
@@ -53,7 +55,16 @@ public class UpdateService {
                                 chatId,
                                 resourceBundle
                                         .getString("update.format.message")
-                                        .formatted(linkUpdate.description(), linkUpdate.url())),
+                                        .formatted(
+                                            linkUpdate.title(),
+                                            linkUpdate.resourceUrl(),
+                                            linkUpdate.description(),
+                                            linkUpdate.user(),
+                                            linkUpdate.userUrl(),
+                                            linkUpdate.updateUrl()
+                                            ))
+                            .parseMode(ParseMode.Markdown)
+                            .linkPreviewOptions(new LinkPreviewOptions().isDisabled(true)),
                         new Callback<SendMessage, SendResponse>() {
                             @Override
                             public void onResponse(SendMessage request, SendResponse response) {

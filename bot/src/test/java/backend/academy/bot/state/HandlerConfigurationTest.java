@@ -185,7 +185,7 @@ class HandlerConfigurationTest {
     @DisplayName("Track link handler")
     void trackLinkHandler() {
         State currentState = State.TRACK_LINK;
-        Message message = TestUtil.generateMessage("url", 123L);
+        Message message = TestUtil.generateMessage("resourceUrl", 123L);
         HandlerContext handlerContext = new HandlerContext(message, telegramBot, currentState);
 
         State nextState = router.process(handlerContext);
@@ -195,7 +195,7 @@ class HandlerConfigurationTest {
 
         ArgumentCaptor<AddLinkRequest.Builder> captor = ArgumentCaptor.forClass(AddLinkRequest.Builder.class);
         verify(contextRepository, times(1)).setContext(eq(123L), captor.capture());
-        assertEquals("url", captor.getValue().build().link());
+        assertEquals("resourceUrl", captor.getValue().build().link());
         checkSentMessageResourceBundle("input.tags.message");
         checkSentMessageChatId(123L);
         assertKeyboardContainsMenu();
@@ -225,7 +225,7 @@ class HandlerConfigurationTest {
     @DisplayName("Track filters handler")
     void trackFiltersHandler() {
         when(contextRepository.getContext(123L, AddLinkRequest.Builder.class)).thenReturn(Optional.of(builder));
-        AddLinkRequest request = AddLinkRequest.builder().link("url").build();
+        AddLinkRequest request = AddLinkRequest.builder().link("resourceUrl").build();
         when(builder.build()).thenReturn(request);
         State currentState = State.TRACK_FILTERS;
         Message message = TestUtil.generateMessage("  filter1   filter2  ", 123L);
@@ -288,8 +288,8 @@ class HandlerConfigurationTest {
         when(linksService.getTrackedLinks(123L))
                 .thenReturn(new ListLinksResponse(
                         List.of(
-                                TestUtil.generateLinkResponse("first-url"),
-                                TestUtil.generateLinkResponse("second-url")),
+                                TestUtil.generateLinkResponse("first-resourceUrl"),
+                                TestUtil.generateLinkResponse("second-resourceUrl")),
                         2));
         State currentState = State.MENU;
         Message message = TestUtil.generateMessage("/untrack", 123L);
@@ -303,17 +303,17 @@ class HandlerConfigurationTest {
         checkSentMessageResourceBundle("untrack.links.message");
         checkSentMessageChatId(123L);
         assertKeyboardContainsMenu();
-        assertKeyboardContainsText("first-url", "second-url");
+        assertKeyboardContainsText("first-resourceUrl", "second-resourceUrl");
     }
 
     @Test
     @DisplayName("Input link to untrack handler")
     void inputLinkToUntrackHandler() {
         when(linksService.untrackLink(eq(123L), any(RemoveLinkRequest.class)))
-                .thenReturn(TestUtil.generateLinkResponse("first-url"));
+                .thenReturn(TestUtil.generateLinkResponse("first-resourceUrl"));
 
         State currentState = State.UNTRACK_LINK;
-        Message message = TestUtil.generateMessage("url", 123L);
+        Message message = TestUtil.generateMessage("resourceUrl", 123L);
         HandlerContext handlerContext = new HandlerContext(message, telegramBot, currentState);
 
         State nextState = router.process(handlerContext);
@@ -321,7 +321,7 @@ class HandlerConfigurationTest {
         assertEquals(State.MENU, nextState);
         verify(linksService, times(1)).untrackLink(eq(123L), any(RemoveLinkRequest.class));
         updateCaptor();
-        checkSentMessageContains(resourceBundle.getString("unsubscribed.message"), "first-url");
+        checkSentMessageContains(resourceBundle.getString("unsubscribed.message"), "first-resourceUrl");
         checkSentMessageChatId(123L);
         assertKeyboardIsRemoved();
     }

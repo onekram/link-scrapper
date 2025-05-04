@@ -2,12 +2,10 @@ package backend.academy.scrapper.update;
 
 import backend.academy.model.LinkUpdate;
 import backend.academy.scrapper.parser.LinkType;
-import backend.academy.scrapper.repository.entity.Chat;
 import backend.academy.scrapper.repository.entity.Link;
-import backend.academy.scrapper.repository.entity.Subscription;
 import backend.academy.scrapper.service.LinksService;
-import java.time.Instant;
 import java.util.List;
+import java.util.stream.Stream;
 import lombok.RequiredArgsConstructor;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -17,25 +15,13 @@ public abstract class AbstractUpdateService implements UpdateService {
 
     @Override
     @Transactional
-    public List<LinkUpdate> getUpdates(Instant from) {
+    public List<LinkUpdate> getUpdates() {
         return linksService.findAllByType(getLinkType()).stream()
-                .filter(link -> isUpdated(link, from))
-                .map(this::buildLinkUpdate)
-                .toList();
+            .flatMap(this::buildLinkUpdate)
+            .toList();
     }
 
-    private LinkUpdate buildLinkUpdate(Link link) {
-        return new LinkUpdate(
-                System.currentTimeMillis(),
-                link.url(),
-                getMessage(),
-                link.subscriptions().stream()
-                    .map(Subscription::chat)
-                    .map(Chat::id)
-                    .toList());
-    }
-
-    protected abstract boolean isUpdated(Link link, Instant from);
+    protected abstract Stream<LinkUpdate> buildLinkUpdate(Link link);
 
     protected abstract LinkType getLinkType();
 
