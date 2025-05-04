@@ -24,9 +24,8 @@ import lombok.Setter;
 @NoArgsConstructor
 @Entity
 @Table(
-    schema = "subscription",
-    indexes = @Index(unique = true, name = "idx_subscription_chat_link", columnList = "chat_id, link_id")
-)
+        schema = "subscription",
+        indexes = @Index(unique = true, name = "idx_subscription_chat_link", columnList = "chat_id, link_id"))
 public class Subscription {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -43,20 +42,18 @@ public class Subscription {
 
     @ManyToMany
     @JoinTable(
-        schema = "subscription",
-        name = "subscription_tag",
-        joinColumns = @JoinColumn(name = "subscription_id"),
-        inverseJoinColumns = @JoinColumn(name = "tag_id")
-    )
+            schema = "subscription",
+            name = "subscription_tag",
+            joinColumns = @JoinColumn(name = "subscription_id"),
+            inverseJoinColumns = @JoinColumn(name = "tag_id"))
     private Set<Tag> tags = new HashSet<>();
 
     @ManyToMany
     @JoinTable(
-        schema = "subscription",
-        name = "subscription_filter",
-        joinColumns = @JoinColumn(name = "subscription_id"),
-        inverseJoinColumns = @JoinColumn(name = "filter_id")
-    )
+            schema = "subscription",
+            name = "subscription_filter",
+            joinColumns = @JoinColumn(name = "subscription_id"),
+            inverseJoinColumns = @JoinColumn(name = "filter_id"))
     private Set<Filter> filters = new HashSet<>();
 
     @Column(nullable = false)

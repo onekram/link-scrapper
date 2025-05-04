@@ -1,11 +1,11 @@
 package backend.academy.scrapper.client.github;
 
 import backend.academy.scrapper.client.model.github.GithubResponse;
+import java.time.Instant;
+import java.util.List;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.service.annotation.GetExchange;
 import org.springframework.web.service.annotation.HttpExchange;
-import java.time.Instant;
-import java.util.List;
 
 @HttpExchange("/repos")
 public interface GithubReposClient {

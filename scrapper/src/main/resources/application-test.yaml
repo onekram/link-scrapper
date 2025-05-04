@@ -8,6 +8,10 @@ app:
   fixed-rate-scheduling: 2000
   stack-overflow-api-url: ${wiremock.url}
 
+features:
+  orm:
+    enabled: false
+
 spring:
   jpa:
     hibernate:

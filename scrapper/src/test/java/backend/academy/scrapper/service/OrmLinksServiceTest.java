@@ -1,5 +1,14 @@
 package backend.academy.scrapper.service;
 
+import static backend.academy.scrapper.test.util.TestUtil.generateChat;
+import static backend.academy.scrapper.test.util.TestUtil.generateLink;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.verifyNoInteractions;
+import static org.mockito.Mockito.when;
+
 import backend.academy.model.AddLinkRequest;
 import backend.academy.model.LinkResponse;
 import backend.academy.model.RemoveLinkRequest;
@@ -22,17 +31,9 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import static backend.academy.scrapper.test.util.TestUtil.generateChat;
-import static backend.academy.scrapper.test.util.TestUtil.generateLink;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.verifyNoInteractions;
-import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-class LinksServiceTest {
+class OrmLinksServiceTest {
 
     @Mock
     private ChatRepository chatRepository;
@@ -50,18 +51,18 @@ class LinksServiceTest {
     private SubscriptionRepository subscriptionRepository;
 
     @InjectMocks
-    private LinksService linksService;
+    private OrmLinksService linksService;
 
     @Test
     @DisplayName("Add link")
     void notPresentLink() {
         Chat chat = generateChat(1L, "https://dot.com", "https://another.com");
-        when(chatRepository.findById(1L))
-                .thenReturn(Optional.of(chat));
+        when(chatRepository.findById(1L)).thenReturn(Optional.of(chat));
         when(tagRepository.findByName("tag23")).thenReturn(Optional.of(new Tag("tag23")));
         Link link = generateLink("https://third.com", 1);
         when(linkRepository.findByUrl("https://third.com")).thenReturn(Optional.of(link));
-        when(subscriptionRepository.findByChatAndLink(any(), any())).thenReturn(Optional.of(new Subscription(chat, link)));
+        when(subscriptionRepository.findByChatAndLink(any(), any()))
+                .thenReturn(Optional.of(new Subscription(chat, link)));
         LinkResponse response = linksService.addLink(
                 1L,
                 AddLinkRequest.builder()

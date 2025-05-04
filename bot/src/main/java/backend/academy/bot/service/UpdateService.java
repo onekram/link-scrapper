@@ -52,19 +52,18 @@ public class UpdateService {
                 .tgChatIds()
                 .forEach(chatId -> telegramBot.execute(
                         new SendMessage(
-                                chatId,
-                                resourceBundle
-                                        .getString("update.format.message")
-                                        .formatted(
-                                            linkUpdate.title(),
-                                            linkUpdate.resourceUrl(),
-                                            linkUpdate.description(),
-                                            linkUpdate.user(),
-                                            linkUpdate.userUrl(),
-                                            linkUpdate.updateUrl()
-                                            ))
-                            .parseMode(ParseMode.Markdown)
-                            .linkPreviewOptions(new LinkPreviewOptions().isDisabled(true)),
+                                        chatId,
+                                        resourceBundle
+                                                .getString("update.format.message")
+                                                .formatted(
+                                                        linkUpdate.title(),
+                                                        linkUpdate.resourceUrl(),
+                                                        linkUpdate.description(),
+                                                        linkUpdate.user(),
+                                                        linkUpdate.userUrl(),
+                                                        linkUpdate.updateUrl()))
+                                .parseMode(ParseMode.Markdown)
+                                .linkPreviewOptions(new LinkPreviewOptions().isDisabled(true)),
                         new Callback<SendMessage, SendResponse>() {
                             @Override
                             public void onResponse(SendMessage request, SendResponse response) {

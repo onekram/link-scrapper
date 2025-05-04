@@ -60,8 +60,6 @@ class TestcontainersConfiguration {
         String host = wireMockContainer.getHost();
         Integer port = wireMockContainer.getMappedPort(8080);
         WireMock.configureFor(host, port);
-        return registry -> registry.add(
-                "wiremock.url",
-                () -> TestUtil.createHttpAddress(host, port));
+        return registry -> registry.add("wiremock.url", () -> TestUtil.createHttpAddress(host, port));
     }
 }

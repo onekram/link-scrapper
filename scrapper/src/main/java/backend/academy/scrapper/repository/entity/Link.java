@@ -59,13 +59,13 @@ public class Link {
     }
 
     public List<Long> getTgChatIds() {
-        return subscriptions().stream()
-            .map(Subscription::chat)
-            .map(Chat::id)
-            .toList();
+        return subscriptions().stream().map(Subscription::chat).map(Chat::id).toList();
     }
 
     public void setUpdatedAt(Stream<? extends Created> createdStream) {
-        updatedAt(createdStream.map(Created::createdAt).max(Comparator.naturalOrder()).orElse(updatedAt()));
+        updatedAt(createdStream
+                .map(Created::createdAt)
+                .max(Comparator.naturalOrder())
+                .orElse(updatedAt()));
     }
 }

@@ -10,5 +10,6 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface LinkRepository extends JpaRepository<Link, Long> {
     List<Link> findAllByType(LinkType type);
+
     Optional<Link> findByUrl(String url);
 }

@@ -93,7 +93,7 @@ public class HandlerConfiguration {
                             .map(MessageUtil::linkMessage)
                             .collect(Collectors.joining("\n"));
                     return new SendMessage(id, links.isEmpty() ? resourceBundle.getString("no.links.message") : links)
-                        .linkPreviewOptions(new LinkPreviewOptions().isDisabled(true));
+                            .linkPreviewOptions(new LinkPreviewOptions().isDisabled(true));
                 })
                 .keyboard(new ReplyKeyboardRemove())
                 .build();

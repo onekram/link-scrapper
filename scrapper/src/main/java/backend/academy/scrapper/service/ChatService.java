@@ -22,7 +22,9 @@ public class ChatService {
 
     @Transactional
     public void unRegister(Long id) {
-        Chat chat = chatRepository.findById(id).orElseThrow(() -> new NotFoundException(String.format("Не существует чата с ID: %s", id)));
+        Chat chat = chatRepository
+                .findById(id)
+                .orElseThrow(() -> new NotFoundException(String.format("Не существует чата с ID: %s", id)));
         chat.subscriptions().forEach(this::deleteSubscription);
         chatRepository.delete(chat);
     }

@@ -5,6 +5,8 @@ import backend.academy.model.ListLinksResponse;
 import backend.academy.scrapper.repository.entity.Chat;
 import backend.academy.scrapper.repository.entity.Link;
 import backend.academy.scrapper.repository.entity.Subscription;
+import backend.academy.scrapper.repository.record.LinkRecord;
+import java.time.Instant;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -33,13 +35,22 @@ public class TestUtil {
 
     public static Link generateLink(String url, long... chats) {
         Link link = new Link(url);
-        link.subscriptions(Arrays.stream(chats).mapToObj(id -> new Subscription(new Chat(id), link)).collect(Collectors.toSet()));
+        link.subscriptions(Arrays.stream(chats)
+                .mapToObj(id -> new Subscription(new Chat(id), link))
+                .collect(Collectors.toSet()));
         return link;
+    }
+
+    public static LinkRecord generateLinkRecord(String url, long... chats) {
+        List<Long> chatList = Arrays.stream(chats).boxed().collect(Collectors.toList());
+        return new LinkRecord(url, chatList, Instant.now());
     }
 
     public static Chat generateChat(long id, String... urls) {
         Chat chat = new Chat(id);
-        chat.subscriptions(Arrays.stream(urls).map(url -> new Subscription(chat, generateLink(url, id))).collect(Collectors.toSet()));
+        chat.subscriptions(Arrays.stream(urls)
+                .map(url -> new Subscription(chat, generateLink(url, id)))
+                .collect(Collectors.toSet()));
         return chat;
     }
 }

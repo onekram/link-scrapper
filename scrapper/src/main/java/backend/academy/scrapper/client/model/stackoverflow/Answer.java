@@ -5,19 +5,11 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import java.time.Instant;
 import java.util.List;
 
-public record Answer (
-
-    List<Comment> comments,
-    Owner owner,
-
-    String link,
-
-    @JsonProperty("body_markdown")
-    String bodyMarkdown,
-
-    @JsonProperty("creation_date")
-    @JsonDeserialize(using = UnixTimestampToInstantDeserializer.class)
-    Instant createdAt
-) implements Response {
-
-}
+public record Answer(
+        List<Comment> comments,
+        Owner owner,
+        String link,
+        @JsonProperty("body_markdown") String bodyMarkdown,
+        @JsonProperty("creation_date") @JsonDeserialize(using = UnixTimestampToInstantDeserializer.class)
+                Instant createdAt)
+        implements Response {}

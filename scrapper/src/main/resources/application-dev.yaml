@@ -8,6 +8,10 @@ app:
   fixed-rate-scheduling: 4000
   stack-overflow-api-url: ${SO_API_URL}
 
+features:
+  orm:
+    enabled: true
+
 spring:
   datasource:
     url: jdbc:postgresql://localhost:${POSTGRES_PORT}/${POSTGRES_DB}
