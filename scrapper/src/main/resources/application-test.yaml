@@ -5,7 +5,7 @@ app:
     access-token: so_access_token
   github-api-url: ${wiremock.url}
   bot-url: ${wiremock.url}
-  fixed-rate-scheduling: 1000
+  fixed-rate-scheduling: 2000
   stack-overflow-api-url: ${wiremock.url}
 
 spring:

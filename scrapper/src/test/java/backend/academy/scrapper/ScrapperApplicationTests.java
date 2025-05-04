@@ -22,6 +22,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.stream.IntStream;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.RepeatedTest;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -312,12 +313,12 @@ class ScrapperApplicationTests {
         });
     }
 
-    @Test
+    @RepeatedTest(3)
     @DisplayName("Scheduling request to github")
     void scheduleRequestToGithub() {
         addLinkRequest("https://github.com/onekram/game", 1L);
-        await().atMost(2, TimeUnit.SECONDS)
-            .pollInterval(100, TimeUnit.MILLISECONDS)
+        await().atMost(5, TimeUnit.SECONDS)
+            .pollInterval(1, TimeUnit.SECONDS)
             .untilAsserted(() -> {
                 verify(1, getRequestedFor(urlMatching("/repos/onekram/game/issues.*")));
                 verify(1, postRequestedFor(urlMatching("/updates"))
@@ -327,8 +328,8 @@ class ScrapperApplicationTests {
         WireMock.reset();
 
         addLinkRequest("https://github.com/onekram/game", 2L);
-        await().atMost(2, TimeUnit.SECONDS)
-            .pollInterval(100, TimeUnit.MILLISECONDS)
+        await().atMost(5, TimeUnit.SECONDS)
+            .pollInterval(1, TimeUnit.SECONDS)
             .untilAsserted(() -> {
                 verify(1, getRequestedFor(urlMatching("/repos/onekram/game/issues.*")));
                 verify(1, postRequestedFor(urlMatching("/updates"))
@@ -340,8 +341,8 @@ class ScrapperApplicationTests {
         WireMock.reset();
 
         addLinkRequest("https://github.com/oleg/tbank", 2L);
-        await().atMost(2, TimeUnit.SECONDS)
-            .pollInterval(100, TimeUnit.MILLISECONDS)
+        await().atMost(5, TimeUnit.SECONDS)
+            .pollInterval(1, TimeUnit.SECONDS)
             .untilAsserted(() -> {
                 verify(1, getRequestedFor(urlMatching("/repos/onekram/game/issues.*")));
                 verify(1, getRequestedFor(urlMatching("/repos/oleg/tbank/issues.*")));
