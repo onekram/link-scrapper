@@ -15,8 +15,4 @@ public record LinkUpdate(
     Instant updatedAt,
     List<Long> tgChatIds
 ) {
-
-    public LinkUpdate(String resourceUrl, String description, List<Long> tgChatIds) {
-        this(resourceUrl, "New update received", "", "Somebody", "", description, Instant.now(), tgChatIds);
-    }
 }

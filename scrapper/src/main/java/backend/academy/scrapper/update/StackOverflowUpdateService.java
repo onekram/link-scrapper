@@ -45,6 +45,11 @@ public class StackOverflowUpdateService extends AbstractUpdateService {
         return Stream.of(new LinkUpdate(
             link.url(),
             getMessage(),
+            "url",
+            "user",
+            "userUrl",
+            getMessage(),
+            Instant.now(),
             link.subscriptions().stream()
                 .map(Subscription::chat)
                 .map(Chat::id)

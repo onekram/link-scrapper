@@ -18,6 +18,7 @@ import com.pengrad.telegrambot.model.request.KeyboardButton;
 import com.pengrad.telegrambot.model.request.ReplyKeyboardMarkup;
 import com.pengrad.telegrambot.model.request.ReplyKeyboardRemove;
 import com.pengrad.telegrambot.request.BaseRequest;
+import java.time.Instant;
 import java.util.Collections;
 import java.util.List;
 import java.util.Random;
@@ -62,7 +63,7 @@ public class TestUtil {
     }
 
     public static LinkUpdate generateLinkUpdate(Long... ids) {
-        return new LinkUpdate("resourceUrl", "description", List.of(ids));
+        return new LinkUpdate("resourceUrl", "title", "url", "user", "userUrl", "text", Instant.now(), List.of(ids));
     }
 
     public static Long getId(BaseRequest<?, ?> sendMessage) {
