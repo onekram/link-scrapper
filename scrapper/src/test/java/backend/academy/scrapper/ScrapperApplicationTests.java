@@ -319,9 +319,8 @@ class ScrapperApplicationTests {
         await().atMost(2, TimeUnit.SECONDS)
             .pollInterval(100, TimeUnit.MILLISECONDS)
             .untilAsserted(() -> {
-                verify(1, getRequestedFor(urlMatching("/repos/onekram/game/pulls.*")));
                 verify(1, getRequestedFor(urlMatching("/repos/onekram/game/issues.*")));
-                verify(2, postRequestedFor(urlMatching("/updates"))
+                verify(1, postRequestedFor(urlMatching("/updates"))
                     .withRequestBody(matchingJsonPath("$.resourceUrl", equalTo("https://github.com/onekram/game")))
                     .withRequestBody(matchingJsonPath("$.tgChatIds", containing("1"))));
             });
@@ -331,9 +330,8 @@ class ScrapperApplicationTests {
         await().atMost(2, TimeUnit.SECONDS)
             .pollInterval(100, TimeUnit.MILLISECONDS)
             .untilAsserted(() -> {
-                verify(1, getRequestedFor(urlMatching("/repos/onekram/game/pulls.*")));
                 verify(1, getRequestedFor(urlMatching("/repos/onekram/game/issues.*")));
-                verify(2, postRequestedFor(urlMatching("/updates"))
+                verify(1, postRequestedFor(urlMatching("/updates"))
                     .withRequestBody(matchingJsonPath("$.resourceUrl", equalTo("https://github.com/onekram/game")))
                     .withRequestBody(matchingJsonPath("$.tgChatIds", containing("1")))
                     .withRequestBody(matchingJsonPath("$.tgChatIds", containing("2"))));
@@ -346,14 +344,12 @@ class ScrapperApplicationTests {
             .pollInterval(100, TimeUnit.MILLISECONDS)
             .untilAsserted(() -> {
                 verify(1, getRequestedFor(urlMatching("/repos/onekram/game/issues.*")));
-                verify(1, getRequestedFor(urlMatching("/repos/onekram/game/pulls.*")));
                 verify(1, getRequestedFor(urlMatching("/repos/oleg/tbank/issues.*")));
-                verify(1, getRequestedFor(urlMatching("/repos/oleg/tbank/pulls.*")));
-                verify(2, postRequestedFor(urlMatching("/updates"))
+                verify(1, postRequestedFor(urlMatching("/updates"))
                     .withRequestBody(matchingJsonPath("$.resourceUrl", equalTo("https://github.com/onekram/game")))
                     .withRequestBody(matchingJsonPath("$.tgChatIds", containing("1")))
                     .withRequestBody(matchingJsonPath("$.tgChatIds", containing("2"))));
-                verify(2, postRequestedFor(urlMatching("/updates"))
+                verify(1, postRequestedFor(urlMatching("/updates"))
                     .withRequestBody(matchingJsonPath("$.resourceUrl", equalTo("https://github.com/oleg/tbank")))
                     .withRequestBody(matchingJsonPath("$.tgChatIds", containing("2"))));
             });

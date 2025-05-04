@@ -12,6 +12,7 @@ import backend.academy.model.AddLinkRequest;
 import backend.academy.model.LinkResponse;
 import backend.academy.model.ListLinksResponse;
 import backend.academy.model.RemoveLinkRequest;
+import com.pengrad.telegrambot.model.LinkPreviewOptions;
 import com.pengrad.telegrambot.model.Message;
 import com.pengrad.telegrambot.model.request.ReplyKeyboardMarkup;
 import com.pengrad.telegrambot.model.request.ReplyKeyboardRemove;
@@ -91,7 +92,8 @@ public class HandlerConfiguration {
                     String links = response.links().stream()
                             .map(MessageUtil::linkMessage)
                             .collect(Collectors.joining("\n"));
-                    return new SendMessage(id, links.isEmpty() ? resourceBundle.getString("no.links.message") : links);
+                    return new SendMessage(id, links.isEmpty() ? resourceBundle.getString("no.links.message") : links)
+                        .linkPreviewOptions(new LinkPreviewOptions().isDisabled(true));
                 })
                 .keyboard(new ReplyKeyboardRemove())
                 .build();

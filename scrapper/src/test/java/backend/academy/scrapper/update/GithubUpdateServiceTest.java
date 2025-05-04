@@ -41,8 +41,7 @@ class GithubUpdateServiceTest {
                         generateLink("https://github.com/onekram/factorization", 453L),
                         generateLink("https://github.com/onekram/hamarch", 123L)));
         Instant now = Instant.now();
-        when(githubReposClient.listIssues(any(), any())).thenReturn(List.of(new GithubResponse("Issue", "url", new GithubUser("login", "url"), now, "body")));
-        when(githubReposClient.listPulls(any(), any())).thenReturn(List.of(new GithubResponse("Pull", "url", new GithubUser("login", "url"), now, "body")));
+        when(githubReposClient.listIssues(any(), any(), any())).thenReturn(List.of(new GithubResponse("Issue", "url", new GithubUser("login", "url"), now, "body")));
 
         var actualUpdates = githubUpdateService.getUpdates();
 
@@ -51,10 +50,7 @@ class GithubUpdateServiceTest {
                 .ignoringCollectionOrder()
                 .isEqualTo(List.of(
                         new LinkUpdate("https://github.com/onekram/game", "Issue", "url", "login", "url", "body", now, List.of(123L, 453L)),
-                        new LinkUpdate("https://github.com/onekram/game", "Pull", "url", "login", "url", "body", now, List.of(123L, 453L)),
                         new LinkUpdate("https://github.com/onekram/factorization", "Issue", "url", "login", "url", "body", now, List.of(453L)),
-                        new LinkUpdate("https://github.com/onekram/factorization", "Pull", "url", "login", "url", "body", now, List.of(453L)),
-                        new LinkUpdate("https://github.com/onekram/hamarch", "Issue", "url", "login", "url", "body", now, List.of(123L)),
-                        new LinkUpdate("https://github.com/onekram/hamarch", "Pull", "url", "login", "url", "body", now, List.of(123L))));
+                        new LinkUpdate("https://github.com/onekram/hamarch", "Issue", "url", "login", "url", "body", now, List.of(123L))));
     }
 }

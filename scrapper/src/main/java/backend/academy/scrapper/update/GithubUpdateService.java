@@ -13,10 +13,11 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.stream.Stream;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.data.relational.core.sql.In;
 import org.springframework.stereotype.Service;
 
+@Slf4j
 @Service
 public class GithubUpdateService extends AbstractUpdateService {
     public static final int PREVIEW_LENGTH = 200;
@@ -37,24 +38,20 @@ public class GithubUpdateService extends AbstractUpdateService {
         String repo = matcher.group(2);
 
         Instant from = link.updatedAt();
-        link.updatedAt(Instant.now());
 
         List<Long> chatIds = link.subscriptions().stream()
             .map(Subscription::chat)
             .map(Chat::id)
             .toList();
 
-        List<GithubResponse> githubPrResponses = githubReposClient.listPulls(owner, repo);
-        List<GithubResponse> githubIssueResponses = githubReposClient.listIssues(owner, repo);
+        List<GithubResponse> githubIssueResponses = githubReposClient.listIssues(owner, repo, from);
 
-        link.updatedAt(Stream.of(githubPrResponses, githubIssueResponses)
-            .flatMap(List::stream)
-            .map(GithubResponse::updatedAt)
+        link.updatedAt(githubIssueResponses.stream()
+            .map(GithubResponse::createdAt)
             .max(Comparator.naturalOrder()).orElse(link.updatedAt()));
 
-        return Stream.of(githubPrResponses, githubIssueResponses)
-            .flatMap(List::stream)
-            .filter(res -> res.updatedAt().isAfter(from))
+        return githubIssueResponses.stream()
+            .filter(res -> res.createdAt().isAfter(from))
             .map(res -> LinkUpdate.builder()
                 .resourceUrl(link.url())
                 .title(res.title())
@@ -62,7 +59,7 @@ public class GithubUpdateService extends AbstractUpdateService {
                 .user(res.user().login())
                 .userUrl(res.user().url())
                 .description(StringUtils.left(res.body(), PREVIEW_LENGTH))
-                .updatedAt(res.updatedAt())
+                .time(res.createdAt())
                 .tgChatIds(chatIds)
                 .build());
     }

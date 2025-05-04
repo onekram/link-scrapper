@@ -12,7 +12,7 @@ public record LinkUpdate(
     String user,
     String userUrl,
     String description,
-    Instant updatedAt,
+    Instant time,
     List<Long> tgChatIds
 ) {
 }

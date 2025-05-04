@@ -8,7 +8,7 @@ public record GithubResponse(
     @JsonProperty("html_url")
     String url,
     GithubUser user,
-    @JsonProperty("updated_at")
-    Instant updatedAt,
+    @JsonProperty("created_at")
+    Instant createdAt,
     String body
 ) {}
