@@ -11,6 +11,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 @RequiredArgsConstructor
 public abstract class AbstractUpdateService implements UpdateService {
+    protected static final int PREVIEW_LENGTH = 200;
+
     private final LinksService linksService;
 
     @Override

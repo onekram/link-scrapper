@@ -1,4 +1,4 @@
-package backend.academy.scrapper.client.model;
+package backend.academy.scrapper.client.model.stackoverflow;
 
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.DeserializationContext;

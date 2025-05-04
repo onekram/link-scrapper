@@ -4,12 +4,9 @@ import backend.academy.model.LinkUpdate;
 import backend.academy.scrapper.client.github.GithubReposClient;
 import backend.academy.scrapper.client.model.github.GithubResponse;
 import backend.academy.scrapper.parser.LinkType;
-import backend.academy.scrapper.repository.entity.Chat;
 import backend.academy.scrapper.repository.entity.Link;
-import backend.academy.scrapper.repository.entity.Subscription;
 import backend.academy.scrapper.service.LinksService;
 import java.time.Instant;
-import java.util.Comparator;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.stream.Stream;
@@ -20,7 +17,6 @@ import org.springframework.stereotype.Service;
 @Slf4j
 @Service
 public class GithubUpdateService extends AbstractUpdateService {
-    public static final int PREVIEW_LENGTH = 200;
     private final GithubReposClient githubReposClient;
 
     public GithubUpdateService(LinksService linksService, GithubReposClient githubReposClient) {
@@ -38,17 +34,10 @@ public class GithubUpdateService extends AbstractUpdateService {
         String repo = matcher.group(2);
 
         Instant from = link.updatedAt();
-
-        List<Long> chatIds = link.subscriptions().stream()
-            .map(Subscription::chat)
-            .map(Chat::id)
-            .toList();
+        List<Long> chatIds = link.getTgChatIds();
 
         List<GithubResponse> githubIssueResponses = githubReposClient.listIssues(owner, repo, from);
-
-        link.updatedAt(githubIssueResponses.stream()
-            .map(GithubResponse::createdAt)
-            .max(Comparator.naturalOrder()).orElse(link.updatedAt()));
+        link.setUpdatedAt(githubIssueResponses.stream());
 
         return githubIssueResponses.stream()
             .filter(res -> res.createdAt().isAfter(from))

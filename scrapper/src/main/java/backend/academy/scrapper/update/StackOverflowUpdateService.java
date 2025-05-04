@@ -1,17 +1,20 @@
 package backend.academy.scrapper.update;
 
 import backend.academy.model.LinkUpdate;
-import backend.academy.scrapper.client.model.StackOverflowQuestionsResponse;
+import backend.academy.scrapper.client.model.stackoverflow.Answer;
+import backend.academy.scrapper.client.model.stackoverflow.Question;
+import backend.academy.scrapper.client.model.stackoverflow.Response;
+import backend.academy.scrapper.client.model.stackoverflow.StackOverflowQuestionsResponse;
 import backend.academy.scrapper.client.stackoverflow.StackOverflowQuestionClient;
 import backend.academy.scrapper.parser.LinkType;
-import backend.academy.scrapper.repository.entity.Chat;
 import backend.academy.scrapper.repository.entity.Link;
-import backend.academy.scrapper.repository.entity.Subscription;
 import backend.academy.scrapper.service.LinksService;
 import java.time.Instant;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.stream.Stream;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 
 @Slf4j
@@ -19,8 +22,7 @@ import org.springframework.stereotype.Service;
 public class StackOverflowUpdateService extends AbstractUpdateService {
     private final StackOverflowQuestionClient stackOverflowQuestionClient;
 
-    public StackOverflowUpdateService(
-            LinksService linksService, StackOverflowQuestionClient stackOverflowQuestionClient) {
+    public StackOverflowUpdateService(LinksService linksService, StackOverflowQuestionClient stackOverflowQuestionClient) {
         super(linksService);
         this.stackOverflowQuestionClient = stackOverflowQuestionClient;
     }
@@ -32,28 +34,44 @@ public class StackOverflowUpdateService extends AbstractUpdateService {
         }
         String id = matcher.group(1);
         StackOverflowQuestionsResponse response = stackOverflowQuestionClient.getQuestionsByIds(id);
-        return response.items().getFirst().lastActivityDate().isAfter(from);
+        return response.items().getFirst().createdAt().isAfter(from);
     }
 
     @Override
     protected Stream<LinkUpdate> buildLinkUpdate(Link link) {
-        Instant from = link.updatedAt() == null ? Instant.now() : link.updatedAt();
+        Instant from = link.updatedAt();
 
-        if (!isUpdated(link, from)) {
-            return null;
+        Matcher matcher = LinkType.STACK_OVERFLOW.parseUrl(link.url());
+        if (!matcher.matches()) {
+            throw new IllegalStateException("Link of STACK_OVERFLOW type doesn't match pattern");
         }
-        return Stream.of(new LinkUpdate(
-            link.url(),
-            getMessage(),
-            "url",
-            "user",
-            "userUrl",
-            getMessage(),
-            Instant.now(),
-            link.subscriptions().stream()
-                .map(Subscription::chat)
-                .map(Chat::id)
-                .toList()));
+        String id = matcher.group(1);
+        Question question = stackOverflowQuestionClient.getQuestionsByIds(id).items().getFirst();
+        String title = question.title();
+        List<Long> chatIds = link.getTgChatIds();
+
+        link.setUpdatedAt(generateResponses(question).parallel());
+
+        return generateResponses(question)
+            .parallel()
+            .filter(r -> r.createdAt().isAfter(from))
+            .map(r -> LinkUpdate.builder()
+                .resourceUrl(link.url())
+                .title(title)
+                .updateUrl(r.link())
+                .user(r.owner().displayName())
+                .userUrl(r.owner().link())
+                .description(StringUtils.left(r.bodyMarkdown(), PREVIEW_LENGTH))
+                .time(r.createdAt())
+                .tgChatIds(chatIds)
+                .build());
+    }
+
+    private Stream<Response> generateResponses(Question question) {
+        return Stream.of(
+            question.comments().stream().toList(),
+            question.answers().stream().map(Answer::comments).flatMap(List::stream).toList(),
+            question.answers().stream().toList()).flatMap(List::stream);
     }
 
     @Override

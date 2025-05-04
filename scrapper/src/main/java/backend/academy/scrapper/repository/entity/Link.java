@@ -1,5 +1,6 @@
 package backend.academy.scrapper.repository.entity;
 
+import backend.academy.scrapper.client.model.Created;
 import backend.academy.scrapper.parser.LinkType;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -12,8 +13,11 @@ import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import java.time.Instant;
+import java.util.Comparator;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
+import java.util.stream.Stream;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -52,5 +56,16 @@ public class Link {
     public Link(String url) {
         this.url = url;
         this.type = LinkType.getType(url).orElse(null);
+    }
+
+    public List<Long> getTgChatIds() {
+        return subscriptions().stream()
+            .map(Subscription::chat)
+            .map(Chat::id)
+            .toList();
+    }
+
+    public void setUpdatedAt(Stream<? extends Created> createdStream) {
+        updatedAt(createdStream.map(Created::createdAt).max(Comparator.naturalOrder()).orElse(updatedAt()));
     }
 }

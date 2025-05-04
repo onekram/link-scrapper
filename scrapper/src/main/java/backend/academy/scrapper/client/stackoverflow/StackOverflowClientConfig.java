@@ -1,7 +1,7 @@
 package backend.academy.scrapper.client.stackoverflow;
 
 import backend.academy.scrapper.ScrapperConfig;
-import backend.academy.scrapper.client.model.StackOverflowApiErrorResponse;
+import backend.academy.scrapper.client.model.stackoverflow.StackOverflowApiErrorResponse;
 import java.net.URI;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
