@@ -19,12 +19,15 @@ public class UpdateCheckerScheduler {
 
     @Scheduled(fixedRateString = "${app.fixed-rate-scheduling}")
     public void checkRepositoryUpdates() {
+        log.info("Start scheduling");
         updateServiceSet.forEach(service -> service.getLinks().forEach(linkRecord -> {
-            try {
-                taskExecutor.execute(() -> service.buildLinkUpdate(linkRecord).forEach(updatesClient::updates));
-            } catch (Exception e) {
-                log.error("Error while checking updates for link: {}", linkRecord.url(), e);
-            }
+            taskExecutor.execute(() -> {
+                try {
+                    service.buildLinkUpdate(linkRecord).forEach(updatesClient::updates);
+                } catch (Exception e) {
+                    log.error("Error while checking updates for link: {}", linkRecord.url(), e);
+                }
+            });
         }));
     }
 }

@@ -25,10 +25,12 @@ spring:
         await-termination: true
         await-termination-period: 10s
 
-
 pagination:
   page-size: 100
 
 server:
   port: 8081
 
+logging:
+  level:
+    root: info
