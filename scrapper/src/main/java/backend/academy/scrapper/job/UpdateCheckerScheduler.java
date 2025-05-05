@@ -6,8 +6,8 @@ import java.util.Set;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
 
 @Component
 @Slf4j
@@ -15,9 +15,16 @@ import org.springframework.transaction.annotation.Transactional;
 public class UpdateCheckerScheduler {
     private final Set<UpdateService> updateServiceSet;
     private final UpdatesClient updatesClient;
+    private final ThreadPoolTaskExecutor taskExecutor;
 
     @Scheduled(fixedRateString = "${app.fixed-rate-scheduling}")
     public void checkRepositoryUpdates() {
-        updateServiceSet.forEach(service -> service.getUpdates().forEach(updatesClient::updates));
+        updateServiceSet.forEach(service -> service.getLinks().forEach(linkRecord -> {
+            try {
+                taskExecutor.execute(() -> service.buildLinkUpdate(linkRecord).forEach(updatesClient::updates));
+            } catch (Exception e) {
+                log.error("Error while checking updates for link: {}", linkRecord.url(), e);
+            }
+        }));
     }
 }

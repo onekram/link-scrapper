@@ -44,7 +44,7 @@ class GithubUpdateServiceTest {
         when(githubReposClient.listIssues(any(), any(), any()))
                 .thenReturn(List.of(new GithubResponse("Issue", "url", new GithubUser("login", "url"), now, "body")));
 
-        List<LinkUpdate> actualUpdates = githubUpdateService.getUpdates().toList();
+        List<LinkUpdate> actualUpdates = githubUpdateService.getLinks().flatMap(githubUpdateService::buildLinkUpdate).toList();
 
         assertThat(actualUpdates)
                 .usingRecursiveComparison()

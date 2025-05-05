@@ -25,7 +25,7 @@ public class GithubUpdateService extends AbstractUpdateService {
     }
 
     @Override
-    protected Stream<LinkUpdate> buildLinkUpdate(LinkRecord linkRecord) {
+    public Stream<LinkUpdate> buildLinkUpdate(LinkRecord linkRecord) {
         Matcher matcher = LinkType.GITHUB.parseUrl(linkRecord.url());
         if (!matcher.matches()) {
             throw new IllegalStateException("Link of GITHUB type doesn't match pattern");

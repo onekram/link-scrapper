@@ -1,6 +1,5 @@
 package backend.academy.scrapper.update;
 
-import backend.academy.model.LinkUpdate;
 import backend.academy.scrapper.parser.LinkType;
 import backend.academy.scrapper.repository.record.LinkRecord;
 import backend.academy.scrapper.service.LinksService;
@@ -16,11 +15,9 @@ public abstract class AbstractUpdateService implements UpdateService {
 
     @Override
     @Transactional
-    public Stream<LinkUpdate> getUpdates() {
-        return linksService.findAllByType(getLinkType()).flatMap(this::buildLinkUpdate);
+    public Stream<LinkRecord> getLinks() {
+        return linksService.findAllByType(getLinkType());
     }
-
-    protected abstract Stream<LinkUpdate> buildLinkUpdate(LinkRecord linkRecord);
 
     protected abstract LinkType getLinkType();
 }
