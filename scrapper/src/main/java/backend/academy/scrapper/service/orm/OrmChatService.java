@@ -20,8 +20,11 @@ public class OrmChatService implements ChatService {
     private final LinkRepository linkRepository;
 
     @Override
+    @Transactional
     public void register(Long id) {
-        chatRepository.save(new Chat(id));
+        if (!chatRepository.existsChatById(id)) {
+            chatRepository.save(new Chat(id));
+        }
     }
 
     @Transactional

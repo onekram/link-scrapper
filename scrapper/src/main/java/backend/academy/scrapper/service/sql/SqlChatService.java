@@ -19,7 +19,7 @@ public class SqlChatService implements ChatService {
 
     @Override
     public void register(Long id) {
-        jdbcTemplate.update("INSERT INTO subscription.chat (id) VALUES (?)", id);
+        jdbcTemplate.update("INSERT INTO subscription.chat (id) VALUES (?) ON CONFLICT (id) DO NOTHING", id);
     }
 
     @Override
