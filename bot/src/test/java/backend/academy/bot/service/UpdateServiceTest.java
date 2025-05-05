@@ -133,7 +133,7 @@ class UpdateServiceTest {
             var values = argumentCaptor.getAllValues().iterator();
             for (var i : List.of(1L, 2L, 3L, 4L)) {
                 SendMessage sendMessage = values.next();
-                assertEquals("description and url", TestUtil.getText(sendMessage));
+                assertEquals("title and resourceUrl", TestUtil.getText(sendMessage));
                 assertEquals(i, TestUtil.getId(sendMessage));
             }
         }
