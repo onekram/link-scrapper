@@ -8,6 +8,7 @@ import backend.academy.scrapper.client.model.Created;
 import backend.academy.scrapper.exception.NotFoundException;
 import backend.academy.scrapper.parser.LinkType;
 import backend.academy.scrapper.repository.record.LinkRecord;
+import backend.academy.scrapper.service.LinksService;
 import java.sql.Timestamp;
 import java.time.Instant;
 import java.util.Comparator;
@@ -15,9 +16,8 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-
-import backend.academy.scrapper.service.LinksService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -29,6 +29,9 @@ import org.springframework.transaction.annotation.Transactional;
 @ConditionalOnProperty(name = "features.orm.enabled", havingValue = "false")
 public class SqlLinkService implements LinksService {
     private final JdbcTemplate jdbcTemplate;
+
+    @Value("${pagination.page-size}")
+    private int PAGE_SIZE;
 
     @Transactional
     @Override
@@ -160,30 +163,36 @@ public class SqlLinkService implements LinksService {
 
     @Transactional
     @Override
-    public List<LinkRecord> findAllByType(LinkType linkType) {
-        String sql =
-                """
-        SELECT l.url AS url,
-               l.updated_at AS updated_at,
-               array_agg(c.id) AS tg_chat_ids
-        FROM subscription.link l
-        JOIN subscription.subscription s ON l.id = s.link_id
-        JOIN subscription.chat c ON s.chat_id = c.id
-        WHERE l.type = ?::subscription.link_type
-        GROUP BY l.url, l.updated_at
+    public Stream<LinkRecord> findAllByType(LinkType linkType) {
+        String sql = """
+            SELECT l.id AS id,
+                   l.url AS url,
+                   l.updated_at AS updated_at,
+                   array_agg(c.id) AS tg_chat_ids
+            FROM subscription.link l
+            JOIN subscription.subscription s ON l.id = s.link_id
+            JOIN subscription.chat c ON s.chat_id = c.id
+            WHERE l.type = ?::subscription.link_type
+            GROUP BY l.id, l.url, l.updated_at
+            ORDER BY l.id
+            LIMIT ? OFFSET ?
         """;
 
-        return jdbcTemplate.query(
-                sql,
-                (rs, rowNum) -> {
-                    String url = rs.getString("url");
-                    Instant updatedAt = rs.getTimestamp("updated_at").toInstant();
-
-                    Long[] tgChatIdsArray = (Long[]) rs.getArray("tg_chat_ids").getArray();
-                    List<Long> tgChatIds = List.of(tgChatIdsArray);
-                    return new LinkRecord(url, tgChatIds, updatedAt);
-                },
-                linkType.name());
+        return Stream
+            .iterate(0, n -> n + 1)
+            .map(n -> {
+                int offset = n * PAGE_SIZE;
+                return jdbcTemplate.query(
+                    sql,
+                    (rs, rowNum) -> new LinkRecord(
+                        rs.getString("url"),
+                        List.of((Long[]) rs.getArray("tg_chat_ids").getArray()),
+                        rs.getTimestamp("updated_at").toInstant()
+                    ),
+                    linkType.name(), PAGE_SIZE, offset);
+            })
+            .takeWhile(pageList -> !pageList.isEmpty())
+            .flatMap(List::stream);
     }
 
     @Transactional

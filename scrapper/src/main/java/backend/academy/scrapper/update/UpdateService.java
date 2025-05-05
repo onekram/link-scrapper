@@ -1,8 +1,8 @@
 package backend.academy.scrapper.update;
 
 import backend.academy.model.LinkUpdate;
-import java.util.List;
+import java.util.stream.Stream;
 
 public interface UpdateService {
-    List<LinkUpdate> getUpdates();
+    Stream<LinkUpdate> getUpdates();
 }

@@ -9,6 +9,9 @@ spring:
     deserialization:
       fail-on-unknown-properties: true
 
+pagination:
+  page-size: 100
+
 server:
   port: 8081
 

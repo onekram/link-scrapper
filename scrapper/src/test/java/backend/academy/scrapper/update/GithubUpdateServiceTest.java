@@ -1,10 +1,5 @@
 package backend.academy.scrapper.update;
 
-import static backend.academy.scrapper.test.util.TestUtil.generateLinkRecord;
-import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
-
 import backend.academy.model.LinkUpdate;
 import backend.academy.scrapper.client.github.GithubReposClient;
 import backend.academy.scrapper.client.model.github.GithubResponse;
@@ -13,12 +8,17 @@ import backend.academy.scrapper.parser.LinkType;
 import backend.academy.scrapper.service.LinksService;
 import java.time.Instant;
 import java.util.List;
+import java.util.stream.Stream;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import static backend.academy.scrapper.test.util.TestUtil.generateLinkRecord;
+import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class GithubUpdateServiceTest {
@@ -36,7 +36,7 @@ class GithubUpdateServiceTest {
     @DisplayName("Correct list of updated links")
     void getListUpdateCorrect() {
         when(linksService.findAllByType(LinkType.GITHUB))
-                .thenReturn(List.of(
+                .thenReturn(Stream.of(
                         generateLinkRecord("https://github.com/onekram/game", 123L, 453L),
                         generateLinkRecord("https://github.com/onekram/factorization", 453L),
                         generateLinkRecord("https://github.com/onekram/hamarch", 123L)));
@@ -44,7 +44,7 @@ class GithubUpdateServiceTest {
         when(githubReposClient.listIssues(any(), any(), any()))
                 .thenReturn(List.of(new GithubResponse("Issue", "url", new GithubUser("login", "url"), now, "body")));
 
-        var actualUpdates = githubUpdateService.getUpdates();
+        List<LinkUpdate> actualUpdates = githubUpdateService.getUpdates().toList();
 
         assertThat(actualUpdates)
                 .usingRecursiveComparison()

@@ -26,7 +26,9 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -39,6 +41,9 @@ public class OrmLinksService implements LinksService {
     private final TagRepository tagRepository;
     private final FilterRepository filterRepository;
     private final SubscriptionRepository subscriptionRepository;
+
+    @Value("${pagination.page-size}")
+    private int PAGE_SIZE;
 
     @Transactional
     @Override
@@ -95,10 +100,12 @@ public class OrmLinksService implements LinksService {
     }
 
     @Override
-    public List<LinkRecord> findAllByType(LinkType linkType) {
-        return linkRepository.findAllByType(linkType).stream()
-                .map(link -> new LinkRecord(link.url(), link.getTgChatIds(), link.updatedAt()))
-                .toList();
+    public Stream<LinkRecord> findAllByType(LinkType linkType) {
+        return Stream.iterate(0, i -> i + 1)
+            .map(i -> linkRepository.findAllByType(linkType, PageRequest.of(i, PAGE_SIZE)))
+            .takeWhile(page ->!page.isEmpty())
+            .flatMap(List::stream)
+            .map(link -> new LinkRecord(link.url(), link.getTgChatIds(), link.updatedAt()));
     }
 
     @Transactional

@@ -4,7 +4,6 @@ import backend.academy.model.LinkUpdate;
 import backend.academy.scrapper.parser.LinkType;
 import backend.academy.scrapper.repository.record.LinkRecord;
 import backend.academy.scrapper.service.LinksService;
-import java.util.List;
 import java.util.stream.Stream;
 import lombok.RequiredArgsConstructor;
 import org.springframework.transaction.annotation.Transactional;
@@ -17,10 +16,8 @@ public abstract class AbstractUpdateService implements UpdateService {
 
     @Override
     @Transactional
-    public List<LinkUpdate> getUpdates() {
-        return linksService.findAllByType(getLinkType()).stream()
-                .flatMap(this::buildLinkUpdate)
-                .toList();
+    public Stream<LinkUpdate> getUpdates() {
+        return linksService.findAllByType(getLinkType()).flatMap(this::buildLinkUpdate);
     }
 
     protected abstract Stream<LinkUpdate> buildLinkUpdate(LinkRecord linkRecord);

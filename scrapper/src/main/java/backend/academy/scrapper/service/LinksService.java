@@ -7,7 +7,6 @@ import backend.academy.model.RemoveLinkRequest;
 import backend.academy.scrapper.client.model.Created;
 import backend.academy.scrapper.parser.LinkType;
 import backend.academy.scrapper.repository.record.LinkRecord;
-import java.util.List;
 import java.util.stream.Stream;
 
 public interface LinksService {
@@ -17,7 +16,7 @@ public interface LinksService {
 
     LinkResponse removeLink(Long tgChatId, RemoveLinkRequest request);
 
-    List<LinkRecord> findAllByType(LinkType linkType);
+    Stream<LinkRecord> findAllByType(LinkType linkType);
 
     void update(LinkRecord linkRecord, Stream<? extends Created> createdStream);
 }
