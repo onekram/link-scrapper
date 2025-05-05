@@ -72,9 +72,9 @@ public class MessageHandler implements Handler {
     private void updateKeyboard() {
         if (menuButton) {
             switch (keyboard) {
-                case null -> keyboard = new ReplyKeyboardMarkup(resourceBundle.getString("menu.message"));
+                case null -> keyboard = new ReplyKeyboardMarkup(resourceBundle.getString("menu.message")).resizeKeyboard(true);
                 case ReplyKeyboardRemove ignored -> keyboard =
-                        new ReplyKeyboardMarkup(resourceBundle.getString("menu.message"));
+                        new ReplyKeyboardMarkup(resourceBundle.getString("menu.message")).resizeKeyboard(true);
                 case ReplyKeyboardMarkup replyKeyboardMarkup -> replyKeyboardMarkup.addRow(
                         resourceBundle.getString("menu.message"));
                 default -> {}

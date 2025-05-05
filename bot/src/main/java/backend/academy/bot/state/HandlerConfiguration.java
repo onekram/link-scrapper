@@ -19,8 +19,11 @@ import com.pengrad.telegrambot.model.request.ReplyKeyboardRemove;
 import com.pengrad.telegrambot.request.SendMessage;
 import java.util.List;
 import java.util.ResourceBundle;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -182,14 +185,52 @@ public class HandlerConfiguration {
                 .nextState(State.UNTRACK_LINK)
                 .method(handlerContext -> {
                     Long id = handlerContext.message().chat().id();
-                    String[] links = linksService.getTrackedLinks(id).links().stream()
+                    List<LinkResponse> linkResponses = linksService.getTrackedLinks(id).links();
+                    String[][] links = linkResponses.stream()
                             .map(LinkResponse::url)
-                            .toArray(String[]::new);
+                            .map(s -> new String[]{s})
+                            .toArray(String[][]::new);
+                    String[] tags = linkResponses.stream()
+                        .map(LinkResponse::tags)
+                        .flatMap(List::stream)
+                        .distinct()
+                        .map(resourceBundle.getString("all.in.tag.message")::formatted)
+                        .toArray(String[]::new);
                     return new SendMessage(id, resourceBundle.getString("untrack.links.message"))
                             .replyMarkup(
-                                    new ReplyKeyboardMarkup(links).addRow(resourceBundle.getString("menu.message")));
+                                    new ReplyKeyboardMarkup(links)
+                                        .addRow(tags)
+                                        .addRow(resourceBundle.getString("menu.message"))
+                                        .resizeKeyboard(true));
                 })
                 .build();
+    }
+
+    @Bean
+    public Handler inputTagToUnTrack(LinksService linksService) {
+        return MessageHandler.builder()
+            .withFilter(new StateFilter(State.UNTRACK_LINK))
+            .withFilter(context ->
+                context.message().text().trim().startsWith(StringUtils.left(resourceBundle.getString("all.in.tag.message"), 10)))
+            .nextState(State.MENU)
+            .method(handlerContext -> {
+                Message message = handlerContext.message();
+                Pattern pattern = Pattern.compile("All in tag (\\w+)");
+                Matcher matcher = pattern.matcher(message.text().trim());
+                if (!matcher.find()) {
+                    throw new RuntimeException("Message should match tag");
+                }
+                String tag = matcher.group(1);
+                Long chatId = message.chat().id();
+                String answer = linksService.getTrackedLinks(chatId).links().stream()
+                    .filter(linkResponse -> linkResponse.tags().contains(tag))
+                    .map(linkResponse -> linksService.untrackLink(chatId, new RemoveLinkRequest(linkResponse.url())))
+                    .map(linkResponse -> resourceBundle.getString("unsubscribed.message") + " " + linkResponse.url())
+                    .collect(Collectors.joining("\n"));
+                return new SendMessage(chatId, answer);
+            })
+            .keyboard(new ReplyKeyboardRemove())
+            .build();
     }
 
     @Bean
