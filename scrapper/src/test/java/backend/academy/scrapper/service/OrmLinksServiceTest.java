@@ -1,14 +1,5 @@
 package backend.academy.scrapper.service;
 
-import static backend.academy.scrapper.test.util.TestUtil.generateChat;
-import static backend.academy.scrapper.test.util.TestUtil.generateLink;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.verifyNoInteractions;
-import static org.mockito.Mockito.when;
-
 import backend.academy.model.AddLinkRequest;
 import backend.academy.model.LinkResponse;
 import backend.academy.model.RemoveLinkRequest;
@@ -22,6 +13,7 @@ import backend.academy.scrapper.repository.entity.Chat;
 import backend.academy.scrapper.repository.entity.Link;
 import backend.academy.scrapper.repository.entity.Subscription;
 import backend.academy.scrapper.repository.entity.Tag;
+import backend.academy.scrapper.service.orm.OrmLinksService;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -31,6 +23,14 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import static backend.academy.scrapper.test.util.TestUtil.generateChat;
+import static backend.academy.scrapper.test.util.TestUtil.generateLink;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.verifyNoInteractions;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class OrmLinksServiceTest {
