@@ -77,6 +77,9 @@ class ScrapperApplicationTests {
     void setUp() {
         linkRepository.deleteAll();
         chatRepository.deleteAll();
+        subscriptionRepository.deleteAll();
+        tagRepository.deleteAll();
+        filterRepository.deleteAll();
     }
 
     @Test
@@ -126,6 +129,77 @@ class ScrapperApplicationTests {
 
         assertThat(chatRepository.findAll()).hasSize(1).singleElement().satisfies(chat -> assertThat(chat.id())
                 .isEqualTo(2L));
+    }
+
+    @Test
+    @DisplayName("Delete chat cascade")
+    void deleteChatCascade() {
+        addLinkRequest("https://github.com/onekram/game", 1L, "t1", "f1");
+        addLinkRequest("https://github.com/onekram/nogame", 1L, "t1", "f2");
+
+        ResponseEntity<Void> response =
+            testRestTemplate.exchange("/tg-chat/1", HttpMethod.DELETE, HttpEntity.EMPTY, Void.class);
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+
+        transactionTemplate.executeWithoutResult(ignored -> {
+            assertThat(chatRepository.findAll()).isEmpty();
+            assertThat(linkRepository.findAll()).isEmpty();
+            assertThat(subscriptionRepository.findAll()).isEmpty();
+            assertThat(tagRepository.findAll())
+                .singleElement()
+                .extracting(Tag::name)
+                .isEqualTo("t1");
+            assertThat(filterRepository.findAll())
+                .hasSize(2)
+                .extracting(Filter::name)
+                .containsExactlyInAnyOrder("f1", "f2");
+        });
+
+    }
+
+    @Test
+    @DisplayName("Delete chat mutual links")
+    void deleteChatMutualLinks() {
+        addLinkRequest("https://github.com/onekram/game", 1L, "t1", "f1");
+        addLinkRequest("https://github.com/onekram/game", 2L, "t1", "f2");
+
+        ResponseEntity<Void> response =
+            testRestTemplate.exchange("/tg-chat/1", HttpMethod.DELETE, HttpEntity.EMPTY, Void.class);
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+
+        transactionTemplate.executeWithoutResult(ignored -> {
+            assertThat(chatRepository.findAll())
+                .singleElement()
+                .satisfies(chat -> {
+                    assertThat(chat.id()).isEqualTo(2L);
+                    assertThat(chat.subscriptions())
+                        .extracting(Subscription::link)
+                        .extracting(Link::url)
+                        .singleElement()
+                        .isEqualTo("https://github.com/onekram/game");
+                });
+            assertThat(linkRepository.findAll())
+                .singleElement()
+                .extracting(Link::url)
+                .isEqualTo("https://github.com/onekram/game");
+            assertThat(subscriptionRepository.findAll())
+                .singleElement()
+                .satisfies(subscription -> {
+                    assertThat(subscription.chat().id()).isEqualTo(2L);
+                    assertThat(subscription.link().url()).isEqualTo("https://github.com/onekram/game");
+                });
+            assertThat(tagRepository.findAll())
+                .singleElement()
+                .extracting(Tag::name)
+                .isEqualTo("t1");
+            assertThat(filterRepository.findAll())
+                .hasSize(2)
+                .extracting(Filter::name)
+                .containsExactlyInAnyOrder("f1", "f2");
+        });
+
     }
 
     @Test
@@ -353,21 +427,24 @@ class ScrapperApplicationTests {
     }
 
     private void addLinkRequest(String url, Long tgChatId) {
+        addLinkRequest(url, tgChatId, "tag1", "filter1");
+    }
+    private void addLinkRequest(String url, Long tgChatId, String tag, String filter) {
         HttpHeaders headers = new HttpHeaders();
         headers.set("Tg-Chat-Id", tgChatId.toString());
         headers.set("Content-Type", "application/json");
-        AddLinkRequest addLinkRequest = new AddLinkRequest(url, List.of("tag1"), List.of("filter1"));
+        AddLinkRequest addLinkRequest = new AddLinkRequest(url, List.of(tag), List.of(filter));
         HttpEntity<AddLinkRequest> requestEntity = new HttpEntity<>(addLinkRequest, headers);
 
         ResponseEntity<LinkResponse> response =
-                testRestTemplate.exchange("/links", HttpMethod.POST, requestEntity, LinkResponse.class);
+            testRestTemplate.exchange("/links", HttpMethod.POST, requestEntity, LinkResponse.class);
 
         assertThat(response).satisfies(r -> {
             assertThat(r.getStatusCode()).isEqualTo(HttpStatus.OK);
             assertThat(r.getBody()).isNotNull();
             assertThat(r.getBody().url()).isEqualTo(url);
-            assertThat(r.getBody().tags()).containsExactly("tag1");
-            assertThat(r.getBody().filters()).containsExactly("filter1");
+            assertThat(r.getBody().tags()).containsExactly(tag);
+            assertThat(r.getBody().filters()).containsExactly(filter);
         });
     }
 
