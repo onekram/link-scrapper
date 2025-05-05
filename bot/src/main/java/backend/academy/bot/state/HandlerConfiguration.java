@@ -31,8 +31,6 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 @RequiredArgsConstructor
 public class HandlerConfiguration {
-    public static final @NotNull String ADD_LINK_BUILDER = "addLinkBuilder";
-
     private final ResourceBundle resourceBundle;
 
     @Bean
