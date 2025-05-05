@@ -32,7 +32,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
-@ConditionalOnProperty(name = "features.orm.enabled", havingValue = "true", matchIfMissing = false)
+@ConditionalOnProperty(name = "features.orm.enabled", havingValue = "true")
 public class OrmLinksService implements LinksService {
     private final ChatRepository chatRepository;
     private final LinkRepository linkRepository;
