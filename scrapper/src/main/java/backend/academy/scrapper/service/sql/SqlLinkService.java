@@ -145,8 +145,6 @@ public class SqlLinkService implements LinksService {
                 String.class,
                 subId);
 
-        jdbcTemplate.update("DELETE FROM subscription.subscription_filter WHERE subscription_id = ?", subId);
-        jdbcTemplate.update("DELETE FROM subscription.subscription_tag WHERE subscription_id = ?", subId);
         jdbcTemplate.update("DELETE FROM subscription.subscription WHERE id = ?", subId);
 
         Integer count = jdbcTemplate.queryForObject(
