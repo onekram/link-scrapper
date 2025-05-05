@@ -1,4 +1,4 @@
-package backend.academy.scrapper.service;
+package backend.academy.scrapper.service.orm;
 
 import backend.academy.model.AddLinkRequest;
 import backend.academy.model.LinkResponse;
@@ -19,6 +19,7 @@ import backend.academy.scrapper.repository.entity.Link;
 import backend.academy.scrapper.repository.entity.Subscription;
 import backend.academy.scrapper.repository.entity.Tag;
 import backend.academy.scrapper.repository.record.LinkRecord;
+import backend.academy.scrapper.service.LinksService;
 import java.util.List;
 import java.util.Set;
 import java.util.function.Function;
@@ -31,7 +32,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
-@ConditionalOnProperty(name = "features.orm.enabled", havingValue = "true", matchIfMissing = true)
+@ConditionalOnProperty(name = "features.orm.enabled", havingValue = "true", matchIfMissing = false)
 public class OrmLinksService implements LinksService {
     private final ChatRepository chatRepository;
     private final LinkRepository linkRepository;
