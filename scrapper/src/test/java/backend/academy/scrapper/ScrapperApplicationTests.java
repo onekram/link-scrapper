@@ -1,12 +1,6 @@
 package backend.academy.scrapper;
 
-import static com.github.tomakehurst.wiremock.client.WireMock.containing;
-import static com.github.tomakehurst.wiremock.client.WireMock.equalTo;
-import static com.github.tomakehurst.wiremock.client.WireMock.getRequestedFor;
-import static com.github.tomakehurst.wiremock.client.WireMock.matchingJsonPath;
-import static com.github.tomakehurst.wiremock.client.WireMock.postRequestedFor;
-import static com.github.tomakehurst.wiremock.client.WireMock.urlMatching;
-import static com.github.tomakehurst.wiremock.client.WireMock.verify;
+import static com.github.tomakehurst.wiremock.client.WireMock.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.awaitility.Awaitility.await;
 
@@ -24,16 +18,12 @@ import backend.academy.scrapper.repository.entity.Filter;
 import backend.academy.scrapper.repository.entity.Link;
 import backend.academy.scrapper.repository.entity.Subscription;
 import backend.academy.scrapper.repository.entity.Tag;
-import com.github.tomakehurst.wiremock.client.WireMock;
 import java.time.Instant;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.IntStream;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Order;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.http.HttpEntity;
@@ -366,53 +356,68 @@ public abstract class ScrapperApplicationTests {
         });
     }
 
-    @Test
-    @DisplayName("Scheduling request to github")
-    void scheduleRequestToGithub() {
-        addLinkRequest("https://github.com/onekram/game", 1L);
-        await().atMost(5, TimeUnit.SECONDS).pollInterval(1, TimeUnit.SECONDS).untilAsserted(() -> {
-            verify(1, getRequestedFor(urlMatching("/repos/onekram/game/issues.*")));
-            verify(
-                    1,
-                    postRequestedFor(urlMatching("/updates"))
-                            .withRequestBody(
-                                    matchingJsonPath("$.resourceUrl", equalTo("https://github.com/onekram/game")))
-                            .withRequestBody(matchingJsonPath("$.tgChatIds", containing("1"))));
-        });
-        WireMock.reset();
+    @Nested
+    @DisplayName("Test for scheduling jobs")
+    class Scheduling {
+        @Test
+        void scheduleRequestToGithubSingleChat() {
+            addLinkRequest("https://github.com/onekram/game", 1L);
+            await().atMost(5, TimeUnit.SECONDS)
+                    .pollInterval(1, TimeUnit.SECONDS)
+                    .untilAsserted(() -> {
+                        verify(moreThanOrExactly(1), getRequestedFor(urlMatching("/repos/onekram/game/issues.*")));
+                        verify(
+                                moreThanOrExactly(1),
+                                postRequestedFor(urlMatching("/updates"))
+                                        .withRequestBody(matchingJsonPath(
+                                                "$.resourceUrl", equalTo("https://github.com/onekram/game")))
+                                        .withRequestBody(matchingJsonPath("$.tgChatIds", containing("1"))));
+                    });
+        }
 
-        addLinkRequest("https://github.com/onekram/game", 2L);
-        await().atMost(5, TimeUnit.SECONDS).pollInterval(1, TimeUnit.SECONDS).untilAsserted(() -> {
-            verify(1, getRequestedFor(urlMatching("/repos/onekram/game/issues.*")));
-            verify(
-                    1,
-                    postRequestedFor(urlMatching("/updates"))
-                            .withRequestBody(
-                                    matchingJsonPath("$.resourceUrl", equalTo("https://github.com/onekram/game")))
-                            .withRequestBody(matchingJsonPath("$.tgChatIds", containing("1")))
-                            .withRequestBody(matchingJsonPath("$.tgChatIds", containing("2"))));
-        });
+        @Test
+        void scheduleRequestToGithubTwoChats() {
+            addLinkRequest("https://github.com/onekram/game", 1L);
+            addLinkRequest("https://github.com/onekram/game", 2L);
+            await().atMost(5, TimeUnit.SECONDS)
+                    .pollInterval(1, TimeUnit.SECONDS)
+                    .untilAsserted(() -> {
+                        verify(moreThanOrExactly(1), getRequestedFor(urlMatching("/repos/onekram/game/issues.*")));
+                        verify(
+                                moreThanOrExactly(1),
+                                postRequestedFor(urlMatching("/updates"))
+                                        .withRequestBody(matchingJsonPath(
+                                                "$.resourceUrl", equalTo("https://github.com/onekram/game")))
+                                        .withRequestBody(matchingJsonPath("$.tgChatIds", containing("1")))
+                                        .withRequestBody(matchingJsonPath("$.tgChatIds", containing("2"))));
+                    });
+        }
 
-        WireMock.reset();
-
-        addLinkRequest("https://github.com/oleg/tbank", 2L);
-        await().atMost(5, TimeUnit.SECONDS).pollInterval(1, TimeUnit.SECONDS).untilAsserted(() -> {
-            verify(1, getRequestedFor(urlMatching("/repos/onekram/game/issues.*")));
-            verify(1, getRequestedFor(urlMatching("/repos/oleg/tbank/issues.*")));
-            verify(
-                    1,
-                    postRequestedFor(urlMatching("/updates"))
-                            .withRequestBody(
-                                    matchingJsonPath("$.resourceUrl", equalTo("https://github.com/onekram/game")))
-                            .withRequestBody(matchingJsonPath("$.tgChatIds", containing("1")))
-                            .withRequestBody(matchingJsonPath("$.tgChatIds", containing("2"))));
-            verify(
-                    1,
-                    postRequestedFor(urlMatching("/updates"))
-                            .withRequestBody(
-                                    matchingJsonPath("$.resourceUrl", equalTo("https://github.com/oleg/tbank")))
-                            .withRequestBody(matchingJsonPath("$.tgChatIds", containing("2"))));
-        });
+        @Test
+        void scheduleRequestToGithubTwoChatsTwoLinks() {
+            addLinkRequest("https://github.com/onekram/game", 1L);
+            addLinkRequest("https://github.com/onekram/game", 2L);
+            addLinkRequest("https://github.com/oleg/tbank", 2L);
+            await().atMost(5, TimeUnit.SECONDS)
+                    .pollInterval(1, TimeUnit.SECONDS)
+                    .untilAsserted(() -> {
+                        verify(moreThanOrExactly(1), getRequestedFor(urlMatching("/repos/onekram/game/issues.*")));
+                        verify(moreThanOrExactly(1), getRequestedFor(urlMatching("/repos/oleg/tbank/issues.*")));
+                        verify(
+                                moreThanOrExactly(1),
+                                postRequestedFor(urlMatching("/updates"))
+                                        .withRequestBody(matchingJsonPath(
+                                                "$.resourceUrl", equalTo("https://github.com/onekram/game")))
+                                        .withRequestBody(matchingJsonPath("$.tgChatIds", containing("1")))
+                                        .withRequestBody(matchingJsonPath("$.tgChatIds", containing("2"))));
+                        verify(
+                                moreThanOrExactly(1),
+                                postRequestedFor(urlMatching("/updates"))
+                                        .withRequestBody(matchingJsonPath(
+                                                "$.resourceUrl", equalTo("https://github.com/oleg/tbank")))
+                                        .withRequestBody(matchingJsonPath("$.tgChatIds", containing("2"))));
+                    });
+        }
     }
 
     private void addLinkRequest(String url, Long tgChatId) {
