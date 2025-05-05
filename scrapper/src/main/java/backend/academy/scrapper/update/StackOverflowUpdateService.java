@@ -59,12 +59,12 @@ public class StackOverflowUpdateService extends AbstractUpdateService {
 
     private Stream<Response> generateResponses(Question question) {
         return Stream.of(
-                        question.comments().stream().toList(),
+                        question.comments(),
                         question.answers().stream()
                                 .map(Answer::comments)
                                 .flatMap(List::stream)
                                 .toList(),
-                        question.answers().stream().toList())
+                        question.answers())
                 .flatMap(List::stream);
     }
 
