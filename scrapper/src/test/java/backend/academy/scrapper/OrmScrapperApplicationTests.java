@@ -14,5 +14,4 @@ import org.springframework.test.context.TestPropertySource;
 @TestPropertySource(properties = {"features.orm.enabled=true"})
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-public class OrmScrapperApplicationTests extends ScrapperApplicationTests {
-}
+public class OrmScrapperApplicationTests extends ScrapperApplicationTests {}

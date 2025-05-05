@@ -102,10 +102,10 @@ public class OrmLinksService implements LinksService {
     @Override
     public Stream<LinkRecord> findAllByType(LinkType linkType) {
         return Stream.iterate(0, i -> i + 1)
-            .map(i -> linkRepository.findAllByType(linkType, PageRequest.of(i, PAGE_SIZE)))
-            .takeWhile(page ->!page.isEmpty())
-            .flatMap(List::stream)
-            .map(link -> new LinkRecord(link.url(), link.getTgChatIds(), link.updatedAt()));
+                .map(i -> linkRepository.findAllByType(linkType, PageRequest.of(i, PAGE_SIZE)))
+                .takeWhile(page -> !page.isEmpty())
+                .flatMap(List::stream)
+                .map(link -> new LinkRecord(link.url(), link.getTgChatIds(), link.updatedAt()));
     }
 
     @Transactional

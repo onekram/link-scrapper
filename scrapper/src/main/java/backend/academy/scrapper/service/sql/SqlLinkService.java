@@ -21,6 +21,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
+import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -29,6 +31,7 @@ import org.springframework.transaction.annotation.Transactional;
 @ConditionalOnProperty(name = "features.orm.enabled", havingValue = "false")
 public class SqlLinkService implements LinksService {
     private final JdbcTemplate jdbcTemplate;
+    private final NamedParameterJdbcTemplate namedParameterJdbcTemplate;
 
     @Value("${pagination.page-size}")
     private int PAGE_SIZE;
@@ -161,10 +164,10 @@ public class SqlLinkService implements LinksService {
         return new LinkResponse(linkId, request.link(), tags, filters);
     }
 
-    @Transactional
     @Override
     public Stream<LinkRecord> findAllByType(LinkType linkType) {
-        String sql = """
+        String sql =
+                """
             SELECT l.id AS id,
                    l.url AS url,
                    l.updated_at AS updated_at,
@@ -172,27 +175,28 @@ public class SqlLinkService implements LinksService {
             FROM subscription.link l
             JOIN subscription.subscription s ON l.id = s.link_id
             JOIN subscription.chat c ON s.chat_id = c.id
-            WHERE l.type = ?::subscription.link_type
+            WHERE l.type = :linkType::subscription.link_type
             GROUP BY l.id, l.url, l.updated_at
             ORDER BY l.id
-            LIMIT ? OFFSET ?
+            LIMIT :limit OFFSET :offset
         """;
-
-        return Stream
-            .iterate(0, n -> n + 1)
-            .map(n -> {
-                int offset = n * PAGE_SIZE;
-                return jdbcTemplate.query(
-                    sql,
-                    (rs, rowNum) -> new LinkRecord(
-                        rs.getString("url"),
-                        List.of((Long[]) rs.getArray("tg_chat_ids").getArray()),
-                        rs.getTimestamp("updated_at").toInstant()
-                    ),
-                    linkType.name(), PAGE_SIZE, offset);
-            })
-            .takeWhile(pageList -> !pageList.isEmpty())
-            .flatMap(List::stream);
+        return Stream.iterate(0, n -> n + 1)
+                .map(n -> {
+                    int offset = n * PAGE_SIZE;
+                    MapSqlParameterSource params = new MapSqlParameterSource()
+                            .addValue("linkType", linkType.name())
+                            .addValue("limit", PAGE_SIZE)
+                            .addValue("offset", offset);
+                    return namedParameterJdbcTemplate.query(
+                            sql,
+                            params,
+                            (rs, rowNum) -> new LinkRecord(
+                                    rs.getString("url"),
+                                    List.of((Long[]) rs.getArray("tg_chat_ids").getArray()),
+                                    rs.getTimestamp("updated_at").toInstant()));
+                })
+                .takeWhile(pageList -> !pageList.isEmpty())
+                .flatMap(List::stream);
     }
 
     @Transactional

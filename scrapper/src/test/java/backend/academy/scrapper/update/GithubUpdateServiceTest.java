@@ -1,5 +1,10 @@
 package backend.academy.scrapper.update;
 
+import static backend.academy.scrapper.test.util.TestUtil.generateLinkRecord;
+import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
+
 import backend.academy.model.LinkUpdate;
 import backend.academy.scrapper.client.github.GithubReposClient;
 import backend.academy.scrapper.client.model.github.GithubResponse;
@@ -15,10 +20,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import static backend.academy.scrapper.test.util.TestUtil.generateLinkRecord;
-import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class GithubUpdateServiceTest {
@@ -44,7 +45,10 @@ class GithubUpdateServiceTest {
         when(githubReposClient.listIssues(any(), any(), any()))
                 .thenReturn(List.of(new GithubResponse("Issue", "url", new GithubUser("login", "url"), now, "body")));
 
-        List<LinkUpdate> actualUpdates = githubUpdateService.getLinks().flatMap(githubUpdateService::buildLinkUpdate).toList();
+        List<LinkUpdate> actualUpdates = githubUpdateService
+                .getLinks()
+                .flatMap(githubUpdateService::buildLinkUpdate)
+                .toList();
 
         assertThat(actualUpdates)
                 .usingRecursiveComparison()

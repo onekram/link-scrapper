@@ -28,7 +28,7 @@ public class StackOverflowUpdateService extends AbstractUpdateService {
     }
 
     @Override
-    public   Stream<LinkUpdate> buildLinkUpdate(LinkRecord linkRecord) {
+    public Stream<LinkUpdate> buildLinkUpdate(LinkRecord linkRecord) {
         Instant from = linkRecord.updatedAt();
 
         Matcher matcher = LinkType.STACK_OVERFLOW.parseUrl(linkRecord.url());
