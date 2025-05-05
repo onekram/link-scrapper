@@ -32,8 +32,11 @@ import java.util.concurrent.TimeUnit;
 import java.util.stream.IntStream;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.MethodOrderer;
+import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.RepeatedTest;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestMethodOrder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
@@ -49,6 +52,7 @@ import org.springframework.transaction.support.TransactionTemplate;
 
 @ActiveProfiles("test")
 @Import(TestcontainersConfiguration.class)
+@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 class ScrapperApplicationTests {
 
@@ -83,6 +87,7 @@ class ScrapperApplicationTests {
     }
 
     @Test
+    @Order(1)
     void contextLoads() {}
 
     @Test
