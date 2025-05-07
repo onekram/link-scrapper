@@ -5,7 +5,7 @@ app:
     access-token: ${SO_ACCESS_TOKEN}
   github-api-url: ${GITHUB_API_URL}
   bot-url: ${BOT_URL}
-  fixed-rate-scheduling: 4000
+  fixed-rate-scheduling: 15000
   stack-overflow-api-url: ${SO_API_URL}
 
 features:
