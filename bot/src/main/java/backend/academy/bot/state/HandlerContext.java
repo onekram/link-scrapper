@@ -14,14 +14,14 @@ public record HandlerContext(Message message, CallbackQuery callbackQuery, Teleg
         this(update.message(), update.callbackQuery(), bot, state);
     }
 
-    public long getChatId(){
+    public long getChatId() {
         if (isCallbackQuery()) {
             return callbackQuery().from().id();
         }
         return message().chat().id();
     }
 
-    public boolean isCallbackQuery(){
+    public boolean isCallbackQuery() {
         return callbackQuery() != null;
     }
 }

@@ -1,5 +1,8 @@
 package backend.academy.bot.service;
 
+import static backend.academy.bot.util.BotUtil.getChatIdFromUpdate;
+import static backend.academy.bot.util.LogUtil.logReceivedUpdate;
+
 import backend.academy.bot.state.HandlerContext;
 import backend.academy.bot.state.Router;
 import backend.academy.bot.state.State;
@@ -18,8 +21,6 @@ import java.util.ResourceBundle;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import static backend.academy.bot.util.BotUtil.getChatIdFromUpdate;
-import static backend.academy.bot.util.LogUtil.logReceivedUpdate;
 
 @Slf4j
 @Service
@@ -48,40 +49,37 @@ public class UpdateService {
     }
 
     public void updateProcess(LinkUpdate linkUpdate) {
-        log.info("Update received for link update: {}", linkUpdate);
-
         String updateMessage = resourceBundle
-            .getString("update.format.message")
-            .formatted(
-                linkUpdate.title(),
-                linkUpdate.resourceUrl(),
-                linkUpdate.description(),
-                linkUpdate.user(),
-                linkUpdate.userUrl());
+                .getString("update.format.message")
+                .formatted(
+                        linkUpdate.title(),
+                        linkUpdate.resourceUrl(),
+                        linkUpdate.description(),
+                        linkUpdate.user(),
+                        linkUpdate.userUrl());
         linkUpdate
-            .tgChatIds()
-            .forEach(chatId -> telegramBot.execute(
-                new SendMessage(
-                    chatId,
-                    updateMessage)
-                    .parseMode(ParseMode.HTML)
-                    .linkPreviewOptions(new LinkPreviewOptions().isDisabled(true))
-                    .replyMarkup(
-                        new InlineKeyboardMarkup(
-                            new InlineKeyboardButton(resourceBundle.getString("link.to.update.inline.button.message"))
-                                .url(linkUpdate.updateUrl()),
-                            new InlineKeyboardButton(resourceBundle.getString("delete.subscription.inline.button.message"))
-                                .callbackData("delete_subscription:" + linkUpdate.resourceUrl()))),
-                new Callback<SendMessage, SendResponse>() {
-                    @Override
-                    public void onResponse(SendMessage request, SendResponse response) {
-                        log.info("Message sent: {} with response: {}", request, response);
-                    }
+                .tgChatIds()
+                .forEach(chatId -> telegramBot.execute(
+                        new SendMessage(chatId, updateMessage)
+                                .parseMode(ParseMode.HTML)
+                                .linkPreviewOptions(new LinkPreviewOptions().isDisabled(true))
+                                .replyMarkup(new InlineKeyboardMarkup(
+                                        new InlineKeyboardButton(resourceBundle.getString(
+                                                        "link.to.update.inline.button.message"))
+                                                .url(linkUpdate.updateUrl()),
+                                        new InlineKeyboardButton(resourceBundle.getString(
+                                                        "delete.subscription.inline.button.message"))
+                                                .callbackData("delete_subscription:" + linkUpdate.resourceUrl()))),
+                        new Callback<SendMessage, SendResponse>() {
+                            @Override
+                            public void onResponse(SendMessage request, SendResponse response) {
+                                log.info("Message sent: {} with response: {}", request, response);
+                            }
 
-                    @Override
-                    public void onFailure(SendMessage request, IOException e) {
-                        log.error("Message sent: {} with error", request, e);
-                    }
-                }));
+                            @Override
+                            public void onFailure(SendMessage request, IOException e) {
+                                log.error("Message sent: {} with error", request, e);
+                            }
+                        }));
     }
 }

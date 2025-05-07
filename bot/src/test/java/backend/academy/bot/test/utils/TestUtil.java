@@ -1,5 +1,9 @@
 package backend.academy.bot.test.utils;
 
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 import backend.academy.bot.state.HandlerContext;
 import backend.academy.bot.state.State;
 import backend.academy.bot.state.handler.MessageHandler;
@@ -25,9 +29,6 @@ import java.util.function.Predicate;
 import java.util.stream.Stream;
 import lombok.experimental.UtilityClass;
 import org.springframework.test.util.ReflectionTestUtils;
-import static org.junit.jupiter.api.Assertions.assertInstanceOf;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @UtilityClass
 public class TestUtil {

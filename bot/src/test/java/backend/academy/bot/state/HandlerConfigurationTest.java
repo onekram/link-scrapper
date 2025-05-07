@@ -1,5 +1,19 @@
 package backend.academy.bot.state;
 
+import static backend.academy.bot.test.utils.TestUtil.generateCallbackQuery;
+import static backend.academy.bot.test.utils.TestUtil.generateLinkResponse;
+import static backend.academy.bot.test.utils.TestUtil.generateMessage;
+import static backend.academy.bot.test.utils.TestUtil.generateUpdate;
+import static backend.academy.bot.test.utils.TestUtil.getId;
+import static backend.academy.bot.test.utils.TestUtil.getText;
+import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
 import backend.academy.bot.BotConfig;
 import backend.academy.bot.configuration.BeanConfiguration;
 import backend.academy.bot.repository.parameters.ContextRepository;
@@ -32,19 +46,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.bean.override.mockito.MockitoBeans;
-import static backend.academy.bot.test.utils.TestUtil.generateCallbackQuery;
-import static backend.academy.bot.test.utils.TestUtil.generateLinkResponse;
-import static backend.academy.bot.test.utils.TestUtil.generateMessage;
-import static backend.academy.bot.test.utils.TestUtil.generateUpdate;
-import static backend.academy.bot.test.utils.TestUtil.getId;
-import static backend.academy.bot.test.utils.TestUtil.getText;
-import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
 @SpringBootTest(classes = {Router.class})
 @Import({HandlerConfiguration.class, BeanConfiguration.class})
@@ -292,9 +293,7 @@ class HandlerConfigurationTest {
     void untrackHandler() {
         when(linksService.getTrackedLinks(123L))
                 .thenReturn(new ListLinksResponse(
-                        List.of(
-                                generateLinkResponse("first-resourceUrl"),
-                                generateLinkResponse("second-resourceUrl")),
+                        List.of(generateLinkResponse("first-resourceUrl"), generateLinkResponse("second-resourceUrl")),
                         2));
         State currentState = State.MENU;
         Message message = generateMessage("/untrack", 123L);
@@ -334,8 +333,7 @@ class HandlerConfigurationTest {
     @Test
     @DisplayName("Delete subscription callback")
     void deleteSubscriptionCallbackHandler() {
-        when(linksService.untrackLink(eq(123L), any(RemoveLinkRequest.class)))
-            .thenReturn(generateLinkResponse("url"));
+        when(linksService.untrackLink(eq(123L), any(RemoveLinkRequest.class))).thenReturn(generateLinkResponse("url"));
 
         State currentState = State.UNTRACK_LINK;
         Update update = generateUpdate(generateCallbackQuery(123L, "delete_subscription:url"));
@@ -360,7 +358,7 @@ class HandlerConfigurationTest {
     }
 
     private void checkSentMessageContains(String... text) {
-            assertThat(getText(sendMessage)).contains(text);
+        assertThat(getText(sendMessage)).contains(text);
     }
 
     private void updateCaptor() {

@@ -40,28 +40,32 @@ public class HandlerConfiguration {
     @Bean
     public Handler deleteSubscriptionCallbackHandler(LinksService linksService) {
         return MessageHandler.builder()
-            .callback()
-            .withFilter(new CallbackFilter("delete_subscription"))
-            .method(handlerContext -> {
-                CallbackQuery callbackQuery = handlerContext.callbackQuery();
-                try {
-                    String targetUrl = StringUtils.substringAfter(handlerContext.callbackQuery().data(), ":");
-                    long chatId = handlerContext.getChatId();
-                    linksService.untrackLink(chatId, new RemoveLinkRequest(targetUrl));
-                    if (handlerContext.callbackQuery().maybeInaccessibleMessage() instanceof Message message) {
-                        handlerContext.bot().execute(new EditMessageReplyMarkup(chatId, message.messageId())
-                            .replyMarkup(new InlineKeyboardMarkup(message.replyMarkup().inlineKeyboard()[0][0])));
+                .callback()
+                .withFilter(new CallbackFilter("delete_subscription"))
+                .method(handlerContext -> {
+                    CallbackQuery callbackQuery = handlerContext.callbackQuery();
+                    try {
+                        String targetUrl = StringUtils.substringAfter(
+                                handlerContext.callbackQuery().data(), ":");
+                        long chatId = handlerContext.getChatId();
+                        linksService.untrackLink(chatId, new RemoveLinkRequest(targetUrl));
+                        if (handlerContext.callbackQuery().maybeInaccessibleMessage() instanceof Message message) {
+                            handlerContext
+                                    .bot()
+                                    .execute(new EditMessageReplyMarkup(chatId, message.messageId())
+                                            .replyMarkup(new InlineKeyboardMarkup(
+                                                    message.replyMarkup().inlineKeyboard()[0][0])));
+                        }
+                        return new AnswerCallbackQuery(callbackQuery.id())
+                                .text(resourceBundle.getString("delete.subscription.result.message"))
+                                .showAlert(false);
+                    } catch (Exception e) {
+                        return new AnswerCallbackQuery(callbackQuery.id())
+                                .text(resourceBundle.getString("error.message"))
+                                .showAlert(true);
                     }
-                    return new AnswerCallbackQuery(callbackQuery.id())
-                        .text(resourceBundle.getString("delete.subscription.result.message"))
-                        .showAlert(false);
-                } catch (Exception e) {
-                    return new AnswerCallbackQuery(callbackQuery.id())
-                        .text(resourceBundle.getString("error.message"))
-                        .showAlert(true);
-                }
-            })
-            .build();
+                })
+                .build();
     }
 
     @Bean
