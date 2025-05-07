@@ -1,18 +1,16 @@
 package backend.academy.bot.test.utils;
 
-import static org.junit.jupiter.api.Assertions.assertInstanceOf;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
 import backend.academy.bot.state.HandlerContext;
 import backend.academy.bot.state.State;
 import backend.academy.bot.state.handler.MessageHandler;
 import backend.academy.model.LinkResponse;
 import backend.academy.model.LinkUpdate;
 import com.pengrad.telegrambot.TelegramBot;
+import com.pengrad.telegrambot.model.CallbackQuery;
 import com.pengrad.telegrambot.model.Chat;
 import com.pengrad.telegrambot.model.Message;
 import com.pengrad.telegrambot.model.Update;
+import com.pengrad.telegrambot.model.User;
 import com.pengrad.telegrambot.model.request.Keyboard;
 import com.pengrad.telegrambot.model.request.KeyboardButton;
 import com.pengrad.telegrambot.model.request.ReplyKeyboardMarkup;
@@ -25,9 +23,11 @@ import java.util.Random;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
-import lombok.SneakyThrows;
 import lombok.experimental.UtilityClass;
 import org.springframework.test.util.ReflectionTestUtils;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @UtilityClass
 public class TestUtil {
@@ -44,7 +44,6 @@ public class TestUtil {
         return new HandlerContext(new Message(), new TelegramBot("123"), state);
     }
 
-    @SneakyThrows
     public static Message generateMessage(String text, Long chatId) {
         Chat chat = new Chat();
         ReflectionTestUtils.setField(chat, "id", chatId);
@@ -55,11 +54,23 @@ public class TestUtil {
         return message;
     }
 
-    @SneakyThrows
     public static Update generateUpdate(Message message) {
         Update update = new Update();
         ReflectionTestUtils.setField(update, "message", message);
         return update;
+    }
+
+    public static Update generateUpdate(CallbackQuery callbackQuery) {
+        Update update = new Update();
+        ReflectionTestUtils.setField(update, "callback_query", callbackQuery);
+        return update;
+    }
+
+    public static CallbackQuery generateCallbackQuery(long chatId, String data) {
+        CallbackQuery callbackQuery = new CallbackQuery();
+        ReflectionTestUtils.setField(callbackQuery, "from", new User(chatId));
+        ReflectionTestUtils.setField(callbackQuery, "data", data);
+        return callbackQuery;
     }
 
     public static LinkUpdate generateLinkUpdate(Long... ids) {

@@ -7,8 +7,9 @@ import backend.academy.model.LinkUpdate;
 import com.pengrad.telegrambot.Callback;
 import com.pengrad.telegrambot.TelegramBot;
 import com.pengrad.telegrambot.model.LinkPreviewOptions;
-import com.pengrad.telegrambot.model.Message;
 import com.pengrad.telegrambot.model.Update;
+import com.pengrad.telegrambot.model.request.InlineKeyboardButton;
+import com.pengrad.telegrambot.model.request.InlineKeyboardMarkup;
 import com.pengrad.telegrambot.model.request.ParseMode;
 import com.pengrad.telegrambot.request.SendMessage;
 import com.pengrad.telegrambot.response.SendResponse;
@@ -17,6 +18,8 @@ import java.util.ResourceBundle;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import static backend.academy.bot.util.BotUtil.getChatIdFromUpdate;
+import static backend.academy.bot.util.LogUtil.logReceivedUpdate;
 
 @Slf4j
 @Service
@@ -28,16 +31,13 @@ public class UpdateService {
     private final ResourceBundle resourceBundle;
 
     public void updateProcess(Update update) {
-        Message message = update.message();
-        if (message == null) {
-            return;
-        }
-        long chatId = message.chat().id();
+        log.info("Update received from user {}", update);
+
+        long chatId = getChatIdFromUpdate(update);
         try {
             State currentState = stateService.getState(chatId);
-            log.info("Message chatId: {}, current state: {}, text: {}", chatId, currentState, message.text());
-
-            State nextState = router.process(new HandlerContext(message, telegramBot, currentState));
+            logReceivedUpdate(update, currentState);
+            State nextState = router.process(new HandlerContext(update, telegramBot, currentState));
             log.info("Message chatId: {}, move to state: {}", chatId, nextState);
             stateService.setState(chatId, nextState);
         } catch (Exception e) {
@@ -48,32 +48,40 @@ public class UpdateService {
     }
 
     public void updateProcess(LinkUpdate linkUpdate) {
-        linkUpdate
-                .tgChatIds()
-                .forEach(chatId -> telegramBot.execute(
-                        new SendMessage(
-                                        chatId,
-                                        resourceBundle
-                                                .getString("update.format.message")
-                                                .formatted(
-                                                        linkUpdate.title(),
-                                                        linkUpdate.resourceUrl(),
-                                                        linkUpdate.description(),
-                                                        linkUpdate.user(),
-                                                        linkUpdate.userUrl(),
-                                                        linkUpdate.updateUrl()))
-                                .parseMode(ParseMode.Markdown)
-                                .linkPreviewOptions(new LinkPreviewOptions().isDisabled(true)),
-                        new Callback<SendMessage, SendResponse>() {
-                            @Override
-                            public void onResponse(SendMessage request, SendResponse response) {
-                                log.info("Message sent: {} with response: {}", request, response);
-                            }
+        log.info("Update received for link update: {}", linkUpdate);
 
-                            @Override
-                            public void onFailure(SendMessage request, IOException e) {
-                                log.error("Message sent: {} with error", request, e);
-                            }
-                        }));
+        String updateMessage = resourceBundle
+            .getString("update.format.message")
+            .formatted(
+                linkUpdate.title(),
+                linkUpdate.resourceUrl(),
+                linkUpdate.description(),
+                linkUpdate.user(),
+                linkUpdate.userUrl());
+        linkUpdate
+            .tgChatIds()
+            .forEach(chatId -> telegramBot.execute(
+                new SendMessage(
+                    chatId,
+                    updateMessage)
+                    .parseMode(ParseMode.HTML)
+                    .linkPreviewOptions(new LinkPreviewOptions().isDisabled(true))
+                    .replyMarkup(
+                        new InlineKeyboardMarkup(
+                            new InlineKeyboardButton(resourceBundle.getString("link.to.update.inline.button.message"))
+                                .url(linkUpdate.updateUrl()),
+                            new InlineKeyboardButton(resourceBundle.getString("delete.subscription.inline.button.message"))
+                                .callbackData("delete_subscription:" + linkUpdate.resourceUrl()))),
+                new Callback<SendMessage, SendResponse>() {
+                    @Override
+                    public void onResponse(SendMessage request, SendResponse response) {
+                        log.info("Message sent: {} with response: {}", request, response);
+                    }
+
+                    @Override
+                    public void onFailure(SendMessage request, IOException e) {
+                        log.error("Message sent: {} with error", request, e);
+                    }
+                }));
     }
 }

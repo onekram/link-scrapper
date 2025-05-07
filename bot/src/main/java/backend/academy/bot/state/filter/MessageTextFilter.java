@@ -9,7 +9,8 @@ public class MessageTextFilter implements Predicate<HandlerContext> {
     private final String requiredText;
 
     @Override
-    public boolean test(HandlerContext context) {
-        return context.message().text().equalsIgnoreCase(requiredText);
+    public boolean test(HandlerContext handlerContext) {
+        if (handlerContext.isCallbackQuery()) return false;
+        return handlerContext.message().text().equalsIgnoreCase(requiredText);
     }
 }

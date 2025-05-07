@@ -3,6 +3,7 @@ package backend.academy.bot.state;
 import backend.academy.bot.repository.parameters.ContextRepository;
 import backend.academy.bot.service.ChatService;
 import backend.academy.bot.service.LinksService;
+import backend.academy.bot.state.filter.CallbackFilter;
 import backend.academy.bot.state.filter.MessageTextFilter;
 import backend.academy.bot.state.filter.StateFilter;
 import backend.academy.bot.state.handler.Handler;
@@ -12,10 +13,14 @@ import backend.academy.model.AddLinkRequest;
 import backend.academy.model.LinkResponse;
 import backend.academy.model.ListLinksResponse;
 import backend.academy.model.RemoveLinkRequest;
+import com.pengrad.telegrambot.model.CallbackQuery;
 import com.pengrad.telegrambot.model.LinkPreviewOptions;
 import com.pengrad.telegrambot.model.Message;
+import com.pengrad.telegrambot.model.request.InlineKeyboardMarkup;
 import com.pengrad.telegrambot.model.request.ReplyKeyboardMarkup;
 import com.pengrad.telegrambot.model.request.ReplyKeyboardRemove;
+import com.pengrad.telegrambot.request.AnswerCallbackQuery;
+import com.pengrad.telegrambot.request.EditMessageReplyMarkup;
 import com.pengrad.telegrambot.request.SendMessage;
 import java.util.List;
 import java.util.ResourceBundle;
@@ -31,6 +36,33 @@ import org.springframework.context.annotation.Configuration;
 @RequiredArgsConstructor
 public class HandlerConfiguration {
     private final ResourceBundle resourceBundle;
+
+    @Bean
+    public Handler deleteSubscriptionCallbackHandler(LinksService linksService) {
+        return MessageHandler.builder()
+            .callback()
+            .withFilter(new CallbackFilter("delete_subscription"))
+            .method(handlerContext -> {
+                CallbackQuery callbackQuery = handlerContext.callbackQuery();
+                try {
+                    String targetUrl = StringUtils.substringAfter(handlerContext.callbackQuery().data(), ":");
+                    long chatId = handlerContext.getChatId();
+                    linksService.untrackLink(chatId, new RemoveLinkRequest(targetUrl));
+                    if (handlerContext.callbackQuery().maybeInaccessibleMessage() instanceof Message message) {
+                        handlerContext.bot().execute(new EditMessageReplyMarkup(chatId, message.messageId())
+                            .replyMarkup(new InlineKeyboardMarkup(message.replyMarkup().inlineKeyboard()[0][0])));
+                    }
+                    return new AnswerCallbackQuery(callbackQuery.id())
+                        .text(resourceBundle.getString("delete.subscription.result.message"))
+                        .showAlert(false);
+                } catch (Exception e) {
+                    return new AnswerCallbackQuery(callbackQuery.id())
+                        .text(resourceBundle.getString("error.message"))
+                        .showAlert(true);
+                }
+            })
+            .build();
+    }
 
     @Bean
     public Handler menuHandler() {
@@ -76,6 +108,7 @@ public class HandlerConfiguration {
         return MessageHandler.builder()
                 .withFilter(new MessageTextFilter("/help"))
                 .message(resourceBundle.getString("available.list.of.commands.message"))
+                .nextState(State.MENU)
                 .keyboard(new ReplyKeyboardRemove())
                 .build();
     }
@@ -107,7 +140,7 @@ public class HandlerConfiguration {
                 .nextState(State.TRACK_LINK)
                 .message(resourceBundle.getString("input.resource.link.message"))
                 .keyboard(new ReplyKeyboardRemove())
-                .menuButton(true)
+                .menuButton()
                 .build();
     }
 
@@ -126,7 +159,7 @@ public class HandlerConfiguration {
                 .keyboard(new ReplyKeyboardMarkup("Work", "Study")
                         .oneTimeKeyboard(true)
                         .resizeKeyboard(true))
-                .menuButton(true)
+                .menuButton()
                 .build();
     }
 
@@ -146,7 +179,7 @@ public class HandlerConfiguration {
                     contextRepository.setContext(chatId, builder);
                     return new SendMessage(chatId, resourceBundle.getString("input.filters.message"));
                 })
-                .menuButton(true)
+                .menuButton()
                 .keyboard(new ReplyKeyboardRemove())
                 .build();
     }
@@ -254,7 +287,7 @@ public class HandlerConfiguration {
     public Handler unrecognizedAnswerHandler() {
         return MessageHandler.builder()
                 .message(resourceBundle.getString("unsupported.command.message"))
-                .menuButton(true)
+                .menuButton()
                 .build();
     }
 }
