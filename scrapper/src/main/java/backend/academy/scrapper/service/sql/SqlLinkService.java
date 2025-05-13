@@ -44,12 +44,12 @@ public class SqlLinkService implements LinksService {
     @Override
     public ListLinksResponse listAll(Long tgChatId) {
         List<LinkResponse> linkResponses = sqlLinkRepository.findAllByChatId(tgChatId).stream()
-            .map(result -> {
-                List<String> tags = sqlTagRepository.findAllBySubscriptionId(result.subscriptionId());
-                List<String> filters = sqlFilterRepository.findAllBySubscriptionId(result.subscriptionId());
-                return new LinkResponse(result.linkId(), result.url(), tags, filters);
-            })
-            .toList();
+                .map(result -> {
+                    List<String> tags = sqlTagRepository.findAllBySubscriptionId(result.subscriptionId());
+                    List<String> filters = sqlFilterRepository.findAllBySubscriptionId(result.subscriptionId());
+                    return new LinkResponse(result.linkId(), result.url(), tags, filters);
+                })
+                .toList();
         return new ListLinksResponse(linkResponses, linkResponses.size());
     }
 
@@ -60,12 +60,12 @@ public class SqlLinkService implements LinksService {
         long linkId = sqlLinkRepository.saveIfAbsentByUrl(request.link());
 
         Set<Long> tagIds = request.tags().stream()
-            .map(sqlTagRepository::saveIfAbsentByName)
-            .collect(Collectors.toSet());
+                .map(sqlTagRepository::saveIfAbsentByName)
+                .collect(Collectors.toSet());
 
         Set<Long> filterIds = request.filters().stream()
-            .map(sqlFilterRepository::saveIfAbsentByName)
-            .collect(Collectors.toSet());
+                .map(sqlFilterRepository::saveIfAbsentByName)
+                .collect(Collectors.toSet());
 
         long subId = sqlSubscriptionRepository.saveIfAbsentByChatIdAndLinkId(tgChatId, linkId);
 
@@ -107,18 +107,18 @@ public class SqlLinkService implements LinksService {
     @Override
     public Stream<LinkRecord> findAllByType(LinkType linkType) {
         return Stream.iterate(0, n -> n + 1)
-            .map(n -> sqlLinkRepository.findAllByType(linkType, n * PAGE_SIZE, PAGE_SIZE))
-            .takeWhile(pageList -> !pageList.isEmpty())
-            .flatMap(List::stream);
+                .map(n -> sqlLinkRepository.findAllByType(linkType, n * PAGE_SIZE, PAGE_SIZE))
+                .takeWhile(pageList -> !pageList.isEmpty())
+                .flatMap(List::stream);
     }
 
     @Transactional
     @Override
     public void update(LinkRecord linkRecord, Stream<? extends Created> createdStream) {
         Instant max = createdStream
-            .map(Created::createdAt)
-            .max(Comparator.naturalOrder())
-            .orElse(linkRecord.updatedAt());
+                .map(Created::createdAt)
+                .max(Comparator.naturalOrder())
+                .orElse(linkRecord.updatedAt());
         sqlLinkRepository.updateUpdatedAtByUrl(linkRecord.url(), max);
     }
 }

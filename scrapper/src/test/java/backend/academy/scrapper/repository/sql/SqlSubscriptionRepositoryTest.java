@@ -1,6 +1,9 @@
 package backend.academy.scrapper.repository.sql;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import backend.academy.scrapper.TestcontainersConfiguration;
+import java.util.List;
 import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,8 +12,6 @@ import org.springframework.boot.test.autoconfigure.jdbc.JdbcTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.ActiveProfiles;
-import java.util.List;
-import static org.assertj.core.api.Assertions.assertThat;
 
 @JdbcTest
 @ActiveProfiles("test")
@@ -20,8 +21,10 @@ class SqlSubscriptionRepositoryTest {
 
     @Autowired
     private RepositoryTestHelper repositoryTestHelper;
+
     @Autowired
     private SqlSubscriptionRepository sqlSubscriptionRepository;
+
     @Autowired
     private JdbcTemplate jdbcTemplate;
 
@@ -32,11 +35,9 @@ class SqlSubscriptionRepositoryTest {
         long subscriptionId = repositoryTestHelper.saveSubscriptionByChatIdAndLinkId(chatId, linkId);
 
         assertThat(sqlSubscriptionRepository.saveIfAbsentByChatIdAndLinkId(chatId, linkId))
-            .isEqualTo(subscriptionId);
+                .isEqualTo(subscriptionId);
 
-        assertThat(allSubscriptions())
-            .singleElement()
-            .isEqualTo(subscriptionId);
+        assertThat(allSubscriptions()).singleElement().isEqualTo(subscriptionId);
     }
 
     @Test
@@ -45,9 +46,7 @@ class SqlSubscriptionRepositoryTest {
         long linkId = repositoryTestHelper.saveLinkByUrl("https://github.com/onekram/game");
         long subscriptionId = sqlSubscriptionRepository.saveIfAbsentByChatIdAndLinkId(chatId, linkId);
 
-        assertThat(allSubscriptions())
-            .singleElement()
-            .isEqualTo(subscriptionId);
+        assertThat(allSubscriptions()).singleElement().isEqualTo(subscriptionId);
     }
 
     @Test
@@ -71,10 +70,8 @@ class SqlSubscriptionRepositoryTest {
         assertThat(repositoryTestHelper.allTags()).hasSize(2);
         assertThat(repositoryTestHelper.allFilters()).hasSize(2);
 
-        assertThat(findTagsBySubscription(s1))
-            .isEmpty();
-        assertThat(findFiltersBySubscription(s1))
-            .hasSize(2);
+        assertThat(findTagsBySubscription(s1)).isEmpty();
+        assertThat(findFiltersBySubscription(s1)).hasSize(2);
     }
 
     @Test
@@ -98,10 +95,8 @@ class SqlSubscriptionRepositoryTest {
         assertThat(repositoryTestHelper.allTags()).hasSize(2);
         assertThat(repositoryTestHelper.allFilters()).hasSize(2);
 
-        assertThat(findTagsBySubscription(s1))
-            .hasSize(2);
-        assertThat(findFiltersBySubscription(s1))
-            .isEmpty();
+        assertThat(findTagsBySubscription(s1)).hasSize(2);
+        assertThat(findFiltersBySubscription(s1)).isEmpty();
     }
 
     @Test
@@ -114,9 +109,7 @@ class SqlSubscriptionRepositoryTest {
 
         sqlSubscriptionRepository.associateTags(s1, List.of(t1, t2));
 
-        assertThat(findTagsBySubscription(s1))
-            .hasSize(2)
-            .containsExactlyInAnyOrder(t1, t2);
+        assertThat(findTagsBySubscription(s1)).hasSize(2).containsExactlyInAnyOrder(t1, t2);
     }
 
     @Test
@@ -129,9 +122,7 @@ class SqlSubscriptionRepositoryTest {
 
         sqlSubscriptionRepository.associateFilters(s1, List.of(f1, f2));
 
-        assertThat(findFiltersBySubscription(s1))
-            .hasSize(2)
-            .containsExactlyInAnyOrder(f1, f2);
+        assertThat(findFiltersBySubscription(s1)).hasSize(2).containsExactlyInAnyOrder(f1, f2);
     }
 
     @Test
@@ -141,7 +132,7 @@ class SqlSubscriptionRepositoryTest {
         long s1 = repositoryTestHelper.saveSubscriptionByChatIdAndLinkId(chatId, linkId);
 
         assertThat(sqlSubscriptionRepository.findByChatIdAndLinkId(chatId, linkId))
-            .isEqualTo(s1);
+                .isEqualTo(s1);
     }
 
     @Test
@@ -152,8 +143,7 @@ class SqlSubscriptionRepositoryTest {
 
         sqlSubscriptionRepository.deleteById(s1);
 
-        assertThat(allSubscriptions())
-            .isEmpty();
+        assertThat(allSubscriptions()).isEmpty();
     }
 
     private List<Long> allSubscriptions() {
@@ -161,10 +151,12 @@ class SqlSubscriptionRepositoryTest {
     }
 
     private @NotNull List<Long> findTagsBySubscription(long s1) {
-        return jdbcTemplate.queryForList("SELECT tag_id FROM subscription.subscription_tag WHERE subscription_id =?", Long.class, s1);
+        return jdbcTemplate.queryForList(
+                "SELECT tag_id FROM subscription.subscription_tag WHERE subscription_id =?", Long.class, s1);
     }
 
     private @NotNull List<Long> findFiltersBySubscription(long s1) {
-        return jdbcTemplate.queryForList("SELECT filter_id FROM subscription.subscription_filter WHERE subscription_id =?", Long.class, s1);
+        return jdbcTemplate.queryForList(
+                "SELECT filter_id FROM subscription.subscription_filter WHERE subscription_id =?", Long.class, s1);
     }
 }

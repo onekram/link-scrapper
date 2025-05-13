@@ -1,5 +1,7 @@
 package backend.academy.scrapper.repository.sql;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import backend.academy.scrapper.TestcontainersConfiguration;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -7,7 +9,6 @@ import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabas
 import org.springframework.boot.test.autoconfigure.jdbc.JdbcTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ActiveProfiles;
-import static org.assertj.core.api.Assertions.assertThat;
 
 @JdbcTest
 @ActiveProfiles("test")
@@ -17,6 +18,7 @@ class SqlFilterRepositoryTest {
 
     @Autowired
     private RepositoryTestHelper repositoryTestHelper;
+
     @Autowired
     private SqlFilterRepository sqlFilterRepository;
 
@@ -24,8 +26,7 @@ class SqlFilterRepositoryTest {
     void saveIfAbsentByName() {
         long oldF1 = repositoryTestHelper.saveFilterByName("f1");
 
-        assertThat(sqlFilterRepository.saveIfAbsentByName("f1"))
-            .isEqualTo(oldF1);
+        assertThat(sqlFilterRepository.saveIfAbsentByName("f1")).isEqualTo(oldF1);
     }
 
     @Test
@@ -40,8 +41,7 @@ class SqlFilterRepositoryTest {
         repositoryTestHelper.associateFiltersWithSubscription(s1, f1, f2, f3);
 
         assertThat(sqlFilterRepository.findAllBySubscriptionId(s1))
-            .hasSize(3)
-            .containsExactlyInAnyOrder("f1", "f2", "f3");
+                .hasSize(3)
+                .containsExactlyInAnyOrder("f1", "f2", "f3");
     }
-
 }

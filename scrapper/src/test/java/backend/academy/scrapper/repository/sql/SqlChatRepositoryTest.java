@@ -1,6 +1,9 @@
 package backend.academy.scrapper.repository.sql;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import backend.academy.scrapper.TestcontainersConfiguration;
+import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
@@ -8,8 +11,6 @@ import org.springframework.boot.test.autoconfigure.jdbc.JdbcTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.ActiveProfiles;
-import java.util.List;
-import static org.assertj.core.api.Assertions.assertThat;
 
 @JdbcTest
 @ActiveProfiles("test")
@@ -18,8 +19,10 @@ import static org.assertj.core.api.Assertions.assertThat;
 class SqlChatRepositoryTest {
     @Autowired
     private RepositoryTestHelper repositoryTestHelper;
+
     @Autowired
     private SqlChatRepository sqlChatRepository;
+
     @Autowired
     private JdbcTemplate jdbcTemplate;
 
@@ -29,29 +32,23 @@ class SqlChatRepositoryTest {
 
         sqlChatRepository.saveIfAbsentById(chatId);
 
-        assertThat(allChats())
-            .singleElement()
-            .isEqualTo(chatId);
+        assertThat(allChats()).singleElement().isEqualTo(chatId);
     }
 
     @Test
     void saveIfAbsentById() {
         sqlChatRepository.saveIfAbsentById(1L);
 
-        assertThat(allChats())
-            .singleElement()
-            .isEqualTo(1L);
+        assertThat(allChats()).singleElement().isEqualTo(1L);
     }
 
     @Test
     void existsById() {
-        assertThat(sqlChatRepository.existsById(1L))
-            .isFalse();
+        assertThat(sqlChatRepository.existsById(1L)).isFalse();
 
         repositoryTestHelper.saveChatById(1L);
 
-        assertThat(sqlChatRepository.existsById(1L))
-            .isTrue();
+        assertThat(sqlChatRepository.existsById(1L)).isTrue();
     }
 
     @Test
@@ -59,8 +56,7 @@ class SqlChatRepositoryTest {
         repositoryTestHelper.saveChatById(1L);
 
         sqlChatRepository.deleteById(1L);
-        assertThat(allChats())
-            .isEmpty();
+        assertThat(allChats()).isEmpty();
     }
 
     private List<Long> allChats() {
