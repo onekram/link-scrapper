@@ -78,21 +78,13 @@ public class SqlLinkService implements LinksService {
                 "SELECT id FROM subscription.link WHERE url = ?", Long.class, request.link());
 
         Set<Long> tagIds = request.tags().stream()
-                .map(name -> {
-                    jdbcTemplate.update(
-                            "INSERT INTO subscription.tag (name) VALUES (?) ON CONFLICT (name) DO NOTHING", name);
-                    return jdbcTemplate.queryForObject(
-                            "SELECT id FROM subscription.tag WHERE name = ?", Long.class, name);
-                })
+                .map(name -> jdbcTemplate.queryForObject(
+                        "INSERT INTO subscription.tag (name) VALUES (?) ON CONFLICT (name) DO UPDATE SET name = excluded.name RETURNING id", Long.class, name))
                 .collect(Collectors.toSet());
 
         Set<Long> filterIds = request.filters().stream()
-                .map(name -> {
-                    jdbcTemplate.update(
-                            "INSERT INTO subscription.filter (name) VALUES (?) ON CONFLICT (name) DO NOTHING", name);
-                    return jdbcTemplate.queryForObject(
-                            "SELECT id FROM subscription.filter WHERE name = ?", Long.class, name);
-                })
+                .map(name -> jdbcTemplate.queryForObject(
+                        "INSERT INTO subscription.filter (name) VALUES (?) ON CONFLICT (name) DO UPDATE SET name = excluded.name RETURNING id", Long.class, name))
                 .collect(Collectors.toSet());
 
         jdbcTemplate.update(
