@@ -29,18 +29,20 @@ public class StackOverflowClientConfig {
                 .defaultHeader(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE)
                 .filter(addQueryParams(
                         scrapperConfig.stackOverflow().accessToken(),
-                        scrapperConfig.stackOverflow().key()))
+                        scrapperConfig.stackOverflow().key(),
+                        scrapperConfig.filter()))
                 .filter(logRequest)
                 .filter(logResponse)
                 .filter(errorHandler())
                 .build();
     }
 
-    private ExchangeFilterFunction addQueryParams(String accessToken, String key) {
+    private ExchangeFilterFunction addQueryParams(String accessToken, String key, String filter) {
         return (clientRequest, next) -> {
             URI modifiedUri = UriComponentsBuilder.fromUri(clientRequest.url())
                     .queryParam("key", key)
                     .queryParam("access_token", accessToken)
+                    .queryParam("filter", filter)
                     .build()
                     .toUri();
 

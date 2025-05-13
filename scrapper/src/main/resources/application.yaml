@@ -1,3 +1,6 @@
+app:
+  filter: "!51spuRwZiq)pz3ajPISQFVxv)9LOZJaAo6Iueu"
+
 spring:
   application:
     name: Scrapper

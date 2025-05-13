@@ -9,7 +9,7 @@ import org.springframework.web.service.annotation.HttpExchange;
 @HttpExchange
 public interface StackOverflowQuestionClient {
 
-    @GetExchange("/questions/{ids}?site=stackoverflow&filter=!51spuRwZiq)pz3ajPISQFVxv)9LOZJaAo6Iueu")
+    @GetExchange("/questions/{ids}?site=stackoverflow")
     StackOverflowQuestionsResponse getQuestionsByIds(@PathVariable String ids);
 
     default StackOverflowQuestionsResponse getQuestionsByIds(List<String> ids) {
