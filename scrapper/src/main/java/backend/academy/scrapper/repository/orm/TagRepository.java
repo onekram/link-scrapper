@@ -1,6 +1,6 @@
-package backend.academy.scrapper.repository;
+package backend.academy.scrapper.repository.orm;
 
-import backend.academy.scrapper.repository.entity.Tag;
+import backend.academy.scrapper.repository.orm.entity.Tag;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

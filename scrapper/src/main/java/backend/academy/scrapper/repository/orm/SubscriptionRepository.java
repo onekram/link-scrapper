@@ -1,8 +1,8 @@
-package backend.academy.scrapper.repository;
+package backend.academy.scrapper.repository.orm;
 
-import backend.academy.scrapper.repository.entity.Chat;
-import backend.academy.scrapper.repository.entity.Link;
-import backend.academy.scrapper.repository.entity.Subscription;
+import backend.academy.scrapper.repository.orm.entity.Chat;
+import backend.academy.scrapper.repository.orm.entity.Link;
+import backend.academy.scrapper.repository.orm.entity.Subscription;
 import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 

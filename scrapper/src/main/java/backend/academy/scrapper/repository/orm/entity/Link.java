@@ -1,4 +1,4 @@
-package backend.academy.scrapper.repository.entity;
+package backend.academy.scrapper.repository.orm.entity;
 
 import backend.academy.scrapper.client.model.Created;
 import backend.academy.scrapper.parser.LinkType;

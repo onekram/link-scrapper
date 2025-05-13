@@ -8,8 +8,12 @@ import backend.academy.scrapper.client.model.Created;
 import backend.academy.scrapper.exception.NotFoundException;
 import backend.academy.scrapper.parser.LinkType;
 import backend.academy.scrapper.repository.record.LinkRecord;
+import backend.academy.scrapper.repository.sql.SqlChatRepository;
+import backend.academy.scrapper.repository.sql.SqlFilterRepository;
+import backend.academy.scrapper.repository.sql.SqlLinkRepository;
+import backend.academy.scrapper.repository.sql.SqlSubscriptionRepository;
+import backend.academy.scrapper.repository.sql.SqlTagRepository;
 import backend.academy.scrapper.service.LinksService;
-import java.sql.Timestamp;
 import java.time.Instant;
 import java.util.Comparator;
 import java.util.List;
@@ -20,9 +24,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.dao.EmptyResultDataAccessException;
-import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
-import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -30,8 +31,11 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 @ConditionalOnProperty(name = "features.orm.enabled", havingValue = "false")
 public class SqlLinkService implements LinksService {
-    private final JdbcTemplate jdbcTemplate;
-    private final NamedParameterJdbcTemplate namedParameterJdbcTemplate;
+    private final SqlFilterRepository sqlFilterRepository;
+    private final SqlTagRepository sqlTagRepository;
+    private final SqlChatRepository sqlChatRepository;
+    private final SqlLinkRepository sqlLinkRepository;
+    private final SqlSubscriptionRepository sqlSubscriptionRepository;
 
     @Value("${pagination.page-size}")
     private int PAGE_SIZE;
@@ -39,74 +43,37 @@ public class SqlLinkService implements LinksService {
     @Transactional
     @Override
     public ListLinksResponse listAll(Long tgChatId) {
-        String sql = "SELECT s.id AS sub_id, l.id AS link_id, l.url AS url "
-                + "FROM subscription.subscription s JOIN subscription.link l ON s.link_id = l.id "
-                + "JOIN subscription.chat c ON s.chat_id = c.id WHERE c.id = ?";
-        List<LinkResponse> links = jdbcTemplate.query(
-                sql,
-                (rs, rowNum) -> {
-                    long subId = rs.getLong("sub_id");
-                    long linkId = rs.getLong("link_id");
-                    String url = rs.getString("url");
-                    List<String> tags = jdbcTemplate.queryForList(
-                            "SELECT t.name FROM subscription.tag t "
-                                    + "JOIN subscription.subscription_tag st ON t.id = st.tag_id WHERE st.subscription_id = ?",
-                            String.class,
-                            subId);
-                    List<String> filters = jdbcTemplate.queryForList(
-                            "SELECT f.name FROM subscription.filter f "
-                                    + "JOIN subscription.subscription_filter sf ON f.id = sf.filter_id WHERE sf.subscription_id = ?",
-                            String.class,
-                            subId);
-                    return new LinkResponse(linkId, url, tags, filters);
-                },
-                tgChatId);
-        return new ListLinksResponse(links, links.size());
+        List<LinkResponse> linkResponses = sqlLinkRepository.findAllByChatId(tgChatId).stream()
+            .map(result -> {
+                List<String> tags = sqlTagRepository.findAllBySubscriptionId(result.subscriptionId());
+                List<String> filters = sqlFilterRepository.findAllBySubscriptionId(result.subscriptionId());
+                return new LinkResponse(result.linkId(), result.url(), tags, filters);
+            })
+            .toList();
+        return new ListLinksResponse(linkResponses, linkResponses.size());
     }
 
     @Transactional
     @Override
     public LinkResponse addLink(Long tgChatId, AddLinkRequest request) {
-        jdbcTemplate.update("INSERT INTO subscription.chat (id) VALUES (?) ON CONFLICT (id) DO NOTHING", tgChatId);
-
-        jdbcTemplate.update(
-                "INSERT INTO subscription.link (url, type) VALUES (?, ?::subscription.link_type) ON CONFLICT (url) DO NOTHING",
-                request.link(),
-                LinkType.getType(request.link()).map(LinkType::name).orElse(null));
-
-        Long linkId = jdbcTemplate.queryForObject(
-                "SELECT id FROM subscription.link WHERE url = ?", Long.class, request.link());
+        sqlChatRepository.saveIfAbsentById(tgChatId);
+        long linkId = sqlLinkRepository.saveIfAbsentByUrl(request.link());
 
         Set<Long> tagIds = request.tags().stream()
-                .map(name -> jdbcTemplate.queryForObject(
-                        "INSERT INTO subscription.tag (name) VALUES (?) ON CONFLICT (name) DO UPDATE SET name = excluded.name RETURNING id", Long.class, name))
-                .collect(Collectors.toSet());
+            .map(sqlTagRepository::saveIfAbsentByName)
+            .collect(Collectors.toSet());
 
         Set<Long> filterIds = request.filters().stream()
-                .map(name -> jdbcTemplate.queryForObject(
-                        "INSERT INTO subscription.filter (name) VALUES (?) ON CONFLICT (name) DO UPDATE SET name = excluded.name RETURNING id", Long.class, name))
-                .collect(Collectors.toSet());
+            .map(sqlFilterRepository::saveIfAbsentByName)
+            .collect(Collectors.toSet());
 
-        jdbcTemplate.update(
-                "INSERT INTO subscription.subscription (chat_id, link_id) VALUES (?, ?) ON CONFLICT (chat_id, link_id) DO NOTHING",
-                tgChatId,
-                linkId);
+        long subId = sqlSubscriptionRepository.saveIfAbsentByChatIdAndLinkId(tgChatId, linkId);
 
-        Long subId = jdbcTemplate.queryForObject(
-                "SELECT id FROM subscription.subscription WHERE chat_id = ? AND link_id = ?",
-                Long.class,
-                tgChatId,
-                linkId);
+        sqlSubscriptionRepository.deleteAssociationTags(subId);
+        sqlSubscriptionRepository.associateTags(subId, tagIds);
 
-        jdbcTemplate.update("DELETE FROM subscription.subscription_tag WHERE subscription_id = ?", subId);
-        jdbcTemplate.update("DELETE FROM subscription.subscription_filter WHERE subscription_id = ?", subId);
-
-        tagIds.forEach(tagId -> jdbcTemplate.update(
-                "INSERT INTO subscription.subscription_tag (subscription_id, tag_id) VALUES (?, ?)", subId, tagId));
-        filterIds.forEach(filterId -> jdbcTemplate.update(
-                "INSERT INTO subscription.subscription_filter (subscription_id, filter_id) VALUES (?, ?)",
-                subId,
-                filterId));
+        sqlSubscriptionRepository.deleteAssociationFilters(subId);
+        sqlSubscriptionRepository.associateFilters(subId, filterIds);
 
         return new LinkResponse(linkId, request.link(), List.copyOf(request.tags()), List.copyOf(request.filters()));
     }
@@ -114,91 +81,44 @@ public class SqlLinkService implements LinksService {
     @Transactional
     @Override
     public LinkResponse removeLink(Long tgChatId, RemoveLinkRequest request) {
-        Long linkId;
+        long linkId;
         try {
-            linkId = jdbcTemplate.queryForObject(
-                    "SELECT id FROM subscription.link WHERE url = ?", Long.class, request.link());
+            linkId = sqlLinkRepository.findByUrl(request.link());
         } catch (EmptyResultDataAccessException e) {
-            throw new NotFoundException("Не существует чата: %s".formatted(tgChatId));
+            throw new NotFoundException("Не существует ссылки: %s".formatted(request.link()));
         }
 
-        Long subId;
+        long subId;
         try {
-            subId = jdbcTemplate.queryForObject(
-                    "SELECT s.id FROM subscription.subscription s WHERE s.chat_id = ? AND s.link_id = ?",
-                    Long.class,
-                    tgChatId,
-                    linkId);
+            subId = sqlSubscriptionRepository.findByChatIdAndLinkId(tgChatId, linkId);
         } catch (EmptyResultDataAccessException e) {
-            throw new NotFoundException("Не существует ссылки: %s".formatted(tgChatId));
+            throw new NotFoundException("Не существует ссылки: %s".formatted(linkId));
         }
 
-        List<String> tags = jdbcTemplate.queryForList(
-                "SELECT t.name FROM subscription.tag t " + "JOIN subscription.subscription_tag st ON t.id = st.tag_id "
-                        + "WHERE st.subscription_id = ?",
-                String.class,
-                subId);
-        List<String> filters = jdbcTemplate.queryForList(
-                "SELECT f.name FROM subscription.filter f "
-                        + "JOIN subscription.subscription_filter sf ON f.id = sf.filter_id "
-                        + "WHERE sf.subscription_id = ?",
-                String.class,
-                subId);
+        List<String> tags = sqlTagRepository.findAllBySubscriptionId(subId);
+        List<String> filters = sqlFilterRepository.findAllBySubscriptionId(subId);
 
-        jdbcTemplate.update("DELETE FROM subscription.subscription WHERE id = ?", subId);
-
-        Integer count = jdbcTemplate.queryForObject(
-                "SELECT COUNT(*) FROM subscription.subscription WHERE link_id = ?", Integer.class, linkId);
-        if (count != null && count == 0) {
-            jdbcTemplate.update("DELETE FROM subscription.link WHERE id = ?", linkId);
-        }
+        sqlSubscriptionRepository.deleteById(subId);
+        sqlLinkRepository.deleteByIdIfNoAssociatedSubscriptions(linkId);
 
         return new LinkResponse(linkId, request.link(), tags, filters);
     }
 
     @Override
     public Stream<LinkRecord> findAllByType(LinkType linkType) {
-        String sql =
-                """
-            SELECT l.id AS id,
-                   l.url AS url,
-                   l.updated_at AS updated_at,
-                   array_agg(c.id) AS tg_chat_ids
-            FROM subscription.link l
-            JOIN subscription.subscription s ON l.id = s.link_id
-            JOIN subscription.chat c ON s.chat_id = c.id
-            WHERE l.type = :linkType::subscription.link_type
-            GROUP BY l.id, l.url, l.updated_at
-            ORDER BY l.id
-            LIMIT :limit OFFSET :offset
-        """;
         return Stream.iterate(0, n -> n + 1)
-                .map(n -> {
-                    int offset = n * PAGE_SIZE;
-                    MapSqlParameterSource params = new MapSqlParameterSource()
-                            .addValue("linkType", linkType.name())
-                            .addValue("limit", PAGE_SIZE)
-                            .addValue("offset", offset);
-                    return namedParameterJdbcTemplate.query(
-                            sql,
-                            params,
-                            (rs, rowNum) -> new LinkRecord(
-                                    rs.getString("url"),
-                                    List.of((Long[]) rs.getArray("tg_chat_ids").getArray()),
-                                    rs.getTimestamp("updated_at").toInstant()));
-                })
-                .takeWhile(pageList -> !pageList.isEmpty())
-                .flatMap(List::stream);
+            .map(n -> sqlLinkRepository.findAllByType(linkType, n * PAGE_SIZE, PAGE_SIZE))
+            .takeWhile(pageList -> !pageList.isEmpty())
+            .flatMap(List::stream);
     }
 
     @Transactional
     @Override
     public void update(LinkRecord linkRecord, Stream<? extends Created> createdStream) {
         Instant max = createdStream
-                .map(Created::createdAt)
-                .max(Comparator.naturalOrder())
-                .orElse(linkRecord.updatedAt());
-        jdbcTemplate.update(
-                "UPDATE subscription.link SET updated_at =? WHERE url =?", Timestamp.from(max), linkRecord.url());
+            .map(Created::createdAt)
+            .max(Comparator.naturalOrder())
+            .orElse(linkRecord.updatedAt());
+        sqlLinkRepository.updateUpdatedAtByUrl(linkRecord.url(), max);
     }
 }

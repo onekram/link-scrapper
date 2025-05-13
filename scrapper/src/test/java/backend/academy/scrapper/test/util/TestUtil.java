@@ -2,9 +2,9 @@ package backend.academy.scrapper.test.util;
 
 import backend.academy.model.LinkResponse;
 import backend.academy.model.ListLinksResponse;
-import backend.academy.scrapper.repository.entity.Chat;
-import backend.academy.scrapper.repository.entity.Link;
-import backend.academy.scrapper.repository.entity.Subscription;
+import backend.academy.scrapper.repository.orm.entity.Chat;
+import backend.academy.scrapper.repository.orm.entity.Link;
+import backend.academy.scrapper.repository.orm.entity.Subscription;
 import backend.academy.scrapper.repository.record.LinkRecord;
 import java.time.Instant;
 import java.util.Arrays;

@@ -1,4 +1,4 @@
-package backend.academy.scrapper.repository.entity;
+package backend.academy.scrapper.repository.orm.entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;

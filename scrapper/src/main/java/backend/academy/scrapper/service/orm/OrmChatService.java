@@ -1,11 +1,11 @@
 package backend.academy.scrapper.service.orm;
 
 import backend.academy.scrapper.exception.NotFoundException;
-import backend.academy.scrapper.repository.ChatRepository;
-import backend.academy.scrapper.repository.LinkRepository;
-import backend.academy.scrapper.repository.entity.Chat;
-import backend.academy.scrapper.repository.entity.Link;
-import backend.academy.scrapper.repository.entity.Subscription;
+import backend.academy.scrapper.repository.orm.ChatRepository;
+import backend.academy.scrapper.repository.orm.LinkRepository;
+import backend.academy.scrapper.repository.orm.entity.Chat;
+import backend.academy.scrapper.repository.orm.entity.Link;
+import backend.academy.scrapper.repository.orm.entity.Subscription;
 import backend.academy.scrapper.service.ChatService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;

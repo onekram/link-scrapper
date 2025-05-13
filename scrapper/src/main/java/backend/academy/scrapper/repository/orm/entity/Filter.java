@@ -1,4 +1,4 @@
-package backend.academy.scrapper.repository.entity;
+package backend.academy.scrapper.repository.orm.entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -19,7 +19,7 @@ import lombok.Setter;
 @NoArgsConstructor
 @Entity
 @Table(schema = "subscription")
-public class Tag {
+public class Filter {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(nullable = false)
@@ -28,13 +28,13 @@ public class Tag {
     @Column(nullable = false, unique = true)
     private String name;
 
-    @ManyToMany(mappedBy = "tags")
+    @ManyToMany(mappedBy = "filters")
     private Set<Subscription> subscriptions = new HashSet<>();
 
     @Column(nullable = false)
     private Instant createdAt = Instant.now();
 
-    public Tag(String name) {
+    public Filter(String name) {
         this.name = name;
     }
 }
