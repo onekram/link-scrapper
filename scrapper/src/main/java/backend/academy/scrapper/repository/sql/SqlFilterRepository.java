@@ -10,7 +10,7 @@ import org.springframework.stereotype.Repository;
 public class SqlFilterRepository {
     private final JdbcTemplate jdbcTemplate;
 
-    public long saveIfAbsentByName(String name) {
+    public Long saveIfAbsentByName(String name) {
         return jdbcTemplate.queryForObject(
                 "INSERT INTO subscription.filter (name) VALUES (?) ON CONFLICT (name) DO UPDATE SET name = excluded.name RETURNING id",
                 Long.class,

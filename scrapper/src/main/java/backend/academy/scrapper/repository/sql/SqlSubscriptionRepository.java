@@ -10,7 +10,7 @@ public class SqlSubscriptionRepository {
 
     private final JdbcTemplate jdbcTemplate;
 
-    public long saveIfAbsentByChatIdAndLinkId(long tgChatId, long linkId) {
+    public Long saveIfAbsentByChatIdAndLinkId(long tgChatId, long linkId) {
         return jdbcTemplate.queryForObject(
                 "INSERT INTO subscription.subscription (chat_id, link_id) VALUES (?, ?) ON CONFLICT (chat_id, link_id) DO UPDATE SET chat_id = excluded.chat_id RETURNING id",
                 Long.class,
@@ -40,7 +40,7 @@ public class SqlSubscriptionRepository {
                 filterId));
     }
 
-    public long findByChatIdAndLinkId(long tgChatId, long linkId) {
+    public Long findByChatIdAndLinkId(long tgChatId, long linkId) {
         return jdbcTemplate.queryForObject(
                 "SELECT s.id FROM subscription.subscription s WHERE s.chat_id = ? AND s.link_id = ?",
                 Long.class,

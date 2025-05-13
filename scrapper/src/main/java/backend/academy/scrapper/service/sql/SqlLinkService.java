@@ -57,7 +57,7 @@ public class SqlLinkService implements LinksService {
     @Override
     public LinkResponse addLink(Long tgChatId, AddLinkRequest request) {
         sqlChatRepository.saveIfAbsentById(tgChatId);
-        long linkId = sqlLinkRepository.saveIfAbsentByUrl(request.link());
+        Long linkId = sqlLinkRepository.saveIfAbsentByUrl(request.link());
 
         Set<Long> tagIds = request.tags().stream()
                 .map(sqlTagRepository::saveIfAbsentByName)
@@ -81,14 +81,14 @@ public class SqlLinkService implements LinksService {
     @Transactional
     @Override
     public LinkResponse removeLink(Long tgChatId, RemoveLinkRequest request) {
-        long linkId;
+        Long linkId;
         try {
             linkId = sqlLinkRepository.findByUrl(request.link());
         } catch (EmptyResultDataAccessException e) {
             throw new NotFoundException("Не существует ссылки: %s".formatted(request.link()));
         }
 
-        long subId;
+        Long subId;
         try {
             subId = sqlSubscriptionRepository.findByChatIdAndLinkId(tgChatId, linkId);
         } catch (EmptyResultDataAccessException e) {

@@ -5,6 +5,7 @@ import backend.academy.scrapper.repository.record.LinkRecord;
 import java.sql.Timestamp;
 import java.time.Instant;
 import java.util.List;
+import java.util.Objects;
 import lombok.RequiredArgsConstructor;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
@@ -17,7 +18,7 @@ public class SqlLinkRepository {
     private final JdbcTemplate jdbcTemplate;
     private final NamedParameterJdbcTemplate namedParameterJdbcTemplate;
 
-    public long saveIfAbsentByUrl(String url) {
+    public Long saveIfAbsentByUrl(String url) {
         return jdbcTemplate.queryForObject(
                 "INSERT INTO subscription.link (url, type) VALUES (?, ?::subscription.link_type) ON CONFLICT (url) DO UPDATE SET type = excluded.type RETURNING id",
                 Long.class,
@@ -58,13 +59,13 @@ public class SqlLinkRepository {
                         rs.getTimestamp("updated_at").toInstant()));
     }
 
-    public long findByUrl(String url) {
+    public Long findByUrl(String url) {
         return jdbcTemplate.queryForObject("SELECT id FROM subscription.link WHERE url = ?", Long.class, url);
     }
 
     public void deleteByIdIfNoAssociatedSubscriptions(long linkId) {
-        Integer count = jdbcTemplate.queryForObject(
-                "SELECT COUNT(*) FROM subscription.subscription WHERE link_id = ?", Integer.class, linkId);
+        Integer count = Objects.requireNonNull(jdbcTemplate.queryForObject(
+                "SELECT COUNT(*) FROM subscription.subscription WHERE link_id = ?", Integer.class, linkId));
         if (count == 0) {
             jdbcTemplate.update("DELETE FROM subscription.link WHERE id = ?", linkId);
         }
