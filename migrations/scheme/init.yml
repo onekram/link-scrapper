@@ -64,6 +64,10 @@ databaseChangeLog:
 
         - sql:
             sql: |
+              CREATE INDEX idx_subscription_link ON subscription.subscription (link_id);
+
+        - sql:
+            sql: |
               CREATE TABLE IF NOT EXISTS subscription.subscription_tag (
                 subscription_id BIGINT NOT NULL,
                 tag_id BIGINT NOT NULL,

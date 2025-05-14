@@ -25,7 +25,10 @@ import lombok.Setter;
 @Entity
 @Table(
         schema = "subscription",
-        indexes = @Index(unique = true, name = "idx_subscription_chat_link", columnList = "chat_id, link_id"))
+        indexes = {
+            @Index(unique = true, name = "idx_subscription_chat_link", columnList = "chat_id, link_id"),
+            @Index(name = "idx_subscription_link", columnList = "link_id")
+        })
 public class Subscription {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
