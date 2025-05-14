@@ -1,6 +1,7 @@
 package backend.academy.scrapper.update;
 
 import backend.academy.model.LinkUpdate;
+import backend.academy.scrapper.client.bot.UpdatesClient;
 import backend.academy.scrapper.client.model.stackoverflow.Answer;
 import backend.academy.scrapper.client.model.stackoverflow.Question;
 import backend.academy.scrapper.client.model.stackoverflow.Response;
@@ -14,6 +15,7 @@ import java.util.regex.Matcher;
 import java.util.stream.Stream;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Service;
 
 @Slf4j
@@ -22,13 +24,16 @@ public class StackOverflowUpdateService extends AbstractUpdateService {
     private final StackOverflowQuestionClient stackOverflowQuestionClient;
 
     public StackOverflowUpdateService(
-            LinksService linksService, StackOverflowQuestionClient stackOverflowQuestionClient) {
-        super(linksService);
+            ThreadPoolTaskExecutor taskExecutor,
+            UpdatesClient updatesClient,
+            LinksService linksService,
+            StackOverflowQuestionClient stackOverflowQuestionClient) {
+        super(taskExecutor, updatesClient, linksService);
         this.stackOverflowQuestionClient = stackOverflowQuestionClient;
     }
 
     @Override
-    public Stream<LinkUpdate> buildLinkUpdate(LinkRecord linkRecord) {
+    protected Stream<LinkUpdate> buildLinkUpdate(LinkRecord linkRecord) {
         Instant from = linkRecord.updatedAt();
 
         Matcher matcher = LinkType.STACK_OVERFLOW.parseUrl(linkRecord.url());

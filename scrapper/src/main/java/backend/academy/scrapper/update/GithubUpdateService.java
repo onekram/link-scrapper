@@ -1,6 +1,7 @@
 package backend.academy.scrapper.update;
 
 import backend.academy.model.LinkUpdate;
+import backend.academy.scrapper.client.bot.UpdatesClient;
 import backend.academy.scrapper.client.github.GithubReposClient;
 import backend.academy.scrapper.client.model.github.GithubResponse;
 import backend.academy.scrapper.parser.LinkType;
@@ -12,6 +13,7 @@ import java.util.regex.Matcher;
 import java.util.stream.Stream;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Service;
 
 @Slf4j
@@ -19,13 +21,17 @@ import org.springframework.stereotype.Service;
 public class GithubUpdateService extends AbstractUpdateService {
     private final GithubReposClient githubReposClient;
 
-    public GithubUpdateService(LinksService linksService, GithubReposClient githubReposClient) {
-        super(linksService);
+    public GithubUpdateService(
+            ThreadPoolTaskExecutor taskExecutor,
+            UpdatesClient updatesClient,
+            LinksService linksService,
+            GithubReposClient githubReposClient) {
+        super(taskExecutor, updatesClient, linksService);
         this.githubReposClient = githubReposClient;
     }
 
     @Override
-    public Stream<LinkUpdate> buildLinkUpdate(LinkRecord linkRecord) {
+    protected Stream<LinkUpdate> buildLinkUpdate(LinkRecord linkRecord) {
         Matcher matcher = LinkType.GITHUB.parseUrl(linkRecord.url());
         if (!matcher.matches()) {
             throw new IllegalStateException("Link of GITHUB type doesn't match pattern");
