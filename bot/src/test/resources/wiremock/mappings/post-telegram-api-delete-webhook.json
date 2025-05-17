@@ -1,0 +1,22 @@
+{
+    "name": "Delete Webhook",
+    "request": {
+        "method": "POST",
+        "urlPathPattern": "/bot.*/deleteWebhook",
+        "headers": {
+            "Content-Type": {
+                "equalTo": "application/x-www-form-urlencoded"
+            }
+        }
+    },
+    "response": {
+        "status": 200,
+        "headers": {
+            "Content-Type": "application/json"
+        },
+        "jsonBody": {
+            "ok": true,
+            "result": true
+        }
+    }
+}

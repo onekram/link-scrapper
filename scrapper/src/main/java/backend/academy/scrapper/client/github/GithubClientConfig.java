@@ -1,7 +1,7 @@
 package backend.academy.scrapper.client.github;
 
 import backend.academy.scrapper.ScrapperConfig;
-import backend.academy.scrapper.client.model.GithubApiError;
+import backend.academy.scrapper.client.model.github.GithubApiError;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -37,7 +37,7 @@ public class GithubClientConfig {
             if (response.statusCode().isError()) {
                 return response.bodyToMono(GithubApiError.class)
                         .flatMap(errorBody -> {
-                            log.error("API Error: {} | Message: {}", errorBody.getStatus(), errorBody.getMessage());
+                            log.error("API Error: {} | Message: {}", errorBody.status(), errorBody.message());
                             return Mono.error(new RuntimeException());
                         })
                         .thenReturn(response);

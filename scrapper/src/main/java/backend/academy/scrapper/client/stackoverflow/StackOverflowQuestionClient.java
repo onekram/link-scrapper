@@ -1,6 +1,6 @@
 package backend.academy.scrapper.client.stackoverflow;
 
-import backend.academy.scrapper.client.model.StackOverflowQuestionsResponse;
+import backend.academy.scrapper.client.model.stackoverflow.StackOverflowQuestionsResponse;
 import java.util.List;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.service.annotation.GetExchange;

@@ -1,0 +1,27 @@
+app:
+  github-token: gh_mock_token
+  stackoverflow:
+    key: so_token_key
+    access-token: so_access_token
+  github-api-url: ${wiremock.url}
+  bot-url: ${wiremock.url}
+  fixed-rate-scheduling: 2000
+  stack-overflow-api-url: ${wiremock.url}
+
+features:
+  orm:
+    enabled: false
+
+spring:
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    open-in-view: false
+  liquibase:
+    enabled: true
+    change-log: file:../migrations/master.yml
+
+springdoc:
+  swagger-ui:
+    enabled: false
+    path: /swagger-ui

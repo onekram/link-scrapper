@@ -1,0 +1,22 @@
+app:
+  telegram-token: "mock_token"
+  scrapper-url: ${wiremock.url}
+  telegram-url: ${wiremock.url}
+
+wiremock:
+  url: "http://localhost:8083"
+
+features:
+  webhook:
+    enabled: false
+
+spring:
+  data:
+    redis:
+      host: localhost
+      port: 6379
+      password: "redisredis"
+
+springdoc:
+  swagger-ui:
+    enabled: false
