@@ -1,0 +1,371 @@
+{
+    "name": "Check question update",
+    "request": {
+        "method": "GET",
+        "urlPattern": "/questions/.*\\?site=stackoverflow&access_token=.*&key=.*",
+        "headers": {
+            "Content-Type": {
+                "equalTo": "application/json"
+            },
+            "Accept": {
+                "equalTo": "application/json"
+            }
+        }
+    },
+    "response": {
+        "status": 200,
+        "headers": {
+            "Content-Type": "application/json"
+        },
+        "jsonBody": {
+            "items": [
+                {
+                    "tags": [
+                        "java",
+                        "multithreading",
+                        "random"
+                    ],
+                    "comments": [
+                        {
+                            "owner": {
+                                "account_id": 7612423,
+                                "reputation": 86653,
+                                "user_id": 5772882,
+                                "user_type": "registered",
+                                "profile_image": "https://www.gravatar.com/avatar/8283c64511fa80afed5259d10850168f?s=256&d=identicon&r=PG&f=y&so-version=2",
+                                "display_name": "Anonymous",
+                                "link": "https://stackoverflow.com/users/5772882/anonymous"
+                            },
+                            "edited": false,
+                            "score": 0,
+                            "creation_date": "{{now format='epoch'}}",
+                            "post_id": 79276625,
+                            "comment_id": 139796915,
+                            "content_license": "CC BY-SA 4.0",
+                            "body_markdown": "Because calculating the next random number is not a thread-safe operation.",
+                            "link": "https://stackoverflow.com/questions/79276625/why-java-util-random-need-to-be-synchronized#comment139796915_79276625",
+                            "body": "Because calculating the next random number is not a thread-safe operation."
+                        },
+                        {
+                            "owner": {
+                                "account_id": 422870,
+                                "reputation": 27403,
+                                "user_id": 801894,
+                                "user_type": "registered",
+                                "profile_image": "https://www.gravatar.com/avatar/67f2ccd17aa6fd622152ad88fc2ae784?s=256&d=identicon&r=PG",
+                                "display_name": "Solomon Slow",
+                                "link": "https://stackoverflow.com/users/801894/solomon-slow"
+                            },
+                            "reply_to_user": {
+                                "account_id": 7612423,
+                                "reputation": 86653,
+                                "user_id": 5772882,
+                                "user_type": "registered",
+                                "profile_image": "https://www.gravatar.com/avatar/8283c64511fa80afed5259d10850168f?s=256&d=identicon&r=PG&f=y&so-version=2",
+                                "display_name": "Anonymous",
+                                "link": "https://stackoverflow.com/users/5772882/anonymous"
+                            },
+                            "edited": false,
+                            "score": 0,
+                            "creation_date": "{{now format='epoch'}}",
+                            "post_id": 79276625,
+                            "comment_id": 139798885,
+                            "content_license": "CC BY-SA 4.0",
+                            "body_markdown": "@Anonymous, The question could be interpreted as asking, _Why_ is `java.util.Random` not thread-safe? The answer is the same as for any class that is not thread-safe. It&#39;s because it does nothing to prevent one thread from using the state of a shared instance concurrently with another thread that is half-way done changing the state. Of course, one might ask, why did the developers make that choice? I can _guess_ that they maybe thought the non-thread-safe version would perform better, and they thought, &quot;Why even bother with thread-safety, when each thread can have its own `Random` instance?&quot;",
+                            "link": "https://stackoverflow.com/questions/79276625/why-java-util-random-need-to-be-synchronized#comment139798885_79276625",
+                            "body": "@Anonymous, The question could be interpreted as asking, <i>Why</i> is <code>java.util.Random</code> not thread-safe? The answer is the same as for any class that is not thread-safe. It&#39;s because it does nothing to prevent one thread from using the state of a shared instance concurrently with another thread that is half-way done changing the state. Of course, one might ask, why did the developers make that choice? I can <i>guess</i> that they maybe thought the non-thread-safe version would perform better, and they thought, &quot;Why even bother with thread-safety, when each thread can have its own <code>Random</code> instance?&quot;"
+                        },
+                        {
+                            "owner": {
+                                "account_id": 23431785,
+                                "reputation": 597,
+                                "user_id": 17490497,
+                                "user_type": "registered",
+                                "profile_image": "https://lh3.googleusercontent.com/a-/AOh14GgoCfudnISaBLKFnV9j9mRb0v4zmmidJDhKyBcv=k-s256",
+                                "display_name": "Jean-Samuel Girard",
+                                "link": "https://stackoverflow.com/users/17490497/jean-samuel-girard"
+                            },
+                            "reply_to_user": {
+                                "account_id": 422870,
+                                "reputation": 27403,
+                                "user_id": 801894,
+                                "user_type": "registered",
+                                "profile_image": "https://www.gravatar.com/avatar/67f2ccd17aa6fd622152ad88fc2ae784?s=256&d=identicon&r=PG",
+                                "display_name": "Solomon Slow",
+                                "link": "https://stackoverflow.com/users/801894/solomon-slow"
+                            },
+                            "edited": false,
+                            "score": 0,
+                            "creation_date": "{{now format='epoch'}}",
+                            "post_id": 79276625,
+                            "comment_id": 139800142,
+                            "content_license": "CC BY-SA 4.0",
+                            "body_markdown": "@SolomonSlow java.util.Random is thread-safe tho. And that&#39;s exactly where the confusion is comming from. Because it&#39;s thread-safe it slows down everything to keep state when in reality you might not actually need that state if you are not generating numbers with a specific seed.",
+                            "link": "https://stackoverflow.com/questions/79276625/why-java-util-random-need-to-be-synchronized#comment139800142_79276625",
+                            "body": "@SolomonSlow java.util.Random is thread-safe tho. And that&#39;s exactly where the confusion is comming from. Because it&#39;s thread-safe it slows down everything to keep state when in reality you might not actually need that state if you are not generating numbers with a specific seed."
+                        },
+                        {
+                            "owner": {
+                                "account_id": 422870,
+                                "reputation": 27403,
+                                "user_id": 801894,
+                                "user_type": "registered",
+                                "profile_image": "https://www.gravatar.com/avatar/67f2ccd17aa6fd622152ad88fc2ae784?s=256&d=identicon&r=PG",
+                                "display_name": "Solomon Slow",
+                                "link": "https://stackoverflow.com/users/801894/solomon-slow"
+                            },
+                            "edited": false,
+                            "score": 0,
+                            "creation_date": "{{now format='epoch'}}",
+                            "post_id": 79276625,
+                            "comment_id": 139800861,
+                            "content_license": "CC BY-SA 4.0",
+                            "body_markdown": "Oops! I misremembered that. I should have checked the documentation.",
+                            "link": "https://stackoverflow.com/questions/79276625/why-java-util-random-need-to-be-synchronized#comment139800861_79276625",
+                            "body": "Oops! I misremembered that. I should have checked the documentation."
+                        }
+                    ],
+                    "answers": [
+                        {
+                            "comments": [
+                                {
+                                    "owner": {
+                                        "account_id": 7254391,
+                                        "reputation": 873,
+                                        "user_id": 5533591,
+                                        "user_type": "registered",
+                                        "accept_rate": 100,
+                                        "profile_image": "https://www.gravatar.com/avatar/28bded5c50ed09576bdd8f8b7e72311b?s=256&d=identicon&r=PG&f=y&so-version=2",
+                                        "display_name": "ChristophE",
+                                        "link": "https://stackoverflow.com/users/5533591/christophe"
+                                    },
+                                    "edited": false,
+                                    "score": 1,
+                                    "creation_date": "{{now format='epoch'}}",
+                                    "post_id": 79276676,
+                                    "comment_id": 139796945,
+                                    "content_license": "CC BY-SA 4.0",
+                                    "body_markdown": "This does not really answer the question &quot;why&quot; it is that way.",
+                                    "link": "https://stackoverflow.com/questions/79276625/why-java-util-random-need-to-be-synchronized/79276676#comment139796945_79276676",
+                                    "body": "This does not really answer the question &quot;why&quot; it is that way."
+                                },
+                                {
+                                    "owner": {
+                                        "account_id": 23431785,
+                                        "reputation": 597,
+                                        "user_id": 17490497,
+                                        "user_type": "registered",
+                                        "profile_image": "https://lh3.googleusercontent.com/a-/AOh14GgoCfudnISaBLKFnV9j9mRb0v4zmmidJDhKyBcv=k-s256",
+                                        "display_name": "Jean-Samuel Girard",
+                                        "link": "https://stackoverflow.com/users/17490497/jean-samuel-girard"
+                                    },
+                                    "reply_to_user": {
+                                        "account_id": 7254391,
+                                        "reputation": 873,
+                                        "user_id": 5533591,
+                                        "user_type": "registered",
+                                        "accept_rate": 100,
+                                        "profile_image": "https://www.gravatar.com/avatar/28bded5c50ed09576bdd8f8b7e72311b?s=256&d=identicon&r=PG&f=y&so-version=2",
+                                        "display_name": "ChristophE",
+                                        "link": "https://stackoverflow.com/users/5533591/christophe"
+                                    },
+                                    "edited": false,
+                                    "score": 0,
+                                    "creation_date": "{{now format='epoch'}}",
+                                    "post_id": 79276676,
+                                    "comment_id": 139798738,
+                                    "content_license": "CC BY-SA 4.0",
+                                    "body_markdown": "@ChristophE I think I misunderstood the question. It&#39;s about the design choices that lead to this behavior, I understood it as &quot;why does the behavior occur&quot;. I think my answer is still relevant.",
+                                    "link": "https://stackoverflow.com/questions/79276625/why-java-util-random-need-to-be-synchronized/79276676#comment139798738_79276676",
+                                    "body": "@ChristophE I think I misunderstood the question. It&#39;s about the design choices that lead to this behavior, I understood it as &quot;why does the behavior occur&quot;. I think my answer is still relevant."
+                                },
+                                {
+                                    "owner": {
+                                        "account_id": 26377,
+                                        "reputation": 362752,
+                                        "user_id": 68587,
+                                        "user_type": "registered",
+                                        "accept_rate": 95,
+                                        "profile_image": "https://www.gravatar.com/avatar/7d9fd158e03cbde94f7e0b33b78222af?s=256&d=identicon&r=PG",
+                                        "display_name": "John Kugelman",
+                                        "link": "https://stackoverflow.com/users/68587/john-kugelman"
+                                    },
+                                    "edited": false,
+                                    "score": 0,
+                                    "creation_date": "{{now format='epoch'}}",
+                                    "post_id": 79276676,
+                                    "comment_id": 139799062,
+                                    "content_license": "CC BY-SA 4.0",
+                                    "body_markdown": "It could just as easily be an unsynchronized, non-thread-safe class. They could have made it users&#39; responsibility to synchronize externally if sharing a `Random` object across threads. I suspect the answer is that early in Java&#39;s design they added synchronization to many classes like `Random` and `Vector`, only to realize down the road that adds an unnecessary performance penalty for single-threaded code.",
+                                    "link": "https://stackoverflow.com/questions/79276625/why-java-util-random-need-to-be-synchronized/79276676#comment139799062_79276676",
+                                    "body": "It could just as easily be an unsynchronized, non-thread-safe class. They could have made it users&#39; responsibility to synchronize externally if sharing a <code>Random</code> object across threads. I suspect the answer is that early in Java&#39;s design they added synchronization to many classes like <code>Random</code> and <code>Vector</code>, only to realize down the road that adds an unnecessary performance penalty for single-threaded code."
+                                },
+                                {
+                                    "owner": {
+                                        "account_id": 401843,
+                                        "reputation": 104612,
+                                        "user_id": 768644,
+                                        "user_type": "registered",
+                                        "profile_image": "https://www.gravatar.com/avatar/b13bedc5215730fbce5edff6c130988a?s=256&d=identicon&r=PG",
+                                        "display_name": "rzwitserloot",
+                                        "link": "https://stackoverflow.com/users/768644/rzwitserloot"
+                                    },
+                                    "reply_to_user": {
+                                        "account_id": 26377,
+                                        "reputation": 362752,
+                                        "user_id": 68587,
+                                        "user_type": "registered",
+                                        "accept_rate": 95,
+                                        "profile_image": "https://www.gravatar.com/avatar/7d9fd158e03cbde94f7e0b33b78222af?s=256&d=identicon&r=PG",
+                                        "display_name": "John Kugelman",
+                                        "link": "https://stackoverflow.com/users/68587/john-kugelman"
+                                    },
+                                    "edited": false,
+                                    "score": 0,
+                                    "creation_date": "{{now format='epoch'}}",
+                                    "post_id": 79276676,
+                                    "comment_id": 139799980,
+                                    "content_license": "CC BY-SA 4.0",
+                                    "body_markdown": "@JohnKugelman that feels like an afterthought, in that `Random` _still_ could not  be used in a way that it doesn&#39;t cause locking issues; if it worked like you said, it would &#39;silently&#39; asplode (e.g. repeat values, possibly a security issue, a massive cost; a bug you can&#39;t easily find is very bad). As to _why_ it is &#39;internally synchronized&#39;, probably what you said. But worth noting: These days, having lots of `synchronized` in code that doesn&#39;t ever run in more than one thread isn&#39;t actually very expensive; hotspot eliminates nearly all of that cost.",
+                                    "link": "https://stackoverflow.com/questions/79276625/why-java-util-random-need-to-be-synchronized/79276676#comment139799980_79276676",
+                                    "body": "@JohnKugelman that feels like an afterthought, in that <code>Random</code> <i>still</i> could not  be used in a way that it doesn&#39;t cause locking issues; if it worked like you said, it would &#39;silently&#39; asplode (e.g. repeat values, possibly a security issue, a massive cost; a bug you can&#39;t easily find is very bad). As to <i>why</i> it is &#39;internally synchronized&#39;, probably what you said. But worth noting: These days, having lots of <code>synchronized</code> in code that doesn&#39;t ever run in more than one thread isn&#39;t actually very expensive; hotspot eliminates nearly all of that cost."
+                                },
+                                {
+                                    "owner": {
+                                        "account_id": 26377,
+                                        "reputation": 362752,
+                                        "user_id": 68587,
+                                        "user_type": "registered",
+                                        "accept_rate": 95,
+                                        "profile_image": "https://www.gravatar.com/avatar/7d9fd158e03cbde94f7e0b33b78222af?s=256&d=identicon&r=PG",
+                                        "display_name": "John Kugelman",
+                                        "link": "https://stackoverflow.com/users/68587/john-kugelman"
+                                    },
+                                    "reply_to_user": {
+                                        "account_id": 401843,
+                                        "reputation": 104612,
+                                        "user_id": 768644,
+                                        "user_type": "registered",
+                                        "profile_image": "https://www.gravatar.com/avatar/b13bedc5215730fbce5edff6c130988a?s=256&d=identicon&r=PG",
+                                        "display_name": "rzwitserloot",
+                                        "link": "https://stackoverflow.com/users/768644/rzwitserloot"
+                                    },
+                                    "edited": false,
+                                    "score": 0,
+                                    "creation_date": "{{now format='epoch'}}",
+                                    "post_id": 79276676,
+                                    "comment_id": 139800100,
+                                    "content_license": "CC BY-SA 4.0",
+                                    "body_markdown": "@rzwitserloot It is the default and normal for classes not to be thread-safe. `ArrayList` is a non-thread-safe `Vector` and the Java community switched over to it because of that, not despite it.",
+                                    "link": "https://stackoverflow.com/questions/79276625/why-java-util-random-need-to-be-synchronized/79276676#comment139800100_79276676",
+                                    "body": "@rzwitserloot It is the default and normal for classes not to be thread-safe. <code>ArrayList</code> is a non-thread-safe <code>Vector</code> and the Java community switched over to it because of that, not despite it."
+                                },
+                                {
+                                    "owner": {
+                                        "account_id": 401843,
+                                        "reputation": 104612,
+                                        "user_id": 768644,
+                                        "user_type": "registered",
+                                        "profile_image": "https://www.gravatar.com/avatar/b13bedc5215730fbce5edff6c130988a?s=256&d=identicon&r=PG",
+                                        "display_name": "rzwitserloot",
+                                        "link": "https://stackoverflow.com/users/768644/rzwitserloot"
+                                    },
+                                    "reply_to_user": {
+                                        "account_id": 26377,
+                                        "reputation": 362752,
+                                        "user_id": 68587,
+                                        "user_type": "registered",
+                                        "accept_rate": 95,
+                                        "profile_image": "https://www.gravatar.com/avatar/7d9fd158e03cbde94f7e0b33b78222af?s=256&d=identicon&r=PG",
+                                        "display_name": "John Kugelman",
+                                        "link": "https://stackoverflow.com/users/68587/john-kugelman"
+                                    },
+                                    "edited": false,
+                                    "score": 0,
+                                    "creation_date": "{{now format='epoch'}}",
+                                    "post_id": 79276676,
+                                    "comment_id": 139800786,
+                                    "content_license": "CC BY-SA 4.0",
+                                    "body_markdown": "@JohnKugelman It&#39;s not. There is no particular default. In the past, the default was &#39;synchronized&#39;, then for a while it was &#39;definitely NOT synchronized and the JDK even has non-synced clone classes (StringBuilder being a non-synced version of StringBuffer)&#39;, and now it&#39;s: Whatever makes sense, which is generally not synchronized, but it no longer matters much for performance. If StringBuilder hadn&#39;t existed yet, it would never be done today most likely.",
+                                    "link": "https://stackoverflow.com/questions/79276625/why-java-util-random-need-to-be-synchronized/79276676#comment139800786_79276676",
+                                    "body": "@JohnKugelman It&#39;s not. There is no particular default. In the past, the default was &#39;synchronized&#39;, then for a while it was &#39;definitely NOT synchronized and the JDK even has non-synced clone classes (StringBuilder being a non-synced version of StringBuffer)&#39;, and now it&#39;s: Whatever makes sense, which is generally not synchronized, but it no longer matters much for performance. If StringBuilder hadn&#39;t existed yet, it would never be done today most likely."
+                                }
+                            ],
+                            "owner": {
+                                "account_id": 23431785,
+                                "reputation": 597,
+                                "user_id": 17490497,
+                                "user_type": "registered",
+                                "profile_image": "https://lh3.googleusercontent.com/a-/AOh14GgoCfudnISaBLKFnV9j9mRb0v4zmmidJDhKyBcv=k-s256",
+                                "display_name": "Jean-Samuel Girard",
+                                "link": "https://stackoverflow.com/users/17490497/jean-samuel-girard"
+                            },
+                            "creation_date": "{{now format='epoch'}}",
+                            "body_markdown": "**It&#39;s a thread contention problem as stated in the Java [documentation][1]** \r\n\r\nIn other words, Since you are sharing an instance of Random to multiple threads, whenever one of the threads attempts to get the next Random number it has to &quot;lock&quot; the instance to perform the work and get the next number. At the same time another thread tries to generate a number with the same instance, it has to wait for the first thread to complete its work and release the &quot;lock&quot; before it can start for the next number.\r\n\r\nEach instance of Random can only generate one number at a time.\r\n\r\nWith ThreadLocalRandom you eliminate that problem, because each thread uses it&#39;s own Random instance.\r\n\r\n___\r\n\r\n**EDIT:** Someone pointed out this doesn&#39;t explain why Random works in that way, in short, this is because of the specs. An other answer explained it well, but simply put Random guarantees that given the same seed and the same method calls in the same order will always result in the same output. This could not be achieved if the threads could work on the instance at the same time because you would mess up with the ordering.\r\n\r\nAs to why they chose to design the specs that way, this is a common approach in multiple languages because generating the same numbers between multiple program runs is a common use case that would otherwise be hard to implement without the use of Random.\r\n\r\n___\r\n\r\n**EDIT:**\r\nIt&#39;s been a while since I touched any Java and remembered that there was this feature of class instances getting synchronized between threads automatically, but I incorrectly assumed this was the default behavior of any class when multiple threads were running. \r\nTo be honest I don&#39;t know why they chose to make it synchronized, it&#39;s not the only class made like that either. They made a choice and went with it. It probably would&#39;ve made more sense to just make it non-thread-safe, but that&#39;s not how it is.\r\n\r\n  [1]: https://docs.oracle.com/javase/8/docs/api/java/util/Random.html",
+                            "link": "https://stackoverflow.com/questions/79276625/why-java-util-random-need-to-be-synchronized/79276676#79276676",
+                            "body": "<p><strong>It's a thread contention problem as stated in the Java <a href=\"https://docs.oracle.com/javase/8/docs/api/java/util/Random.html\" rel=\"nofollow noreferrer\">documentation</a></strong></p>\n<p>In other words, Since you are sharing an instance of Random to multiple threads, whenever one of the threads attempts to get the next Random number it has to &quot;lock&quot; the instance to perform the work and get the next number. At the same time another thread tries to generate a number with the same instance, it has to wait for the first thread to complete its work and release the &quot;lock&quot; before it can start for the next number.</p>\n<p>Each instance of Random can only generate one number at a time.</p>\n<p>With ThreadLocalRandom you eliminate that problem, because each thread uses it's own Random instance.</p>\n<hr />\n<p><strong>EDIT:</strong> Someone pointed out this doesn't explain why Random works in that way, in short, this is because of the specs. An other answer explained it well, but simply put Random guarantees that given the same seed and the same method calls in the same order will always result in the same output. This could not be achieved if the threads could work on the instance at the same time because you would mess up with the ordering.</p>\n<p>As to why they chose to design the specs that way, this is a common approach in multiple languages because generating the same numbers between multiple program runs is a common use case that would otherwise be hard to implement without the use of Random.</p>\n<hr />\n<p><strong>EDIT:</strong>\nIt's been a while since I touched any Java and remembered that there was this feature of class instances getting synchronized between threads automatically, but I incorrectly assumed this was the default behavior of any class when multiple threads were running.\nTo be honest I don't know why they chose to make it synchronized, it's not the only class made like that either. They made a choice and went with it. It probably would've made more sense to just make it non-thread-safe, but that's not how it is.</p>\n"
+                        },
+                        {
+                            "comments": [
+                                {
+                                    "owner": {
+                                        "account_id": 2053598,
+                                        "reputation": 44519,
+                                        "user_id": 1831987,
+                                        "user_type": "registered",
+                                        "profile_image": "https://www.gravatar.com/avatar/38b1c37530189ec4471a43a618e33f67?s=256&d=identicon&r=PG",
+                                        "display_name": "VGR",
+                                        "link": "https://stackoverflow.com/users/1831987/vgr"
+                                    },
+                                    "edited": false,
+                                    "score": 0,
+                                    "creation_date": "{{now format='epoch'}}",
+                                    "post_id": 79276858,
+                                    "comment_id": 139799160,
+                                    "content_license": "CC BY-SA 4.0",
+                                    "body_markdown": "It took a while, but Java 17 did add [that abstraction](https://docs.oracle.com/en/java/javase/23/docs/api/java.base/java/util/random/RandomGenerator.html).",
+                                    "link": "https://stackoverflow.com/questions/79276625/why-java-util-random-need-to-be-synchronized/79276858#comment139799160_79276858",
+                                    "body": "It took a while, but Java 17 did add <a href=\"https://docs.oracle.com/en/java/javase/23/docs/api/java.base/java/util/random/RandomGenerator.html\" rel=\"nofollow noreferrer\">that abstraction</a>."
+                                }
+                            ],
+                            "owner": {
+                                "account_id": 401843,
+                                "reputation": 104612,
+                                "user_id": 768644,
+                                "user_type": "registered",
+                                "profile_image": "https://www.gravatar.com/avatar/b13bedc5215730fbce5edff6c130988a?s=256&d=identicon&r=PG",
+                                "display_name": "rzwitserloot",
+                                "link": "https://stackoverflow.com/users/768644/rzwitserloot"
+                            },
+                            "creation_date": "{{now format='epoch'}}",
+                            "body_markdown": "`Random` works on the basis of a seed value; create a new instance of `Random` with the same seed value and out come the same numbers, in the same order, every time.\r\n\r\nThis is inherent to `Random`; the spec _demands_ that it works this way. Straight from the javadoc:\r\n\r\n&gt; An instance of this class is used to generate a stream of pseudorandom numbers. The class uses a 48-bit seed, which is modified using a linear congruential formula. (See Donald Knuth, The Art of Computer Programming, Volume 2, Section 3.2.1.)\r\n\r\nIt does this (and _has to_, as per spec) even if you don&#39;t bother with a seed value. If you don&#39;t bother with it (just `new Random()`) you get a random seed value, but, there still is one. You can reset it even (with [`setSeed()`](https://docs.oracle.com/javase/8/docs/api/java/util/Random.html#setSeed-long-)).\r\n\r\nThe system is __fundamentally__ synchronized. When explaining a spec, the moment you say &#39;in the same order&#39;, you lose the game immediately. Those words lock you into synchronizing the lot (or not doing so and having the thing fall to bits, i.e. spec dictates that unsynced access means bizarre things can occur, such as repeated values). They didn&#39;t do that for kicks - it&#39;s to enable that seed functionality.\r\n\r\n_But I don&#39;t care or need it!_\r\n\r\nGreat, but, that&#39;s not how specs work. That&#39;s why there&#39;s ThreadLocal, which _does_ have a seed value but each thread has its own completely independent rng and seed, or various other sources of randomness which make no promises about the reliability of the emitted sequence in the face of repeating the seed value, thus &#39;freeing&#39; it from the shackles that that implies (Namely, that access has to be ordered, which requires locking).\r\n\r\nProgramming is hard. Abstraction is _very_ hard.\r\n\r\nIn this specific case you thought Random is an abstraction for a concept that doesn&#39;t have anything whatsoever to do with ordering, so why in the blazes would a lock even apply? Except, Random is an abstraction that can cover many use cases, and &#39;same numbers in the same order&#39; is one of those use cases.\r\n\r\nThis is common: multicore performance and multicore behaviour in general &#39;does not compose&#39; - you can&#39;t just write components such that the concurrency of each component makes sense and is easy/obvious to use, and _also_ have that if you slap these components together that the end result automatically has sensible behaviour and performance as well.\r\n\r\nAlternate designs are imaginable; for example, a basic `Random` class or more likely interface that makes very few guarantees and locks down very little (such as: It would make no promises about concurrent behaviour at all, it would make no promises about how it works, it would neither offer a way to initialize one based off of a seed value nor would it have `setSeed`), and then various implementations or even a factory toolkit concept where you pass in your particular desires (such as &#39;I want it to be seed based&#39; or &#39;I want it to be as fast as possible; I will accept, as long as it is rare, that 2 concurrent threads end up getting identical values, speed is more important to me&#39;), but that&#39;d be a rather heavyhanded, kinda &#39;overengineered&#39; feel, and such extremes are best left to libraries instead of the core; libraries can update and break API if it is warrented. Core can pretty much never do that.\r\n",
+                            "link": "https://stackoverflow.com/questions/79276625/why-java-util-random-need-to-be-synchronized/79276858#79276858",
+                            "body": "<p><code>Random</code> works on the basis of a seed value; create a new instance of <code>Random</code> with the same seed value and out come the same numbers, in the same order, every time.</p>\n<p>This is inherent to <code>Random</code>; the spec <em>demands</em> that it works this way. Straight from the javadoc:</p>\n<blockquote>\n<p>An instance of this class is used to generate a stream of pseudorandom numbers. The class uses a 48-bit seed, which is modified using a linear congruential formula. (See Donald Knuth, The Art of Computer Programming, Volume 2, Section 3.2.1.)</p>\n</blockquote>\n<p>It does this (and <em>has to</em>, as per spec) even if you don't bother with a seed value. If you don't bother with it (just <code>new Random()</code>) you get a random seed value, but, there still is one. You can reset it even (with <a href=\"https://docs.oracle.com/javase/8/docs/api/java/util/Random.html#setSeed-long-\" rel=\"noreferrer\"><code>setSeed()</code></a>).</p>\n<p>The system is <strong>fundamentally</strong> synchronized. When explaining a spec, the moment you say 'in the same order', you lose the game immediately. Those words lock you into synchronizing the lot (or not doing so and having the thing fall to bits, i.e. spec dictates that unsynced access means bizarre things can occur, such as repeated values). They didn't do that for kicks - it's to enable that seed functionality.</p>\n<p><em>But I don't care or need it!</em></p>\n<p>Great, but, that's not how specs work. That's why there's ThreadLocal, which <em>does</em> have a seed value but each thread has its own completely independent rng and seed, or various other sources of randomness which make no promises about the reliability of the emitted sequence in the face of repeating the seed value, thus 'freeing' it from the shackles that that implies (Namely, that access has to be ordered, which requires locking).</p>\n<p>Programming is hard. Abstraction is <em>very</em> hard.</p>\n<p>In this specific case you thought Random is an abstraction for a concept that doesn't have anything whatsoever to do with ordering, so why in the blazes would a lock even apply? Except, Random is an abstraction that can cover many use cases, and 'same numbers in the same order' is one of those use cases.</p>\n<p>This is common: multicore performance and multicore behaviour in general 'does not compose' - you can't just write components such that the concurrency of each component makes sense and is easy/obvious to use, and <em>also</em> have that if you slap these components together that the end result automatically has sensible behaviour and performance as well.</p>\n<p>Alternate designs are imaginable; for example, a basic <code>Random</code> class or more likely interface that makes very few guarantees and locks down very little (such as: It would make no promises about concurrent behaviour at all, it would make no promises about how it works, it would neither offer a way to initialize one based off of a seed value nor would it have <code>setSeed</code>), and then various implementations or even a factory toolkit concept where you pass in your particular desires (such as 'I want it to be seed based' or 'I want it to be as fast as possible; I will accept, as long as it is rare, that 2 concurrent threads end up getting identical values, speed is more important to me'), but that'd be a rather heavyhanded, kinda 'overengineered' feel, and such extremes are best left to libraries instead of the core; libraries can update and break API if it is warrented. Core can pretty much never do that.</p>\n"
+                        }
+                    ],
+                    "owner": {
+                        "account_id": 28583692,
+                        "reputation": 41,
+                        "user_id": 21884343,
+                        "user_type": "registered",
+                        "profile_image": "https://lh3.googleusercontent.com/a/AGNmyxbN6Ts-PKEe9dP_CufmdqWCLI8tnVo1MgZhQ6F_Jw=k-s256",
+                        "display_name": "onekram",
+                        "link": "https://stackoverflow.com/users/21884343/onekram"
+                    },
+                    "is_answered": true,
+                    "view_count": 157,
+                    "answer_count": 2,
+                    "last_activity_date": 1734400795,
+                    "creation_date": "{{now format='epoch'}}",
+                    "last_edit_date": 1734400795,
+                    "question_id": 79276625,
+                    "link": "https://stackoverflow.com/questions/79276625/why-java-util-random-need-to-be-synchronized",
+                    "title": "Why java.util.Random need to be synchronized?"
+                }
+            ],
+            "has_more": false,
+            "quota_max": 10000,
+            "quota_remaining": 9705
+        }
+    }
+}

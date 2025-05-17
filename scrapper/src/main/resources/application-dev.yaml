@@ -1,0 +1,31 @@
+app:
+  github-token: ${GITHUB_TOKEN}
+  stackoverflow:
+    key: ${SO_TOKEN_KEY}
+    access-token: ${SO_ACCESS_TOKEN}
+  github-api-url: ${GITHUB_API_URL}
+  bot-url: ${BOT_URL}
+  fixed-rate-scheduling: 15000
+  stack-overflow-api-url: ${SO_API_URL}
+
+features:
+  orm:
+    enabled: true
+
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:${POSTGRES_PORT}/${POSTGRES_DB}
+    username: ${POSTGRES_USER}
+    password: ${POSTGRES_PASSWORD}
+    driver-class-name: org.postgresql.Driver
+  liquibase:
+    enabled: false
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    open-in-view: false
+
+springdoc:
+  swagger-ui:
+    enabled: true
+    path: /swagger-ui

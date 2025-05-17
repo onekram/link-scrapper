@@ -1,27 +1,39 @@
 app:
-  github-token: ${GITHUB_TOKEN} # env variable
-  stackoverflow:
-    key: ${SO_TOKEN_KEY}
-    access-token: ${SO_ACCESS_TOKEN}
-  github-api-url: "https://api.github.com"
-  bot-url: "http://localhost:8080"
-  fixed-rate-scheduling: 4000
-  stack-overflow-api-url: "https://api.stackexchange.com/2.3"
+  filter: "!51spuRwZiq)pz3ajPISQFVxv)9LOZJaAo6Iueu"
 
 spring:
   application:
     name: Scrapper
-  liquibase:
-    enabled: false
   jpa:
     hibernate:
       ddl-auto: validate
     open-in-view: false
+  jackson:
+    deserialization:
+      fail-on-unknown-properties: true
+  task:
+    execution:
+      pool:
+        core-size: 8
+        max-size: 16
+        queue-capacity: 500
+      thread-name-prefix: task-executor-
+      shutdown:
+        await-termination: true
+        await-termination-period: 10s
+    scheduling:
+      pool:
+        size: 2
+      shutdown:
+        await-termination: true
+        await-termination-period: 10s
+
+pagination:
+  page-size: 100
 
 server:
   port: 8081
 
-springdoc:
-  swagger-ui:
-    enabled: true
-    path: /swagger-ui
+logging:
+  level:
+    root: info

@@ -1,7 +1,7 @@
 package backend.academy.scrapper.client.stackoverflow;
 
 import backend.academy.scrapper.ScrapperConfig;
-import backend.academy.scrapper.client.model.StackOverflowApiErrorResponse;
+import backend.academy.scrapper.client.model.stackoverflow.StackOverflowApiErrorResponse;
 import java.net.URI;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
@@ -29,18 +29,20 @@ public class StackOverflowClientConfig {
                 .defaultHeader(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE)
                 .filter(addQueryParams(
                         scrapperConfig.stackOverflow().accessToken(),
-                        scrapperConfig.stackOverflow().key()))
+                        scrapperConfig.stackOverflow().key(),
+                        scrapperConfig.filter()))
                 .filter(logRequest)
                 .filter(logResponse)
                 .filter(errorHandler())
                 .build();
     }
 
-    private ExchangeFilterFunction addQueryParams(String accessToken, String key) {
+    private ExchangeFilterFunction addQueryParams(String accessToken, String key, String filter) {
         return (clientRequest, next) -> {
             URI modifiedUri = UriComponentsBuilder.fromUri(clientRequest.url())
                     .queryParam("key", key)
                     .queryParam("access_token", accessToken)
+                    .queryParam("filter", filter)
                     .build()
                     .toUri();
 
@@ -58,9 +60,9 @@ public class StackOverflowClientConfig {
                         .flatMap(errorBody -> {
                             log.error(
                                     "API Error: {} | Error name: {} | Message: {}",
-                                    errorBody.getErrorId(),
-                                    errorBody.getErrorName(),
-                                    errorBody.getErrorMessage());
+                                    errorBody.errorId(),
+                                    errorBody.errorName(),
+                                    errorBody.errorMessage());
                             return Mono.error(new RuntimeException());
                         })
                         .thenReturn(response);

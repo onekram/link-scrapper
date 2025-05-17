@@ -1,40 +1,41 @@
 package backend.academy.scrapper.update;
 
 import backend.academy.model.LinkUpdate;
+import backend.academy.scrapper.client.bot.UpdatesClient;
 import backend.academy.scrapper.parser.LinkType;
-import backend.academy.scrapper.repository.LinkRecord;
+import backend.academy.scrapper.repository.record.LinkRecord;
 import backend.academy.scrapper.service.LinksService;
-import java.time.Instant;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
+@Slf4j
 @RequiredArgsConstructor
 public abstract class AbstractUpdateService implements UpdateService {
-    private final LinksService linksService;
+    protected static final int PREVIEW_LENGTH = 200;
+    private final ThreadPoolTaskExecutor taskExecutor;
+    private final UpdatesClient updatesClient;
+    protected final LinksService linksService;
+
+    public Stream<LinkRecord> getLinks() {
+        return linksService.findAllByType(getLinkType());
+    }
 
     @Override
-    public List<LinkUpdate> getUpdates(Instant from) {
-        return linksService.fetchIdAndLinksByType(getLinkType()).entrySet().stream()
-                .flatMap(entry -> entry.getValue().stream().map(link -> Map.entry(entry.getKey(), link)))
-                .filter(entry -> isUpdated(entry.getValue(), from))
-                .collect(Collectors.groupingBy(
-                        entry -> entry.getValue().getUrl().toString(),
-                        Collectors.mapping(Map.Entry::getKey, Collectors.toList())))
-                .entrySet()
-                .stream()
-                .map(this::buildLinkUpdate)
-                .toList();
+    public void processUpdate() {
+        getLinks().forEach(linkRecord -> {
+            taskExecutor.execute(() -> {
+                try {
+                    buildLinkUpdate(linkRecord).forEach(updatesClient::updates);
+                } catch (Exception e) {
+                    log.error("Error while checking updates for link: {}", linkRecord.url(), e);
+                }
+            });
+        });
     }
-
-    private LinkUpdate buildLinkUpdate(Map.Entry<String, List<Long>> entry) {
-        return new LinkUpdate(System.currentTimeMillis(), entry.getKey(), getMessage(), entry.getValue());
-    }
-
-    protected abstract boolean isUpdated(LinkRecord linkRecord, Instant from);
 
     protected abstract LinkType getLinkType();
 
-    protected abstract String getMessage();
+    protected abstract Stream<LinkUpdate> buildLinkUpdate(LinkRecord linkRecord);
 }

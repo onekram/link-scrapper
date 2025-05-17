@@ -20,6 +20,7 @@ import com.pengrad.telegrambot.TelegramBot;
 import com.pengrad.telegrambot.model.request.Keyboard;
 import com.pengrad.telegrambot.model.request.ReplyKeyboardMarkup;
 import com.pengrad.telegrambot.model.request.ReplyKeyboardRemove;
+import com.pengrad.telegrambot.request.BaseRequest;
 import com.pengrad.telegrambot.request.SendMessage;
 import java.util.ResourceBundle;
 import java.util.function.Function;
@@ -47,13 +48,13 @@ class MessageHandlerTest {
     @DisplayName("HappyPath filters passed")
     void filtersPasssed() {
         when(resourceBundle.getString("menu.message")).thenReturn("Menu");
-        when(context.message()).thenReturn(TestUtil.generateMessage("mytext", 123L));
+        when(context.getChatId()).thenReturn(123L);
         when(context.bot()).thenReturn(bot);
 
         MessageHandler handler = MessageHandler.builder()
                 .withFilter(ignore -> true)
                 .message("Test message")
-                .menuButton(true)
+                .menuButton()
                 .build();
         setResourceBundle(handler, resourceBundle);
         invokePostConstruct(handler);
@@ -76,7 +77,7 @@ class MessageHandlerTest {
         MessageHandler handler = MessageHandler.builder()
                 .withFilter(ignore -> false)
                 .message("Test message")
-                .menuButton(true)
+                .menuButton()
                 .build();
         setResourceBundle(handler, resourceBundle);
         invokePostConstruct(handler);
@@ -84,7 +85,7 @@ class MessageHandlerTest {
         boolean result = handler.handle(context);
 
         assertFalse(result);
-        verifyNoInteractions(context);
+        verify(context, times(1)).isCallbackQuery();
         verifyNoInteractions(bot);
     }
 
@@ -92,7 +93,7 @@ class MessageHandlerTest {
     @DisplayName("Custom method")
     void customMethod() {
         SendMessage sendMessage = spy(new SendMessage(123L, "Custom"));
-        Function<HandlerContext, SendMessage> customMethod = ignore -> sendMessage;
+        Function<HandlerContext, BaseRequest<?, ?>> customMethod = ignore -> sendMessage;
         when(context.bot()).thenReturn(bot);
 
         MessageHandler handler = MessageHandler.builder()
@@ -112,7 +113,7 @@ class MessageHandlerTest {
     void customMethodKeyboardOverrides() {
         SendMessage sendMessage =
                 spy(new SendMessage(123L, "Custom").replyMarkup(new ReplyKeyboardMarkup("ButtonMethod")));
-        Function<HandlerContext, SendMessage> customMethod = ignore -> sendMessage;
+        Function<HandlerContext, BaseRequest<?, ?>> customMethod = ignore -> sendMessage;
         when(context.bot()).thenReturn(bot);
 
         MessageHandler handler = MessageHandler.builder()
@@ -137,7 +138,7 @@ class MessageHandlerTest {
     void customMethodOverrides() {
         SendMessage sendMessage =
                 spy(new SendMessage(123L, "Custom").replyMarkup(new ReplyKeyboardMarkup("ButtonMethod")));
-        Function<HandlerContext, SendMessage> customMethod = ignore -> sendMessage;
+        Function<HandlerContext, BaseRequest<?, ?>> customMethod = ignore -> sendMessage;
         when(context.bot()).thenReturn(bot);
 
         MessageHandler handler = MessageHandler.builder()
@@ -157,7 +158,7 @@ class MessageHandlerTest {
     void setMenuIfKeyboardIsNull() {
         when(resourceBundle.getString("menu.message")).thenReturn("Menu");
 
-        MessageHandler handler = MessageHandler.builder().menuButton(true).build();
+        MessageHandler handler = MessageHandler.builder().menuButton().build();
         setResourceBundle(handler, resourceBundle);
         invokePostConstruct(handler);
 
@@ -171,7 +172,7 @@ class MessageHandlerTest {
 
         MessageHandler handler = MessageHandler.builder()
                 .keyboard(new ReplyKeyboardRemove())
-                .menuButton(true)
+                .menuButton()
                 .build();
         setResourceBundle(handler, resourceBundle);
         invokePostConstruct(handler);
@@ -186,7 +187,7 @@ class MessageHandlerTest {
 
         ReplyKeyboardMarkup existing = new ReplyKeyboardMarkup("Button1");
         MessageHandler handler =
-                MessageHandler.builder().keyboard(existing).menuButton(true).build();
+                MessageHandler.builder().keyboard(existing).menuButton().build();
         setResourceBundle(handler, resourceBundle);
         invokePostConstruct(handler);
 
@@ -196,7 +197,7 @@ class MessageHandlerTest {
     @Test
     @DisplayName("If menu button false keyboard is null")
     void keyboardIsNullWhenMenuNotEnabled() {
-        MessageHandler handler = MessageHandler.builder().menuButton(false).build();
+        MessageHandler handler = MessageHandler.builder().build();
         invokePostConstruct(handler);
         assertNull(TestUtil.getKeyboardFromHandler(handler));
     }

@@ -13,32 +13,32 @@ class MessageUtilTest {
     @Test
     void testNotEmpty() {
         String result = MessageUtil.linkMessage(
-                TestUtil.generateLinkResponse("url", List.of("tag1", "tag2"), List.of("filter1", "filter2")));
+                TestUtil.generateLinkResponse("resourceUrl", List.of("tag1", "tag2"), List.of("filter1", "filter2")));
         assertLines(3, result);
-        assertThat(result).contains("url", "tag1", "tag2", "filter1", "filter2");
+        assertThat(result).contains("resourceUrl", "tag1", "tag2", "filter1", "filter2");
     }
 
     @Test
     void testNoTags() {
         String result = MessageUtil.linkMessage(
-                TestUtil.generateLinkResponse("url", Collections.emptyList(), List.of("filter1", "filter2")));
+                TestUtil.generateLinkResponse("resourceUrl", Collections.emptyList(), List.of("filter1", "filter2")));
         assertLines(2, result);
-        assertThat(result).contains("url", "filter1", "filter2");
+        assertThat(result).contains("resourceUrl", "filter1", "filter2");
     }
 
     @Test
     void testNoFilters() {
         String result = MessageUtil.linkMessage(
-                TestUtil.generateLinkResponse("url", List.of("tag1", "tag2"), Collections.emptyList()));
+                TestUtil.generateLinkResponse("resourceUrl", List.of("tag1", "tag2"), Collections.emptyList()));
         assertLines(2, result);
-        assertThat(result).contains("url", "tag1", "tag2");
+        assertThat(result).contains("resourceUrl", "tag1", "tag2");
     }
 
     @Test
     void testNoParameters() {
-        String result = MessageUtil.linkMessage(TestUtil.generateLinkResponse("url"));
+        String result = MessageUtil.linkMessage(TestUtil.generateLinkResponse("resourceUrl"));
         assertLines(1, result);
-        assertThat(result).contains("url");
+        assertThat(result).contains("resourceUrl");
     }
 
     private void assertLines(int count, String result) {

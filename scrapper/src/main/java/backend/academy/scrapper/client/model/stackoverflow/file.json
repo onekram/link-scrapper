@@ -1,0 +1,330 @@
+{
+    "items": [
+        {
+            "tags": [
+                "java",
+                "multithreading",
+                "random"
+            ],
+            "comments": [
+                {
+                    "owner": {
+                        "account_id": 7612423,
+                        "reputation": 86653,
+                        "user_id": 5772882,
+                        "user_type": "registered",
+                        "profile_image": "https://www.gravatar.com/avatar/8283c64511fa80afed5259d10850168f?s=256&d=identicon&r=PG&f=y&so-version=2",
+                        "display_name": "Anonymous",
+                        "link": "https://stackoverflow.com/users/5772882/anonymous"
+                    },
+                    "edited": false,
+                    "score": 0,
+                    "creation_date": 1734075853,
+                    "post_id": 79276625,
+                    "comment_id": 139796915,
+                    "content_license": "CC BY-SA 4.0"
+                },
+                {
+                    "owner": {
+                        "account_id": 422870,
+                        "reputation": 27403,
+                        "user_id": 801894,
+                        "user_type": "registered",
+                        "profile_image": "https://www.gravatar.com/avatar/67f2ccd17aa6fd622152ad88fc2ae784?s=256&d=identicon&r=PG",
+                        "display_name": "Solomon Slow",
+                        "link": "https://stackoverflow.com/users/801894/solomon-slow"
+                    },
+                    "reply_to_user": {
+                        "account_id": 7612423,
+                        "reputation": 86653,
+                        "user_id": 5772882,
+                        "user_type": "registered",
+                        "profile_image": "https://www.gravatar.com/avatar/8283c64511fa80afed5259d10850168f?s=256&d=identicon&r=PG&f=y&so-version=2",
+                        "display_name": "Anonymous",
+                        "link": "https://stackoverflow.com/users/5772882/anonymous"
+                    },
+                    "edited": false,
+                    "score": 0,
+                    "creation_date": 1734101225,
+                    "post_id": 79276625,
+                    "comment_id": 139798885,
+                    "content_license": "CC BY-SA 4.0"
+                },
+                {
+                    "owner": {
+                        "account_id": 23431785,
+                        "reputation": 597,
+                        "user_id": 17490497,
+                        "user_type": "registered",
+                        "profile_image": "https://lh3.googleusercontent.com/a-/AOh14GgoCfudnISaBLKFnV9j9mRb0v4zmmidJDhKyBcv=k-s256",
+                        "display_name": "Jean-Samuel Girard",
+                        "link": "https://stackoverflow.com/users/17490497/jean-samuel-girard"
+                    },
+                    "reply_to_user": {
+                        "account_id": 422870,
+                        "reputation": 27403,
+                        "user_id": 801894,
+                        "user_type": "registered",
+                        "profile_image": "https://www.gravatar.com/avatar/67f2ccd17aa6fd622152ad88fc2ae784?s=256&d=identicon&r=PG",
+                        "display_name": "Solomon Slow",
+                        "link": "https://stackoverflow.com/users/801894/solomon-slow"
+                    },
+                    "edited": false,
+                    "score": 0,
+                    "creation_date": 1734114199,
+                    "post_id": 79276625,
+                    "comment_id": 139800142,
+                    "content_license": "CC BY-SA 4.0"
+                },
+                {
+                    "owner": {
+                        "account_id": 422870,
+                        "reputation": 27403,
+                        "user_id": 801894,
+                        "user_type": "registered",
+                        "profile_image": "https://www.gravatar.com/avatar/67f2ccd17aa6fd622152ad88fc2ae784?s=256&d=identicon&r=PG",
+                        "display_name": "Solomon Slow",
+                        "link": "https://stackoverflow.com/users/801894/solomon-slow"
+                    },
+                    "edited": false,
+                    "score": 0,
+                    "creation_date": 1734124880,
+                    "post_id": 79276625,
+                    "comment_id": 139800861,
+                    "content_license": "CC BY-SA 4.0"
+                }
+            ],
+            "answers": [
+                {
+                    "comments": [
+                        {
+                            "owner": {
+                                "account_id": 7254391,
+                                "reputation": 873,
+                                "user_id": 5533591,
+                                "user_type": "registered",
+                                "accept_rate": 100,
+                                "profile_image": "https://www.gravatar.com/avatar/28bded5c50ed09576bdd8f8b7e72311b?s=256&d=identicon&r=PG&f=y&so-version=2",
+                                "display_name": "ChristophE",
+                                "link": "https://stackoverflow.com/users/5533591/christophe"
+                            },
+                            "edited": false,
+                            "score": 1,
+                            "creation_date": 1734076341,
+                            "post_id": 79276676,
+                            "comment_id": 139796945,
+                            "content_license": "CC BY-SA 4.0"
+                        },
+                        {
+                            "owner": {
+                                "account_id": 23431785,
+                                "reputation": 597,
+                                "user_id": 17490497,
+                                "user_type": "registered",
+                                "profile_image": "https://lh3.googleusercontent.com/a-/AOh14GgoCfudnISaBLKFnV9j9mRb0v4zmmidJDhKyBcv=k-s256",
+                                "display_name": "Jean-Samuel Girard",
+                                "link": "https://stackoverflow.com/users/17490497/jean-samuel-girard"
+                            },
+                            "reply_to_user": {
+                                "account_id": 7254391,
+                                "reputation": 873,
+                                "user_id": 5533591,
+                                "user_type": "registered",
+                                "accept_rate": 100,
+                                "profile_image": "https://www.gravatar.com/avatar/28bded5c50ed09576bdd8f8b7e72311b?s=256&d=identicon&r=PG&f=y&so-version=2",
+                                "display_name": "ChristophE",
+                                "link": "https://stackoverflow.com/users/5533591/christophe"
+                            },
+                            "edited": false,
+                            "score": 0,
+                            "creation_date": 1734099778,
+                            "post_id": 79276676,
+                            "comment_id": 139798738,
+                            "content_license": "CC BY-SA 4.0"
+                        },
+                        {
+                            "owner": {
+                                "account_id": 26377,
+                                "reputation": 362752,
+                                "user_id": 68587,
+                                "user_type": "registered",
+                                "accept_rate": 95,
+                                "profile_image": "https://www.gravatar.com/avatar/7d9fd158e03cbde94f7e0b33b78222af?s=256&d=identicon&r=PG",
+                                "display_name": "John Kugelman",
+                                "link": "https://stackoverflow.com/users/68587/john-kugelman"
+                            },
+                            "edited": false,
+                            "score": 0,
+                            "creation_date": 1734102879,
+                            "post_id": 79276676,
+                            "comment_id": 139799062,
+                            "content_license": "CC BY-SA 4.0"
+                        },
+                        {
+                            "owner": {
+                                "account_id": 401843,
+                                "reputation": 104612,
+                                "user_id": 768644,
+                                "user_type": "registered",
+                                "profile_image": "https://www.gravatar.com/avatar/b13bedc5215730fbce5edff6c130988a?s=256&d=identicon&r=PG",
+                                "display_name": "rzwitserloot",
+                                "link": "https://stackoverflow.com/users/768644/rzwitserloot"
+                            },
+                            "reply_to_user": {
+                                "account_id": 26377,
+                                "reputation": 362752,
+                                "user_id": 68587,
+                                "user_type": "registered",
+                                "accept_rate": 95,
+                                "profile_image": "https://www.gravatar.com/avatar/7d9fd158e03cbde94f7e0b33b78222af?s=256&d=identicon&r=PG",
+                                "display_name": "John Kugelman",
+                                "link": "https://stackoverflow.com/users/68587/john-kugelman"
+                            },
+                            "edited": false,
+                            "score": 0,
+                            "creation_date": 1734111973,
+                            "post_id": 79276676,
+                            "comment_id": 139799980,
+                            "content_license": "CC BY-SA 4.0"
+                        },
+                        {
+                            "owner": {
+                                "account_id": 26377,
+                                "reputation": 362752,
+                                "user_id": 68587,
+                                "user_type": "registered",
+                                "accept_rate": 95,
+                                "profile_image": "https://www.gravatar.com/avatar/7d9fd158e03cbde94f7e0b33b78222af?s=256&d=identicon&r=PG",
+                                "display_name": "John Kugelman",
+                                "link": "https://stackoverflow.com/users/68587/john-kugelman"
+                            },
+                            "reply_to_user": {
+                                "account_id": 401843,
+                                "reputation": 104612,
+                                "user_id": 768644,
+                                "user_type": "registered",
+                                "profile_image": "https://www.gravatar.com/avatar/b13bedc5215730fbce5edff6c130988a?s=256&d=identicon&r=PG",
+                                "display_name": "rzwitserloot",
+                                "link": "https://stackoverflow.com/users/768644/rzwitserloot"
+                            },
+                            "edited": false,
+                            "score": 0,
+                            "creation_date": 1734113577,
+                            "post_id": 79276676,
+                            "comment_id": 139800100,
+                            "content_license": "CC BY-SA 4.0"
+                        },
+                        {
+                            "owner": {
+                                "account_id": 401843,
+                                "reputation": 104612,
+                                "user_id": 768644,
+                                "user_type": "registered",
+                                "profile_image": "https://www.gravatar.com/avatar/b13bedc5215730fbce5edff6c130988a?s=256&d=identicon&r=PG",
+                                "display_name": "rzwitserloot",
+                                "link": "https://stackoverflow.com/users/768644/rzwitserloot"
+                            },
+                            "reply_to_user": {
+                                "account_id": 26377,
+                                "reputation": 362752,
+                                "user_id": 68587,
+                                "user_type": "registered",
+                                "accept_rate": 95,
+                                "profile_image": "https://www.gravatar.com/avatar/7d9fd158e03cbde94f7e0b33b78222af?s=256&d=identicon&r=PG",
+                                "display_name": "John Kugelman",
+                                "link": "https://stackoverflow.com/users/68587/john-kugelman"
+                            },
+                            "edited": false,
+                            "score": 0,
+                            "creation_date": 1734123627,
+                            "post_id": 79276676,
+                            "comment_id": 139800786,
+                            "content_license": "CC BY-SA 4.0"
+                        }
+                    ],
+                    "owner": {
+                        "account_id": 23431785,
+                        "reputation": 597,
+                        "user_id": 17490497,
+                        "user_type": "registered",
+                        "profile_image": "https://lh3.googleusercontent.com/a-/AOh14GgoCfudnISaBLKFnV9j9mRb0v4zmmidJDhKyBcv=k-s256",
+                        "display_name": "Jean-Samuel Girard",
+                        "link": "https://stackoverflow.com/users/17490497/jean-samuel-girard"
+                    },
+                    "is_accepted": false,
+                    "score": -2,
+                    "last_activity_date": 1734107612,
+                    "last_edit_date": 1734107612,
+                    "creation_date": 1734039507,
+                    "answer_id": 79276676,
+                    "question_id": 79276625,
+                    "content_license": "CC BY-SA 4.0",
+                    "body_markdown": "**It&#39;s a thread contention problem as stated in the Java [documentation][1]** \r\n\r\nIn other words, Since you are sharing an instance of Random to multiple threads, whenever one of the threads attempts to get the next Random number it has to &quot;lock&quot; the instance to perform the work and get the next number. At the same time another thread tries to generate a number with the same instance, it has to wait for the first thread to complete its work and release the &quot;lock&quot; before it can start for the next number.\r\n\r\nEach instance of Random can only generate one number at a time.\r\n\r\nWith ThreadLocalRandom you eliminate that problem, because each thread uses it&#39;s own Random instance.\r\n\r\n___\r\n\r\n**EDIT:** Someone pointed out this doesn&#39;t explain why Random works in that way, in short, this is because of the specs. An other answer explained it well, but simply put Random guarantees that given the same seed and the same method calls in the same order will always result in the same output. This could not be achieved if the threads could work on the instance at the same time because you would mess up with the ordering.\r\n\r\nAs to why they chose to design the specs that way, this is a common approach in multiple languages because generating the same numbers between multiple program runs is a common use case that would otherwise be hard to implement without the use of Random.\r\n\r\n___\r\n\r\n**EDIT:**\r\nIt&#39;s been a while since I touched any Java and remembered that there was this feature of class instances getting synchronized between threads automatically, but I incorrectly assumed this was the default behavior of any class when multiple threads were running. \r\nTo be honest I don&#39;t know why they chose to make it synchronized, it&#39;s not the only class made like that either. They made a choice and went with it. It probably would&#39;ve made more sense to just make it non-thread-safe, but that&#39;s not how it is.\r\n\r\n  [1]: https://docs.oracle.com/javase/8/docs/api/java/util/Random.html",
+                    "body": "<p><strong>It's a thread contention problem as stated in the Java <a href=\"https://docs.oracle.com/javase/8/docs/api/java/util/Random.html\" rel=\"nofollow noreferrer\">documentation</a></strong></p>\n<p>In other words, Since you are sharing an instance of Random to multiple threads, whenever one of the threads attempts to get the next Random number it has to &quot;lock&quot; the instance to perform the work and get the next number. At the same time another thread tries to generate a number with the same instance, it has to wait for the first thread to complete its work and release the &quot;lock&quot; before it can start for the next number.</p>\n<p>Each instance of Random can only generate one number at a time.</p>\n<p>With ThreadLocalRandom you eliminate that problem, because each thread uses it's own Random instance.</p>\n<hr />\n<p><strong>EDIT:</strong> Someone pointed out this doesn't explain why Random works in that way, in short, this is because of the specs. An other answer explained it well, but simply put Random guarantees that given the same seed and the same method calls in the same order will always result in the same output. This could not be achieved if the threads could work on the instance at the same time because you would mess up with the ordering.</p>\n<p>As to why they chose to design the specs that way, this is a common approach in multiple languages because generating the same numbers between multiple program runs is a common use case that would otherwise be hard to implement without the use of Random.</p>\n<hr />\n<p><strong>EDIT:</strong>\nIt's been a while since I touched any Java and remembered that there was this feature of class instances getting synchronized between threads automatically, but I incorrectly assumed this was the default behavior of any class when multiple threads were running.\nTo be honest I don't know why they chose to make it synchronized, it's not the only class made like that either. They made a choice and went with it. It probably would've made more sense to just make it non-thread-safe, but that's not how it is.</p>\n"
+                },
+                {
+                    "comments": [
+                        {
+                            "owner": {
+                                "account_id": 2053598,
+                                "reputation": 44519,
+                                "user_id": 1831987,
+                                "user_type": "registered",
+                                "profile_image": "https://www.gravatar.com/avatar/38b1c37530189ec4471a43a618e33f67?s=256&d=identicon&r=PG",
+                                "display_name": "VGR",
+                                "link": "https://stackoverflow.com/users/1831987/vgr"
+                            },
+                            "edited": false,
+                            "score": 0,
+                            "creation_date": 1734103687,
+                            "post_id": 79276858,
+                            "comment_id": 139799160,
+                            "content_license": "CC BY-SA 4.0"
+                        }
+                    ],
+                    "owner": {
+                        "account_id": 401843,
+                        "reputation": 104612,
+                        "user_id": 768644,
+                        "user_type": "registered",
+                        "profile_image": "https://www.gravatar.com/avatar/b13bedc5215730fbce5edff6c130988a?s=256&d=identicon&r=PG",
+                        "display_name": "rzwitserloot",
+                        "link": "https://stackoverflow.com/users/768644/rzwitserloot"
+                    },
+                    "is_accepted": false,
+                    "score": 5,
+                    "last_activity_date": 1734045703,
+                    "creation_date": 1734045703,
+                    "answer_id": 79276858,
+                    "question_id": 79276625,
+                    "content_license": "CC BY-SA 4.0",
+                    "body_markdown": "`Random` works on the basis of a seed value; create a new instance of `Random` with the same seed value and out come the same numbers, in the same order, every time.\r\n\r\nThis is inherent to `Random`; the spec _demands_ that it works this way. Straight from the javadoc:\r\n\r\n&gt; An instance of this class is used to generate a stream of pseudorandom numbers. The class uses a 48-bit seed, which is modified using a linear congruential formula. (See Donald Knuth, The Art of Computer Programming, Volume 2, Section 3.2.1.)\r\n\r\nIt does this (and _has to_, as per spec) even if you don&#39;t bother with a seed value. If you don&#39;t bother with it (just `new Random()`) you get a random seed value, but, there still is one. You can reset it even (with [`setSeed()`](https://docs.oracle.com/javase/8/docs/api/java/util/Random.html#setSeed-long-)).\r\n\r\nThe system is __fundamentally__ synchronized. When explaining a spec, the moment you say &#39;in the same order&#39;, you lose the game immediately. Those words lock you into synchronizing the lot (or not doing so and having the thing fall to bits, i.e. spec dictates that unsynced access means bizarre things can occur, such as repeated values). They didn&#39;t do that for kicks - it&#39;s to enable that seed functionality.\r\n\r\n_But I don&#39;t care or need it!_\r\n\r\nGreat, but, that&#39;s not how specs work. That&#39;s why there&#39;s ThreadLocal, which _does_ have a seed value but each thread has its own completely independent rng and seed, or various other sources of randomness which make no promises about the reliability of the emitted sequence in the face of repeating the seed value, thus &#39;freeing&#39; it from the shackles that that implies (Namely, that access has to be ordered, which requires locking).\r\n\r\nProgramming is hard. Abstraction is _very_ hard.\r\n\r\nIn this specific case you thought Random is an abstraction for a concept that doesn&#39;t have anything whatsoever to do with ordering, so why in the blazes would a lock even apply? Except, Random is an abstraction that can cover many use cases, and &#39;same numbers in the same order&#39; is one of those use cases.\r\n\r\nThis is common: multicore performance and multicore behaviour in general &#39;does not compose&#39; - you can&#39;t just write components such that the concurrency of each component makes sense and is easy/obvious to use, and _also_ have that if you slap these components together that the end result automatically has sensible behaviour and performance as well.\r\n\r\nAlternate designs are imaginable; for example, a basic `Random` class or more likely interface that makes very few guarantees and locks down very little (such as: It would make no promises about concurrent behaviour at all, it would make no promises about how it works, it would neither offer a way to initialize one based off of a seed value nor would it have `setSeed`), and then various implementations or even a factory toolkit concept where you pass in your particular desires (such as &#39;I want it to be seed based&#39; or &#39;I want it to be as fast as possible; I will accept, as long as it is rare, that 2 concurrent threads end up getting identical values, speed is more important to me&#39;), but that&#39;d be a rather heavyhanded, kinda &#39;overengineered&#39; feel, and such extremes are best left to libraries instead of the core; libraries can update and break API if it is warrented. Core can pretty much never do that.\r\n",
+                    "body": "<p><code>Random</code> works on the basis of a seed value; create a new instance of <code>Random</code> with the same seed value and out come the same numbers, in the same order, every time.</p>\n<p>This is inherent to <code>Random</code>; the spec <em>demands</em> that it works this way. Straight from the javadoc:</p>\n<blockquote>\n<p>An instance of this class is used to generate a stream of pseudorandom numbers. The class uses a 48-bit seed, which is modified using a linear congruential formula. (See Donald Knuth, The Art of Computer Programming, Volume 2, Section 3.2.1.)</p>\n</blockquote>\n<p>It does this (and <em>has to</em>, as per spec) even if you don't bother with a seed value. If you don't bother with it (just <code>new Random()</code>) you get a random seed value, but, there still is one. You can reset it even (with <a href=\"https://docs.oracle.com/javase/8/docs/api/java/util/Random.html#setSeed-long-\" rel=\"noreferrer\"><code>setSeed()</code></a>).</p>\n<p>The system is <strong>fundamentally</strong> synchronized. When explaining a spec, the moment you say 'in the same order', you lose the game immediately. Those words lock you into synchronizing the lot (or not doing so and having the thing fall to bits, i.e. spec dictates that unsynced access means bizarre things can occur, such as repeated values). They didn't do that for kicks - it's to enable that seed functionality.</p>\n<p><em>But I don't care or need it!</em></p>\n<p>Great, but, that's not how specs work. That's why there's ThreadLocal, which <em>does</em> have a seed value but each thread has its own completely independent rng and seed, or various other sources of randomness which make no promises about the reliability of the emitted sequence in the face of repeating the seed value, thus 'freeing' it from the shackles that that implies (Namely, that access has to be ordered, which requires locking).</p>\n<p>Programming is hard. Abstraction is <em>very</em> hard.</p>\n<p>In this specific case you thought Random is an abstraction for a concept that doesn't have anything whatsoever to do with ordering, so why in the blazes would a lock even apply? Except, Random is an abstraction that can cover many use cases, and 'same numbers in the same order' is one of those use cases.</p>\n<p>This is common: multicore performance and multicore behaviour in general 'does not compose' - you can't just write components such that the concurrency of each component makes sense and is easy/obvious to use, and <em>also</em> have that if you slap these components together that the end result automatically has sensible behaviour and performance as well.</p>\n<p>Alternate designs are imaginable; for example, a basic <code>Random</code> class or more likely interface that makes very few guarantees and locks down very little (such as: It would make no promises about concurrent behaviour at all, it would make no promises about how it works, it would neither offer a way to initialize one based off of a seed value nor would it have <code>setSeed</code>), and then various implementations or even a factory toolkit concept where you pass in your particular desires (such as 'I want it to be seed based' or 'I want it to be as fast as possible; I will accept, as long as it is rare, that 2 concurrent threads end up getting identical values, speed is more important to me'), but that'd be a rather heavyhanded, kinda 'overengineered' feel, and such extremes are best left to libraries instead of the core; libraries can update and break API if it is warrented. Core can pretty much never do that.</p>\n"
+                }
+            ],
+            "owner": {
+                "account_id": 28583692,
+                "reputation": 41,
+                "user_id": 21884343,
+                "user_type": "registered",
+                "profile_image": "https://lh3.googleusercontent.com/a/AGNmyxbN6Ts-PKEe9dP_CufmdqWCLI8tnVo1MgZhQ6F_Jw=k-s256",
+                "display_name": "onekram",
+                "link": "https://stackoverflow.com/users/21884343/onekram"
+            },
+            "is_answered": true,
+            "view_count": 157,
+            "answer_count": 2,
+            "score": 2,
+            "last_activity_date": 1734400795,
+            "creation_date": 1734038274,
+            "last_edit_date": 1734400795,
+            "question_id": 79276625,
+            "body_markdown": "While writing a multithreaded application I encountered a problem that the multithreaded version runs as long as the single threaded one. \r\n\r\nI realize that I use `java.util.Random` shared between threads. So I change to `ThreadLocalRandom`.\r\n\r\nI have a question, why is `Random` designed in such a way that it requires thread synchronization? Same question for `SecureRandom`.",
+            "link": "https://stackoverflow.com/questions/79276625/why-java-util-random-need-to-be-synchronized",
+            "title": "Why java.util.Random need to be synchronized?"
+        }
+    ],
+    "has_more": false,
+    "quota_max": 10000,
+    "quota_remaining": 9949
+}
